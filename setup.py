@@ -34,8 +34,20 @@ packages = find_packages(exclude="tests")
 
 long_description = read('README.rst')
 
+required = []
+dependency_links = []
 with open("requirements.txt") as f:
-    required = f.read().splitlines()
+    for line in f.read().splitlines():
+        if line.startswith('git'):
+            _, url = line.split('+')
+            pkg_name = url[url.index('=')+1:]
+            dependency_links.append(url)
+            required.append(pkg_name)
+        else:
+            required.append(line)
+
+print(required)
+print(dependency_links)
 
 setup (
     name = "bluebrick",
@@ -50,6 +62,7 @@ setup (
     include_package_data = True,
     packages = packages,
     install_requires = required,
+    dependency_links = dependency_links,
     entry_points = {
             'console_scripts': [
                     'bluebrick = bluebrick.bluebrick:main'

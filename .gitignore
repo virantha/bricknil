@@ -1,6 +1,8 @@
 *.py[cod]
 *.swp
 
+# adafruit checkout
+Adafruit_Python_BluefruitLE/*
 # C extensions
 *.so
 
