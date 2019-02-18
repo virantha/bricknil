@@ -9,9 +9,9 @@ BlueBrick Documentation (version |release|)
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-   blubrick
+   bluebrick
    readme
    contributing
    authors

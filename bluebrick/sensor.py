@@ -11,33 +11,29 @@ class InternalMotor(Peripheral):
         the motor's current speed and position.  You don't need to use the sensors, and
         can treat this as strictly an output.
 
-        Examples
-        --------
-        ~~~~
-        # Basic connection to the motor on Port A
-        @attach(InternalMotor, 'left_motor', port=InternalMotor.Port.A)
+        Examples::
 
-        # Basic connection to both motors at the same time (virtual I/O port).
-        # Any speed command will cause both motors to rotate at the same speed
-        @attach(InternalMotor, 'motors', port=InternalMotor.Port.AB)
+            # Basic connection to the motor on Port A
+            @attach(InternalMotor, 'left_motor', port=InternalMotor.Port.A)
 
-        # Report back when motor speed changes. You must have a motors_change method defined 
-        @attach(InternalMotor, 'motors', port=InternalMotor.Port.A, capabilities=['sense_speed'])
-        # Only report back when speed change exceeds 5 units
-        @attach(InternalMotor, 'motors', port=InternalMotor.Port.A, capabilities=[('sense_speed', 5)])
-        ~~~~
+            # Basic connection to both motors at the same time (virtual I/O port).
+            # Any speed command will cause both motors to rotate at the same speed
+            @attach(InternalMotor, 'motors', port=InternalMotor.Port.AB)
 
-        See Also
-        --------
-        TrainMotor: class for connecting to a train motor
+            # Report back when motor speed changes. You must have a motors_change method defined 
+            @attach(InternalMotor, 'motors', port=InternalMotor.Port.A, capabilities=['sense_speed'])
+            # Only report back when speed change exceeds 5 units
+            @attach(InternalMotor, 'motors', port=InternalMotor.Port.A, capabilities=[('sense_speed', 5)])
+
+        See Also:
+            :class:`TrainMotor` for connecting to a train motor
 
     """
     _sensor_id = 0x0027
     _DEFAULT_THRESHOLD=2
     """Set to 2 to avoid a lot of updates since the speed seems to oscillate a lot"""
 
-    capability = Enum("InternalMotor", {"sense_speed":1, "sense_pos":2})
-    """Two sensing capabilities `sense_speed` and `sense_pos`"""
+    capability = Enum("capability", {"sense_speed":1, "sense_pos":2})
 
     Port = Enum('Port', 'A B AB', start=0)
     """Address either motor A or Motor B, or both AB at the same time"""
@@ -46,13 +42,12 @@ class InternalMotor(Peripheral):
     datasets = { capability.sense_speed: (1, 1),
                  capability.sense_pos: (1, 4),
                 }
-    """ Dict of cap: (num_datasets, bytes_per_dataset).
+    """ Dict of (num_datasets, bytes_per_dataset).
        `sense_speed` (1-byte), and `sense_pos` (uint32)"""
 
     allowed_combo = [ capability.sense_speed,
                       capability.sense_pos,
                     ]
-    """Allows any combination of speed or position sensing"""
 
     def __init__(self, name, port=None, capabilities=[]):
         """Maps the port names `A`, `B`, `AB` to hard-coded port numbers"""
@@ -62,13 +57,11 @@ class InternalMotor(Peripheral):
         super().__init__(name, port, capabilities)
     
     async def set_speed(self, speed):
-        """Sets the speed of the motor, and calls the Peripheral._convert_speed method
+        """Sets the speed of the motor, and calls the :func:`bluebrick.peripheral.Peripheral._convert_speed` method
            to do some sanity checking and bounding.
 
-           Parameters
-           ----------
-           speed : int
-                   -100 to 100 (I believe this is a percentage
+           Args:
+               speed (int) : -100 to 100 (I believe this is a percentage)
         """
         speed = self._convert_speed(speed)
         mode = 0
@@ -89,50 +82,45 @@ class VisionSensor(Peripheral):
         Any combination of sense_color, sense_distance, sense_count, sense_reflectivity, 
         and sense_rgb is supported.
 
-        Examples
-        --------
-        ~~~~
-        # Basic distance sensor
-        @attach(VisionSensor, 'vision', capabilities=['sense_color'])
-        # Or use the capability Enum
-        @attach(VisionSensor, 'vision', capabilities=[VisionSensor.capability.sense_color])
+        Examples::
 
-        # Distance and color sensor
-        @attach(VisionSensor, 'vision', capabilities=['sense_color', 'sense_distance'])
+            # Basic distance sensor
+            @attach(VisionSensor, 'vision', capabilities=['sense_color'])
+            # Or use the capability Enum
+            @attach(VisionSensor, 'vision', capabilities=[VisionSensor.capability.sense_color])
 
-        # Distance and rgb sensor with different thresholds to trigger updates
-        @attach(VisionSensor, 'vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
-        ~~~~
+            # Distance and color sensor
+            @attach(VisionSensor, 'vision', capabilities=['sense_color', 'sense_distance'])
+
+            # Distance and rgb sensor with different thresholds to trigger updates
+            @attach(VisionSensor, 'vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
 
         The values returned by the sensor will always be available in the instance variable
         `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are 
-        enabled, the following values will be stored and updated:
+        enabled, the following values will be stored and updated::
 
-        ~~~~
-        self.value = { VisionSensor.capability.sense_color:  uint8,
-                       VisionSensor.capability.sense_rgb: 
-                                        [ uint16, uint16, uint16 ]
-                     }
-        ~~~~
+            self.value = { VisionSensor.capability.sense_color:  uint8,
+                           VisionSensor.capability.sense_rgb: 
+                                            [ uint16, uint16, uint16 ]
+                         }
 
-        Notes
-        -----
-        The actual modes supported by the sensor are as follows:
+        Notes:
+            The actual modes supported by the sensor are as follows:
 
-        -  0 = color (0-10)
-        -  1 = IR proximity (0-7)
-        -  2 = count (32-bit int)
-        -  3 = Reflt   (inverse of distance when closer than 1")
-        -  4 = Amb  (distance when closer than 1")
-        -  5 = COL (output) ?
-        -  6 = RGB I
-        -  7 = IR tx (output) ?
-        -  8 = combined:  Color byte, Distance byte, 0xFF, Reflected light
+            -  0 = color (0-10)
+            -  1 = IR proximity (0-7)
+            -  2 = count (32-bit int)
+            -  3 = Reflt   (inverse of distance when closer than 1")
+            -  4 = Amb  (distance when closer than 1")
+            -  5 = COL (output) ?
+            -  6 = RGB I
+            -  7 = IR tx (output) ?
+            -  8 = combined:  Color byte, Distance byte, 0xFF, Reflected light
 
     """
 
     _sensor_id = 0x0025
-    capability = Enum("ColorSensor", 
+    capability = Enum("capability", 
                       [('sense_color', 0),
                        ('sense_distance', 1),
                        ('sense_count', 2),
@@ -155,15 +143,12 @@ class VisionSensor(Peripheral):
                       capability.sense_reflectivity,
                       capability.sense_rgb,
                     ]
-    """any combination of sense_color, sense_distance, sense_count, sense_reflectivity, 
-       and sense_rgb can be registered for updates
-    """
 
 class InternalTiltSensor(Peripheral):
     """
         Access the internal tilt sensor in the Boost Move Hub.
         
-        The various modes are described below:
+        The various modes are:
 
         - **sense_angle** - X, Y angles.  Both are 0 if hub is lying flat with button up
         - **sense_tilt** - value from 0-9 if hub is tilted around any of its axis. Seems to be
@@ -181,32 +166,28 @@ class InternalTiltSensor(Peripheral):
 
         Any combination of the above modes are allowed.
 
-        Examples
-        --------
-        ~~~~
-        # Basic tilt sensor
-        @attach(InternalTiltSensor, 'tilt', capabilities=['sense_tilt'])
-        # Or use the capability Enum
-        @attach(InternalTiltSensor, 'tilt', capabilities=[InternalTiltSensor.sense_tilt])
+        Examples::
 
-        # Tilt and orientation sensor
-        @attach(InternalTiltSensor, 'tilt', capabilities=['sense_tilt, sense_orientation'])
+            # Basic tilt sensor
+            @attach(InternalTiltSensor, 'tilt', capabilities=['sense_tilt'])
+            # Or use the capability Enum
+            @attach(InternalTiltSensor, 'tilt', capabilities=[InternalTiltSensor.sense_tilt])
 
-        ~~~~
+            # Tilt and orientation sensor
+            @attach(InternalTiltSensor, 'tilt', capabilities=['sense_tilt, sense_orientation'])
 
-        The values returned by the sensor will always be available in the instance variable
-        `self.value`.  For example, when the `sense_angle` and `sense_orientation` capabilities are 
-        enabled, the following values will be stored and updated:
+        The values returned by the sensor will always be available in the
+        instance variable `self.value`.  For example, when the `sense_angle`
+        and `sense_orientation` capabilities are enabled, the following values
+        will be stored and updated::
 
-        ~~~~
-        self.value = { InternalTiltSensor.capability.sense_angle:  [uint8, uint8],
-                       InternalTiltSensor.capability.sense_orientation: 
-                                        Enum(InternalTiltSensor.orientation)
-                     }
-        ~~~~
+            self.value = { InternalTiltSensor.capability.sense_angle:  [uint8, uint8],
+                           InternalTiltSensor.capability.sense_orientation: 
+                                            Enum(InternalTiltSensor.orientation)
+                         }
     """
     _sensor_id = 0x0028
-    capability = Enum("InternalTiltSensor", 
+    capability = Enum("capability", 
                       [('sense_angle', 0),
                        ('sense_tilt', 1),
                        ('sense_orientation', 2),
@@ -228,7 +209,7 @@ class InternalTiltSensor(Peripheral):
                       capability.sense_acceleration_3_axis,
                     ]
 
-    orientation = Enum('Orientation', 
+    orientation = Enum('orientation', 
                         {   'up': 0,
                             'right': 1, 
                             'left': 2, 
@@ -250,16 +231,14 @@ class InternalTiltSensor(Peripheral):
 
 
 class LED(Peripheral):
-    """ Changes the LED color on the Hubs
-        ~~~~
-        @attach(LED, 'hub_led')
+    """ Changes the LED color on the Hubs::
 
-        self.hub_led.set_output(Color.red)
-        ~~~~
+            @attach(LED, 'hub_led')
 
-        Warnings
-        --------
-        No support yet for the standalone LEDs that connect to the Hub ports.
+            self.hub_led.set_output(Color.red)
+
+        Warnings:
+            No support yet for the standalone LEDs that connect to the Hub ports.
 
     """
     _sensor_id = 0x0017
@@ -282,31 +261,26 @@ class TrainMotor(Peripheral):
         TrainMotor has no sensing capabilities and only supports a single output mode that
         sets the speed.
 
-        Usage
-        -----
-        ~~~~
-        @attach(TrainMotor, 'train')
-        ~~~~
-        And then within the run body, use:
-        ~~~~
-        self.train.set_speed(speed)
-        ~~~~
+        Examples::
 
-        See Also
-        --------
-        InternalMotor
+            @attach(TrainMotor, 'train')
+
+        And then within the run body, use::
+
+            self.train.set_speed(speed)
+
+        See Also:
+            InternalMotor
     """
     _sensor_id = 0x0002
 
     async def set_speed(self, speed):
         """ Validate and set the train speed
 
-            Parameters
-            ----------
-            speed : int
-                Range -100 to 100 where negative numbers are reverse.
-                Use 0 to put the motor into neutral.
-                255 will do a hard brake
+            Args:
+                speed (int) : Range -100 to 100 where negative numbers are reverse.
+                    Use 0 to put the motor into neutral.
+                    255 will do a hard brake
         """
         speed = self._convert_speed(speed)
         await self.set_output(0, speed)
@@ -319,17 +293,16 @@ class Button(Peripheral):
         through Hub property messages.  We abstract away these special messages to make the
         button appear to be like any other peripheral sensor.
 
-        Examples
-        --------
-        ~~~~
-        @attach(Button, 'hub_btn')
-        ~~~~
+        Examples::
 
-        Notes
-        -----
-        Since there is no attach I/O message from the hub to trigger the `Button.activate_updates` method, 
-        we instead insert a fake "attaach" message from this fake sensor on port 255 in
-        the `BLEventQ.get_messages` method that is used to register for updates from a given sensor.
+            @attach(Button, 'hub_btn')
+
+        Notes:
+            Since there is no attach I/O message from the hub to trigger the
+            :func:`activate_updates` method, we instead insert a fake
+            "attaach" message from this fake sensor on port 255 in the
+            `BLEventQ.get_messages` method that is used to register for updates
+            from a given sensor.
 
     """
     _sensor_id = 0x0005
