@@ -189,6 +189,7 @@ class Message:
         # No matching port name, so let's just search for the name and assign the port
         for peripheral_name, peripheral in self.hub.peripherals.items():
             if peripheral.sensor_name == device_name and peripheral.port == None:
+                print("ASSIGNING PORT")
                 peripheral.port = port
                 return peripheral
         return None
@@ -226,7 +227,6 @@ class Message:
             msg_bytes.pop(0) # pop off MSB that's always 0 
             l.append(f'{device_name}')
 
-
             # Send a message saying this port is detected, in case the hub
             # wants to query for more properties
             self.hub.peripheral_queue.put( (port, 'port_detected'))
@@ -239,6 +239,7 @@ class Message:
                 l.append(f':Attached to handler:')
                 # Now, we should activate updates from this sensor
                 self.hub.peripheral_queue.put( (peripheral, 'attach'))
+            self.hub.peripheral_queue.put( ((port, self.port_info[port]), 'update_port'))
 
         if attach:
             for ver_type in ['HW', 'SW']:
@@ -254,7 +255,6 @@ class Message:
             l.append(f'Port A: {port0}, Port B: {port1}')
             self._add_port_info(port, 'virtual', (port0, port1))
 
-        self.hub.peripheral_queue.put( ((port, self.port_info[port]), 'update_port'))
         return l
 
 

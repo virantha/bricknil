@@ -131,7 +131,7 @@ class Peripheral(Process):
 
     async def activate_updates(self):
         """ Send a message to the sensor to activate updates"""
-        assert self.port, "Cannot activate sensor before it's been attached!"
+        assert self.port is not None, f"Cannot activate updates on sensor before it's been attached to {self.name}!"
         if len(self.capabilities) == 0: 
             # Nothing to do since no capabilities defined
             return

@@ -1,3 +1,5 @@
+from curio import current_task, spawn  # Needed for motor speed ramp
+
 from enum import Enum
 from .const import Color
 
@@ -10,6 +12,13 @@ class InternalMotor(Peripheral):
         Unlike the train motors, these motors have a built-in sensor for sending back
         the motor's current speed and position.  You don't need to use the sensors, and
         can treat this as strictly an output.
+
+        .. graphviz::
+
+            digraph {
+               "from" -> "to"
+            }
+
 
         Examples::
 
@@ -269,10 +278,19 @@ class TrainMotor(Peripheral):
 
             self.train.set_speed(speed)
 
+        Attributes:
+            speed (int) : Keep track of the current speed in order to ramp it
+
         See Also:
-            InternalMotor
+            `InternalMotor`
     """
     _sensor_id = 0x0002
+
+    def __init__(self, name, port=None, capabilities=[]):
+        """Initialize current speed to 0"""
+        self.speed = 0
+        self.ramp_in_progress_task = None
+        super().__init__(name, port, capabilities)
 
     async def set_speed(self, speed):
         """ Validate and set the train speed
@@ -282,9 +300,57 @@ class TrainMotor(Peripheral):
                     Use 0 to put the motor into neutral.
                     255 will do a hard brake
         """
+
+        # Check if there's a ramp task in progress
+        if self.ramp_in_progress_task:
+            # Check if it's this current task or not
+            current = await current_task()
+            if current == self.ramp_in_progress_task:
+                # Everything is ok!
+                pass
+            else:
+                # Someone else is trying to set the speed
+                # outside the ramp, so cancel the ramp!
+                await self.ramp_in_progress_task.cancel()
+                self.ramp_in_progress_task = None
+
+        # WHo's trying t
         speed = self._convert_speed(speed)
+        self.speed = speed
         await self.set_output(0, speed)
         
+    async def ramp_speed(self, target_speed, ramp_time_ms):
+        """Ramp the speed by 10 units in the time given
+
+        """
+        TIME_STEP_MS = 100 
+        target_speed = self._convert_speed(speed)
+        if self.ramp_in_progress_task:
+            # IF there's a ramp already in progress, cancel it
+            await self.ramp_in_progress_task.cancel()
+
+        # 500ms ramp time, 100ms per step
+        # Therefore, number of steps = 500/100 = 5
+        # Therefore speed_step = speed_diff/5
+        number_of_steps = ramp_time_ms/TIME_STEP_MS
+        speed_diff = target_speed - self.speed
+        speed_step = speed_diff/number_of_steps
+
+        current_step = 0
+        async def _ramp_speed():
+            while current_step < number_of_steps:
+                next_speed = self.speed + speed_step
+                current_step +=1 
+                if current_step == number_of_steps: 
+                    next_speed = target_speed
+                await self.set_speed(next_speed)
+                await sleep(TIME_STEP_MS)
+
+        self.ramp_in_progress_task = await spawn(_ramp_speed, daemon = True)
+
+
+
+
 class Button(Peripheral):
     """ Register to be notified of button presses on the Hub (Boost or PoweredUp)
 
