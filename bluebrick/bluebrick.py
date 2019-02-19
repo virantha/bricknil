@@ -103,6 +103,12 @@ async def _run_all(ble, system):
         task_listen = await spawn(hub.peripheral_message_loop())
         hub_peripheral_listen_tasks.append(task_listen)
 
+        # Need to wait here until all the ports are set
+        for name, peripheral in hub.peripherals.items():
+            while peripheral.port is None:
+                print(f"Waiting for peripheral {name} to attach to a port")
+                await sleep(1)
+
         # Start each hub
         task_run = await spawn(hub.run())
         hub_tasks.append(task_run)

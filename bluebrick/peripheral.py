@@ -93,7 +93,7 @@ class Peripheral(Process):
         await self.message_handler(msg, msg_bytes)
 
     # Use this for motors and leds
-    def _convert_speed(self, speed):
+    def _convert_speed_to_val(self, speed):
         # -100 to 100 (negative means reverse)
         # 0 is floating
         # 127 is brake
@@ -103,6 +103,7 @@ class Peripheral(Process):
             # Now, truncate to 8-bits
             speed = speed & 255 # Or I guess I could do 256-abs(s)
         return speed
+
 
     async def set_output(self, mode, value):
         """Don't change this unless you're changing the way you do a Port Output command"""

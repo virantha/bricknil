@@ -1,4 +1,4 @@
-from curio import current_task, spawn  # Needed for motor speed ramp
+from curio import sleep, current_task, spawn  # Needed for motor speed ramp
 
 from enum import Enum
 from .const import Color
@@ -66,13 +66,13 @@ class InternalMotor(Peripheral):
         super().__init__(name, port, capabilities)
     
     async def set_speed(self, speed):
-        """Sets the speed of the motor, and calls the :func:`bluebrick.peripheral.Peripheral._convert_speed` method
+        """Sets the speed of the motor, and calls the :func:`bluebrick.peripheral.Peripheral._convert_speed_to_val` method
            to do some sanity checking and bounding.
 
            Args:
                speed (int) : -100 to 100 (I believe this is a percentage)
         """
-        speed = self._convert_speed(speed)
+        speed = self._convert_speed_to_val(speed)
         mode = 0
         await self.set_output(mode, speed)
         
@@ -315,16 +315,15 @@ class TrainMotor(Peripheral):
                 self.ramp_in_progress_task = None
 
         # WHo's trying t
-        speed = self._convert_speed(speed)
         self.speed = speed
-        await self.set_output(0, speed)
+        await self.set_output(0, self._convert_speed_to_val(speed))
         
     async def ramp_speed(self, target_speed, ramp_time_ms):
         """Ramp the speed by 10 units in the time given
 
         """
         TIME_STEP_MS = 100 
-        target_speed = self._convert_speed(speed)
+        #target_speed = self._convert_speed_to_val(target_speed)
         if self.ramp_in_progress_task:
             # IF there's a ramp already in progress, cancel it
             await self.ramp_in_progress_task.cancel()
@@ -335,16 +334,20 @@ class TrainMotor(Peripheral):
         number_of_steps = ramp_time_ms/TIME_STEP_MS
         speed_diff = target_speed - self.speed
         speed_step = speed_diff/number_of_steps
+        start_speed = self.speed
+        self.message(f'ramp_speed steps: {number_of_steps}, speed_diff: {speed_diff}, speed_step: {speed_step}')
 
         current_step = 0
         async def _ramp_speed():
+            nonlocal current_step  # Since this is being assigned to, we need to mark it as coming from the enclosed scope
             while current_step < number_of_steps:
-                next_speed = self.speed + speed_step
+                next_speed = int(start_speed + current_step*speed_step)
+                self.message(f'Setting next_speed: {next_speed}')
                 current_step +=1 
                 if current_step == number_of_steps: 
                     next_speed = target_speed
                 await self.set_speed(next_speed)
-                await sleep(TIME_STEP_MS)
+                await sleep(TIME_STEP_MS/1000)
 
         self.ramp_in_progress_task = await spawn(_ramp_speed, daemon = True)
 
