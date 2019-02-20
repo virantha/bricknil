@@ -6,12 +6,29 @@
 BlueBrick Documentation (version |release|)
 ====================================================
 
-Contents:
+API
+=================
+:doc:`bluebrick`
+
+.. autosummary::
+   :toctree: _autosummary
+
+   bluebrick.bluebrick
+   bluebrick.hub
+   bluebrick.ble_queue
+   bluebrick.messages
+   bluebrick.sensor
+   bluebrick.peripheral
+   bluebrick.process
+   bluebrick.const
+   
+
+Other Documentation
+===================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
-   bluebrick
    readme
    contributing
    authors
@@ -29,6 +46,7 @@ Changelog
 .. include:: ../CHANGES.rst
 
 .. include:: ../TODO.rst
+
 
 Indices and tables
 ==================

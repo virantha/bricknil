@@ -21,20 +21,17 @@ class attach():
         you need to ensure your `Peripheral` sub-class has the matching
         call-back method 'peripheralname_change'.  
 
-        Usage
-        -----
-        ~~~~
-        @attach(PeripheralType, 
-                name="instance name", 
-                port='port', 
-                capabilities=[])
-        ~~~~
+        Examples::
 
-        Warning
-        -------
-        - No support for checking to make sure user put in correct parameters
-        - Identifies capabilities that need a callback update handler based purely on
-          checking if the capability name starts with the string "sense*"
+            @attach(PeripheralType, 
+                    name="instance name", 
+                    port='port', 
+                    capabilities=[])
+
+        Warnings:
+            - No support for checking to make sure user put in correct parameters
+            - Identifies capabilities that need a callback update handler based purely on
+              checking if the capability name starts with the string "sense*"
 
     """
     def __init__(self, peripheral_type, **kwargs):
@@ -134,12 +131,9 @@ def _curio_event_run(ble, system):
         starting all the hubs with the message queue to the bluetooth
         communcation thread loop.
 
-        Parameters
-        ----------
-        ble 
-            The Adafruit_BluefruitLE interface object
-        system
-            Coroutine that the user provided to instantate their system
+        Args:
+            ble : The Adafruit_BluefruitLE interface object
+            system :  Coroutine that the user provided to instantate their system
 
     """
     run(_run_all(ble, system), with_monitor=True)

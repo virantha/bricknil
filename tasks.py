@@ -12,7 +12,7 @@ def docs(c):
         print("Running sphinx in docs/ and building to ~/dev/githubpages/bluebrick")
         c.run("make clean")
         c.run("make html")
-        c.run("cp -R ../test/htmlcov %s/html/testing" % githubpages)
+        #c.run("cp -R ../test/htmlcov %s/html/testing" % githubpages)
     with c.cd(githubpages):
         c.run("git add .")
         c.run('git commit -am "doc update"')

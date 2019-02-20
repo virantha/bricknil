@@ -31,6 +31,7 @@ import pkg_resources
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.graphviz',
@@ -342,3 +343,5 @@ epub_copyright = u'2013, Author'
 
 # If false, no index is generated.
 #epub_use_index = True
+
+autosummary_generate = True
