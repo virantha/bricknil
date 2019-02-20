@@ -1,0 +1,28 @@
+bluebrick.messages
+==================
+
+.. automodule:: bluebrick.messages
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Message
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      UnknownMessageError
+   
+   

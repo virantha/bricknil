@@ -1,8 +1,16 @@
-blubrick package
-================
+BlueBrick API Documentation
+===========================
 
 Submodules
 ~~~~~~~~~~
+
+bluebrick.bluebrick module
+---------------------------
+.. automodule:: bluebrick.bluebrick
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :private-members:
 
 bluebrick.peripheral module
 ---------------------------
@@ -14,7 +22,6 @@ bluebrick.peripheral module
 
 bluebrick.sensor module
 ------------------------
-
 .. automodule:: bluebrick.sensor
     :members:
     :undoc-members:
