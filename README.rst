@@ -11,7 +11,7 @@ event programming built on top of the Curio_ async library.
 
 * Free and open-source software: ASL2 license
 * Blog: http://virantha.com/category/projects/bluebrick
-* Documentation: http://virantha.github.io/bluebrick/html
+* Documentation: http://virantha.github.io/bluebrick
 * Source: https://github.com/virantha/bluebrick
 
 Features

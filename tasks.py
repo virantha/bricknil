@@ -3,8 +3,13 @@ from bluebrick.version import __version__
 
 @task
 def pypi(c):
+    ver = __version__
     c.run('python setup.py bdist_wheel')
-    c.run(f'python -m twine upload dist/bluebrick-{__version__}-py3-none-any.whl')
+    c.run(f'python -m twine upload dist/bluebrick-{ver}-py3-none-any.whl')
+    c.run(f'git commit -am "Committing everything for release {ver}"')
+    c.run(f'git tag -a v{ver} -m "Tagging release {ver}"')
+    c.run(f'git push')
+    c.run(f'git push --tags')
 
 @task
 def docs(c):
