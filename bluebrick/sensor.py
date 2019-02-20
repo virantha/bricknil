@@ -252,7 +252,7 @@ class LED(Peripheral):
     """
     _sensor_id = 0x0017
 
-    async def set_output(self, color: Color):
+    async def set_color(self, color: Color):
         """ Converts a Color enumeration to a color value"""
 
         # For now, only support preset colors
@@ -260,8 +260,9 @@ class LED(Peripheral):
         col = color.value
         assert col < 11
         mode = 0
-        b = [0x00, 0x81, self.port, 0x11, 0x51, mode, col ]
-        await self.send_message(f'set color to {color}', b)
+        await self.set_output(mode, col)
+        #b = [0x00, 0x81, self.port, 0x11, 0x51, mode, col ]
+        #await self.message_info(f'set color to {color}')
 
 class TrainMotor(Peripheral):
     """
@@ -385,11 +386,21 @@ class Button(Peripheral):
     """Piggy back the hub button off the normal peripheral button id 0x0005.
        Might need to change this in the future"""
 
+    capability = Enum('capability', {'sense_press':0})
+
+    datasets = { capability.sense_press: (1,1)
+               }
+    allowed_combo = [capability.sense_press]
+
     def __init__(self, name, port=None, capabilities=[]):
         """Call super-class with port set to 255 """
         super().__init__(name, 255, capabilities)
 
     async def activate_updates(self):
         """Use a special Hub Properties button message updates activation message"""
+        self.value = {}
+        for cap in self.capabilities:
+            self.value[cap] = [None]*self.datasets[cap][0]
+
         b = [0x00, 0x01, 0x02, 0x02]  # Button reports from "Hub Properties Message Type"
         await self.send_message(f'Activate button reports: port {self.port}', b) 

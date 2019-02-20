@@ -17,9 +17,6 @@ Contents
    authors
    api
 
-Recent Changes
-==============
-.. include:: ../CHANGES_RECENT.rst
 
 Testing
 ================

@@ -1,14 +1,36 @@
 ============
-Contributing
+Development
 ============
+
+How-to
+------
+Make sure to install all the dev packages in your local environment::
+
+   pip install -r requirements-dev.txt
+
+* **Making the documentation**::
+    
+       cd docs
+       make html
+   
+  Docs by default are built in `../../githubdocs/bluebrick`, but you can change this in 
+  `docs/Makefile`.
+
+* **Deploying documentation**: Documentation is hosted on github pages.  We use fabric (see `tasks.py`) for deploying::
+
+      invoke docs
+
+* **Testing**: TODO
+
+* **Coverage**: TODO
+
+Contributing
+----------------------
 
 Contributions are welcome, and they are greatly appreciated! Every
 little bit helps, and credit will always be given. 
 
 You can contribute in many ways:
-
-Types of Contributions
-----------------------
 
 Report Bugs
 ~~~~~~~~~~~

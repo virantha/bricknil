@@ -6,8 +6,8 @@ def docs(c):
     with c.cd(githubpages):
         c.run('git checkout gh-pages')
         c.run('git pull origin gh-pages')
-    c.run("head CHANGES.rst > CHANGES_RECENT.rst")
-    c.run("tail -n 1 CHANGES.rst >> CHANGES_RECENT.rst")
+    #c.run("head CHANGES.rst > CHANGES_RECENT.rst")
+    #c.run("tail -n 1 CHANGES.rst >> CHANGES_RECENT.rst")
     with c.cd("docs"):
         print("Running sphinx in docs/ and building to ~/dev/githubpages/bluebrick")
         c.run("make clean")
