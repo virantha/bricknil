@@ -356,9 +356,8 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 
 .. |image_pypi| image:: https://badge.fury.io/py/bluebrick.png
    :target: https://pypi.python.org/pypi/bluebrick
-.. |image_downloads| image:: https://pypip.in/d/bluebrick/badge.png
-   :target: https://crate.io/packages/bluebrick?version=latest
-.. |image_license| image:: https://pypip.in/license/bluebrick/badge.png
+.. |image_downloads| image:: https://img.shields.io/pypi/dd/bluebrick.svg
+.. |image_license| image:: https://img.shields.io/pypi/l/bluebrick.svg
 .. |passing| image:: https://scrutinizer-ci.com/g/virantha/bluebrick/badges/build.png?b=master
 .. |quality| image:: https://scrutinizer-ci.com/g/virantha/bluebrick/badges/quality-score.png?b=master
 .. |Coverage Status| image:: https://coveralls.io/repos/virantha/bluebrick/badge.png?branch=develop
