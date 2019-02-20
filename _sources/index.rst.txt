@@ -8,7 +8,6 @@ BlueBrick Documentation (version |release|)
 
 API
 =================
-:doc:`bluebrick`
 
 .. autosummary::
    :toctree: _autosummary
