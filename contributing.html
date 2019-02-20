@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Contributing &#8212; BlueBrick 0.1 documentation</title>
+    <title>Development &#8212; BlueBrick 0.1 documentation</title>
     <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -50,13 +50,39 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="contributing">
-<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="development">
+<h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-to">
+<h2>How-to<a class="headerlink" href="#how-to" title="Permalink to this headline">¶</a></h2>
+<p>Make sure to install all the dev packages in your local environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">-</span><span class="n">dev</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first"><strong>Making the documentation</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">docs</span>
+<span class="n">make</span> <span class="n">html</span>
+</pre></div>
+</div>
+<p>Docs by default are built in <cite>../../githubdocs/bluebrick</cite>, but you can change this in
+<cite>docs/Makefile</cite>.</p>
+</li>
+<li><p class="first"><strong>Deploying documentation</strong>: Documentation is hosted on github pages.  We use fabric (see <cite>tasks.py</cite>) for deploying:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">invoke</span> <span class="n">docs</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Testing</strong>: TODO</p>
+</li>
+<li><p class="first"><strong>Coverage</strong>: TODO</p>
+</li>
+</ul>
+</div>
+<div class="section" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
 <p>Contributions are welcome, and they are greatly appreciated! Every
 little bit helps, and credit will always be given.</p>
 <p>You can contribute in many ways:</p>
-<div class="section" id="types-of-contributions">
-<h2>Types of Contributions<a class="headerlink" href="#types-of-contributions" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="report-bugs">
 <h3>Report Bugs<a class="headerlink" href="#report-bugs" title="Permalink to this headline">¶</a></h3>
 <p>Report bugs at <a class="reference external" href="https://github.com/virantha/bluebrick/issues">https://github.com/virantha/bluebrick/issues</a>.</p>
@@ -159,8 +185,9 @@ and make sure that the tests pass for all supported Python versions.</li>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Contributing</a><ul>
-<li><a class="reference internal" href="#types-of-contributions">Types of Contributions</a><ul>
+<li><a class="reference internal" href="#">Development</a><ul>
+<li><a class="reference internal" href="#how-to">How-to</a></li>
+<li><a class="reference internal" href="#contributing">Contributing</a><ul>
 <li><a class="reference internal" href="#report-bugs">Report Bugs</a></li>
 <li><a class="reference internal" href="#fix-bugs">Fix Bugs</a></li>
 <li><a class="reference internal" href="#implement-features">Implement Features</a></li>

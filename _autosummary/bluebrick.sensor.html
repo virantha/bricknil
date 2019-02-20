@@ -112,6 +112,28 @@ from a given sensor.</p>
 <dd><p>Use a special Hub Properties button message updates activation message</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="bluebrick.sensor.Button.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_press: 0&gt;]</em><a class="headerlink" href="#bluebrick.sensor.Button.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.Button.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bluebrick.sensor.Button.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.Button.capability.sense_press">
+<code class="descname">sense_press</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.sensor.Button.capability.sense_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.Button.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_press: 0&gt;: (1, 1)}</em><a class="headerlink" href="#bluebrick.sensor.Button.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -364,8 +386,8 @@ special to the self.value dict.</p>
 <p class="last">No support yet for the standalone LEDs that connect to the Hub ports.</p>
 </div>
 <dl class="method">
-<dt id="bluebrick.sensor.LED.set_output">
-<code class="descname">set_output</code><span class="sig-paren">(</span><em>color: bluebrick.const.Color</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/sensor.html#LED.set_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.LED.set_output" title="Permalink to this definition">¶</a></dt>
+<dt id="bluebrick.sensor.LED.set_color">
+<code class="descname">set_color</code><span class="sig-paren">(</span><em>color: bluebrick.const.Color</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/sensor.html#LED.set_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.LED.set_color" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a Color enumeration to a color value</p>
 </dd></dl>
 

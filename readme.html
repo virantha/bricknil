@@ -17,7 +17,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="next" title="Development" href="contributing.html" />
     <link rel="prev" title="BlueBrick Docs (version 0.1)" href="index.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -36,7 +36,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="contributing.html" title="Contributing"
+          <a href="contributing.html" title="Development"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="BlueBrick Docs (version 0.1)"
@@ -89,7 +89,7 @@ event programming built on top of the <a class="reference external" href="http:/
 </dd>
 </dl>
 </li>
-<li>Fully supports Python asynchronous keywords and co-routines</li>
+<li>Fully supports Python asynchronous keywords and coroutines</li>
 <li><dl class="first docutils">
 <dt>Allows expressive concurrent programming using async/await syntax</dt>
 <dd><ul class="first last">
@@ -109,33 +109,359 @@ event programming built on top of the <a class="reference external" href="http:/
 </li>
 </ul>
 </div>
-<div class="section" id="usage">
-<h2>Usage:<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>Here’s a simple program that will let you control a PoweredUp train motor:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
+<div class="section" id="building-a-simple-train-controller">
+<h2>Building a simple train controller<a class="headerlink" href="#building-a-simple-train-controller" title="Permalink to this headline">¶</a></h2>
+<p>Let’s build a simple program to control a LEGO® PoweredUp train.  The first thing to do
+is create a class that subclasses the Bluetooth hub that we’ll be using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="k">import</span> <span class="n">PoweredUpHub</span>
 
-<span class="kn">from</span> <span class="nn">curio</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">bluebrick</span> <span class="kn">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
-<span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="kn">import</span> <span class="n">BoostHub</span>
-<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="kn">import</span> <span class="n">VisionSensor</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
 
-<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
-<span class="k">class</span> <span class="nc">Robot</span><span class="p">(</span><span class="n">BoostHub</span><span class="p">):</span>
-    <span class="n">async</span> <span class="k">def</span> <span class="nf">vision_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;sensor change detected&#39;</span><span class="p">)</span>
+   <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="o">...</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">run</span></code> async function (it’s actually a coroutine) will contain the code that will control
+everything attached to this hub.  Speaking of which, because we’ll be wanting to control the train
+motor connected to this hub, we’d better attach it to the code like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="k">import</span> <span class="n">PoweredUpHub</span>
+<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="k">import</span> <span class="n">TrainMotor</span>
 
-    <span class="n">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+
+   <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="o">...</span>
+</pre></div>
+</div>
+<p>Now, we can access the motor functions by calling the object <cite>self.motor</cite> inside <cite>run</cite>.  For example,
+let’s say that we wanted to set the motor speed to 50 (the allowed range is -100 to 100 where negative
+numbers are reverse speeds):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="k">import</span> <span class="n">PoweredUpHub</span>
+<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="k">import</span> <span class="n">TrainMotor</span>
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+
+   <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+      <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># Wait 5 seconds before exiting</span>
+</pre></div>
+</div>
+<p>Notice that we’re using the <cite>await</cite> keyword in front of all the calls, because
+those are also asynchronous coroutines that will get run in the event loop.
+At some point, the <a class="reference internal" href="_autosummary/bluebrick.sensor.html#bluebrick.sensor.TrainMotor.set_speed" title="bluebrick.sensor.TrainMotor.set_speed"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.sensor.TrainMotor.set_speed()</span></code></a> coroutine
+will finish executing and control will return back to the statement after it.
+The next statement is a call to the <cite>sleep</cite> coroutine from the <cite>curio</cite>
+library. It’s important to use this, instead of the regular <em>function</em>
+<cite>time.sleep</cite> because <cite>curio.sleep</cite> is a coroutine that will <strong>not</strong> block
+other tasks from running.</p>
+<p>Note that we can use arbitrary Python to build our controller; suppose that we
+wanted to ramp the motor speed gradually to 80 over 5 seconds, and then reduce
+speed back to a stop in 1 second, and then repeat it over again.  We could implement
+the <cite>run</cite> logic as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="mi">5000</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="_autosummary/bluebrick.sensor.html#bluebrick.sensor.TrainMotor.ramp_speed" title="bluebrick.sensor.TrainMotor.ramp_speed"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.sensor.TrainMotor.ramp_speed()</span></code></a> function will ramp the speed from
+whatever it is currently to the target speed over the millisecond duration given (internally, it will
+change the train speed every 100ms).  Here, you can see how things are running concurrently:  we issue
+the ramp_speed command, that will take 5 seconds to complete in the background,
+so we need to make sure our control logic sleeps for 5 seconds too, to ensure
+the train has enough time to get up to speed, before we issue the braking command.  Once the train
+comes to a stop, it will stay stopped for 1 second, then repeat this sequence of speed changes
+once more before exiting.</p>
+<p>It’s also useful to print out what’s happening as we run our program. In order to facilitate that,
+there is some rudimentary logging capability built-in to <cite>bluebrick</cite> via the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.process.Process</span></code> class that all of these concurrent processes are sub-classed from.
+Here’s the run coroutine with logging statements via
+<code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.process.Process.message_info()</span></code> enabled:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;Increasing speed&#39;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="mi">5000</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;Coming to a stop&#39;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Of course, just running the above code isn’t quite enough to execute the
+controller.  Once we have the controller logic implemented, we need to define
+our entire system in a separate top-level coroutine like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">train</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;My train&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This coroutine instantiates all the hubs we want to control; once we have that,
+we can go ahead and implement the full program that calls
+<code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.start()</span></code> with this <cite>system</cite> coroutine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">bluebrick</span> <span class="k">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
+<span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="k">import</span> <span class="n">PoweredUpHub</span>
+<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="k">import</span> <span class="n">TrainMotor</span>
+<span class="kn">from</span> <span class="nn">bluebrick.process</span> <span class="k">import</span> <span class="n">Process</span>
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
-            <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-        <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;Increasing speed&#39;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="mi">5000</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;Coming to a stop&#39;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="n">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
-    <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="s1">&#39;vernie&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">train</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;My train&#39;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">Process</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">Process</span><span class="o">.</span><span class="n">MSG_LEVEL</span><span class="o">.</span><span class="n">INFO</span>
     <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
 </pre></div>
+</div>
+<p>Running this program will output the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BLE</span> <span class="n">Event</span> <span class="n">Q</span><span class="o">.</span><span class="mi">0</span><span class="p">:</span> <span class="n">Looking</span> <span class="k">for</span> <span class="n">first</span> <span class="n">matching</span> <span class="n">hub</span>
+<span class="n">BLE</span> <span class="n">Event</span> <span class="n">Q</span><span class="o">.</span><span class="mi">0</span><span class="p">:</span> <span class="n">Connected</span> <span class="n">to</span> <span class="n">device</span>
+<span class="n">BLE</span> <span class="n">Event</span> <span class="n">Q</span><span class="o">.</span><span class="mi">0</span><span class="p">:</span> <span class="n">Device</span> <span class="n">name</span> <span class="n">HUB</span> <span class="n">NO</span><span class="o">.</span><span class="mi">4</span>
+<span class="n">BLE</span> <span class="n">Event</span> <span class="n">Q</span><span class="o">.</span><span class="mi">0</span><span class="p">:</span> <span class="n">Device</span> <span class="nb">id</span> <span class="n">XXXX</span><span class="o">-</span><span class="n">XXXX</span>
+<span class="n">BLE</span> <span class="n">Event</span> <span class="n">Q</span><span class="o">.</span><span class="mi">0</span><span class="p">:</span> <span class="n">Device</span> <span class="n">advertised</span> <span class="p">[</span><span class="n">UUID</span><span class="p">(</span><span class="s1">&#39;XXXXX&#39;</span><span class="p">)]</span>
+<span class="n">My</span> <span class="n">train</span><span class="o">.</span><span class="mi">2</span><span class="p">:</span> <span class="n">Waiting</span> <span class="k">for</span> <span class="n">peripheral</span> <span class="n">motor</span> <span class="n">to</span> <span class="n">attach</span> <span class="n">to</span> <span class="n">a</span> <span class="n">port</span>
+<span class="n">My</span> <span class="n">train</span><span class="o">.</span><span class="mi">2</span><span class="p">:</span> <span class="n">Running</span>
+<span class="n">My</span> <span class="n">train</span><span class="o">.</span><span class="mi">2</span><span class="p">:</span> <span class="n">Increasing</span> <span class="n">speed</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Starting</span> <span class="n">ramp</span> <span class="n">of</span> <span class="n">speed</span><span class="p">:</span> <span class="mi">0</span> <span class="o">-&gt;</span> <span class="mi">80</span> <span class="p">(</span><span class="mf">5.0</span><span class="n">s</span><span class="p">)</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">0</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">1</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">3</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">4</span>
+<span class="o">...</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">80</span>
+<span class="n">My</span> <span class="n">train</span><span class="o">.</span><span class="mi">2</span><span class="p">:</span> <span class="n">Coming</span> <span class="n">to</span> <span class="n">a</span> <span class="n">stop</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Starting</span> <span class="n">ramp</span> <span class="n">of</span> <span class="n">speed</span><span class="p">:</span> <span class="mi">76</span> <span class="o">-&gt;</span> <span class="mi">0</span> <span class="p">(</span><span class="mf">1.0</span><span class="n">s</span><span class="p">)</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">76</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">68</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">60</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">53</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">45</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">38</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">30</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">22</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">15</span>
+<span class="n">motor</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span> <span class="n">Setting</span> <span class="n">speed</span> <span class="n">to</span> <span class="mi">0</span>
+<span class="o">...</span> <span class="n">repeats</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="integrating-a-vision-sensor-into-a-simple-train-controller">
+<h2>Integrating a vision sensor into a simple train controller<a class="headerlink" href="#integrating-a-vision-sensor-into-a-simple-train-controller" title="Permalink to this headline">¶</a></h2>
+<p>Now let’s build a controller that sets the speed of the train depending on how
+close your hand is to a snensor, and will quit the program if you wave your hand
+more than three times in front of it.</p>
+<p>We’ll be using the Vision Sensor that comes with the LEGO Boost robotics kit;
+plug the sensor into the second port of the train’s PoweredUP hub.  This sensor
+has a multitude of different sensing abilities including distance and color,
+but for this example, we’re just going to use the <cite>sense_count</cite> and
+<cite>sense_distance</cite> capabilities.  The former measures how many times it sees
+something pass in front of it at a distance of ~2 inches, while the latter
+measures roughly how many inches something is from the sensor (from 1-10
+inches).  For a full list of the supported capabilities, please see the API
+documentation at <a class="reference internal" href="_autosummary/bluebrick.sensor.html#bluebrick.sensor.VisionSensor" title="bluebrick.sensor.VisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.sensor.VisionSensor</span></code></a>.</p>
+<p>The full program is listed at the end of this section, but let’s just go through
+it bit by bit.  The first thing we’ll do is attach the sensor to the Train class:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+     <span class="o">...</span>
+</pre></div>
+</div>
+<p>Anytime you attach a sensor to the system (motion, tilt, color, etc), you need to define
+what capabilities you want to enable; each sensor can physically provide different capabilities
+depending on which sensor you’re using.  As soon as you attach a sensor, you need to provide
+a call-back coroutine that will be called whenever the sensor detects a change like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">train_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>The values will be provided in dictionary called <cite>self.value</cite> that is indexed by the capability.
+Let’s look at a practical example, and implement the logic we were discussing above:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">train_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_distance</span><span class="p">]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># Wave your hand more than three times in front of the sensor and the program ends</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># The closer your hand gets to the sensor, the faster the motor runs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">-</span><span class="n">distance</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span>
+
+        <span class="c1"># Flag a change</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>Here, we get the <cite>distance</cite> and <cite>count</cite> from the <cite>value</cite> dict.  If the <cite>count</cite> is greater than
+3 (more than 3 hand waves), we set a flag that keeps the system running to <cite>False</cite>.  Next, based
+on the inverse of the distance, we set a motor_speed instance variable, and then use <cite>self.sensor_change</cite>
+to signal to the main <cite>run</cite> routine that a sensor update has happened.  Our <cite>run</cite> logic can now
+use these values to implement the controller:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span><span class="p">,</span> <span class="mi">900</span><span class="p">)</span>  <span class="c1"># Ramp to new speed in 0.9 seconds</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We keep running the train while <cite>keep_running</cite> flag is <cite>True</cite>; if a <cite>sensor_change</cite> is detected,
+we ramp the train speed to the new target <cite>self.motor_speed</cite> in 0.9 seconds, and then wait
+for the next sensor update, whenever that may be, at intervals of 1 second.  As soon as you pass
+your hand more than three times in front of the sensor, the program will exit this <cite>while</cite> loop
+and end.</p>
+<p>Here’s the full code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">bluebrick</span> <span class="k">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
+<span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="k">import</span> <span class="n">PoweredUpHub</span>
+<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="k">import</span> <span class="n">TrainMotor</span><span class="p">,</span> <span class="n">VisionSensor</span>
+<span class="kn">from</span> <span class="nn">bluebrick.process</span> <span class="k">import</span> <span class="n">Process</span>
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">train_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_distance</span><span class="p">]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># Wave your hand more than three times in front of the sensor and the program ends</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># The closer your hand gets to the sensor, the faster the motor runs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">-</span><span class="n">distance</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span>
+
+        <span class="c1"># Flag a change</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span><span class="p">,</span> <span class="mi">900</span><span class="p">)</span>  <span class="c1"># Ramp to new speed in 0.9 seconds</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">train</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;My Train&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">Process</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">Process</span><span class="o">.</span><span class="n">MSG_LEVEL</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="further-examples">
+<h2>Further examples<a class="headerlink" href="#further-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="hub-buttons-and-led-colors">
+<h3>Hub buttons and LED colors<a class="headerlink" href="#hub-buttons-and-led-colors" title="Permalink to this headline">¶</a></h3>
+<p>Here’s an example that enables the train motor, vision sensor, hub button, and hub LED.  First,
+we’ll wait until the hub button is pressed before we do anything; the LED will blink purple and yellow
+while it’s waiting.  Then, we’ll change the speed like the previous example based on the vision distance,
+while at the same time changing the LED color orange if it’s responding to a distance change.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
+<span class="kn">from</span> <span class="nn">curio</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">bluebrick</span> <span class="kn">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
+<span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="kn">import</span> <span class="n">PoweredUpHub</span>
+<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="kn">import</span> <span class="n">TrainMotor</span><span class="p">,</span> <span class="n">VisionSensor</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">LED</span>
+<span class="kn">from</span> <span class="nn">bluebrick.process</span> <span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">from</span> <span class="nn">bluebrick.const</span> <span class="kn">import</span> <span class="n">Color</span>
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">Button</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_btn&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_press&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_led&#39;</span><span class="p">)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">train_btn_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;train button push {self.train_btn.value}&#39;</span><span class="p">)</span>
+        <span class="n">btn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_btn</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">Button</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">btn</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Pushed!</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">train_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Train sensor value change {self.train_sensor.value}&#39;</span><span class="p">)</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_distance</span><span class="p">]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># Wave your hand more than three times in front of the sensor and the program ends</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c1"># The closer your hand gets to the sensor, the faster the motor runs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">-</span><span class="n">distance</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span>
+
+        <span class="c1"># Flag a change</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c1"># Blink the color  from purple and yellow</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="n">Color</span><span class="o">.</span><span class="n">purple</span><span class="p">,</span> <span class="n">Color</span><span class="o">.</span><span class="n">yellow</span><span class="p">])</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">go</span><span class="p">:</span>  <span class="c1"># Wait until the hub button is pushed</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_led</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+            <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="n">Color</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="n">Color</span><span class="o">.</span><span class="n">orange</span><span class="p">])</span>
+        <span class="c1"># Ready to go, let&#39;s change the color to green!</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_running</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span><span class="p">:</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_led</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_speed</span><span class="p">,</span> <span class="mi">900</span><span class="p">)</span>  <span class="c1"># Ramp to new speed in 0.9 seconds</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sensor_change</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_led</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">train</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;My Train&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">Process</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">Process</span><span class="o">.</span><span class="n">MSG_LEVEL</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="installation">
@@ -158,7 +484,12 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
   <ul>
 <li><a class="reference internal" href="#">BlueBrick - Control LEGO Bluetooth Sensors and Motors with Python</a><ul>
 <li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#usage">Usage:</a></li>
+<li><a class="reference internal" href="#building-a-simple-train-controller">Building a simple train controller</a></li>
+<li><a class="reference internal" href="#integrating-a-vision-sensor-into-a-simple-train-controller">Integrating a vision sensor into a simple train controller</a></li>
+<li><a class="reference internal" href="#further-examples">Further examples</a><ul>
+<li><a class="reference internal" href="#hub-buttons-and-led-colors">Hub buttons and LED colors</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#disclaimer">Disclaimer</a></li>
 </ul>
@@ -168,7 +499,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">BlueBrick Docs (version 0.1)</a></li>
-      <li>Next: <a href="contributing.html" title="next chapter">Contributing</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">Development</a></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">

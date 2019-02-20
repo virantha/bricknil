@@ -298,7 +298,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0017</span>
 
-<div class="viewcode-block" id="LED.set_output"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.LED.set_output">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">Color</span><span class="p">):</span>
+<div class="viewcode-block" id="LED.set_color"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.LED.set_color">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">Color</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Converts a Color enumeration to a color value&quot;&quot;&quot;</span>
 
         <span class="c1"># For now, only support preset colors</span>
@@ -306,8 +306,9 @@
         <span class="n">col</span> <span class="o">=</span> <span class="n">color</span><span class="o">.</span><span class="n">value</span>
         <span class="k">assert</span> <span class="n">col</span> <span class="o">&lt;</span> <span class="mi">11</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x11</span><span class="p">,</span> <span class="mh">0x51</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">col</span> <span class="p">]</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;set color to </span><span class="si">{color}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div></div>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span></div></div>
+        <span class="c1">#b = [0x00, 0x81, self.port, 0x11, 0x51, mode, col ]</span>
+        <span class="c1">#await self.message_info(f&#39;set color to {color}&#39;)</span>
 
 <div class="viewcode-block" id="TrainMotor"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.TrainMotor">[docs]</a><span class="k">class</span> <span class="nc">TrainMotor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -431,12 +432,22 @@
     <span class="sd">&quot;&quot;&quot;Piggy back the hub button off the normal peripheral button id 0x0005.</span>
 <span class="sd">       Might need to change this in the future&quot;&quot;&quot;</span>
 
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;capability&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sense_press&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+               <span class="p">}</span>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;Call super-class with port set to 255 &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">capabilities</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Button.activate_updates"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.Button.activate_updates">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">activate_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Use a special Hub Properties button message updates activation message&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">cap</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
         <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>  <span class="c1"># Button reports from &quot;Hub Properties Message Type&quot;</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Activate button reports: port </span><span class="si">{self.port}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> </div></div>
 </pre></div>
