@@ -1,4 +1,10 @@
 from invoke import task
+from bluebrick.version import __version__
+
+@task
+def pypi(c):
+    c.run('python setup.py bdist_wheel')
+    c.run(f'python -m twine upload dist/bluebrick-{__version__}-py3-none-any.whl')
 
 @task
 def docs(c):

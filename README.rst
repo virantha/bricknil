@@ -339,9 +339,14 @@ while at the same time changing the LED color orange if it's responding to a dis
 Installation
 ############
 
-.. code-block: bash
+On Mac OS X, it should just be a simple:
+
+.. code-block:: bash
 
     $ pip install bluebrick
+
+Installing on other platforms like Linux is not supported at this time until I can break out the
+mac requirements, and test bluez.
 
 Disclaimer
 ##########

@@ -3,7 +3,6 @@ from setuptools import setup, find_packages
 
 import io
 import os
-import bluebrick
 from bluebrick.version import __version__
 from setuptools import Command
 
@@ -52,6 +51,7 @@ print(dependency_links)
 setup (
     name = "bluebrick",
     version = __version__,
+    #version = "0.5",
     description="Control LEGO(tm) BluetoothLE Hubs, Motors, and Sensors using Async Python",
     license = "ASL 2.0",
     long_description = long_description,
@@ -61,7 +61,7 @@ setup (
     zip_safe = True,
     include_package_data = True,
     packages = packages,
-    install_requires = required,
+    install_requires = required + ['pyobjc ; sys.platform == "darwin"'],
     dependency_links = dependency_links,
     entry_points = {
             'console_scripts': [

@@ -4,4 +4,7 @@ git+git://github.com/virantha/Adafruit_Python_BluefruitLE@master#egg=Adafruit-Bl
 fabric
 sphinx
 sphinx-readable-theme
+setuptools
+wheel
+twine
 

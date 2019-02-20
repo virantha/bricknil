@@ -1,3 +1,2 @@
-pyobjc
 curio
-git+git://github.com/virantha/Adafruit_Python_BluefruitLE@master#egg=Adafruit-BluefruitLE
+bluebrick-Adafruit_BluefruitLE
