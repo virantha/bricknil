@@ -9,6 +9,7 @@
     <title>bluebrick.sensor &#8212; BlueBrick 0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
@@ -53,7 +54,9 @@
           <div class="body" role="main">
             
   <h1>Source code for bluebrick.sensor</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span></span><span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">current_task</span><span class="p">,</span> <span class="n">spawn</span>  <span class="c1"># Needed for motor speed ramp</span>
+
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">Color</span>
 
 <span class="kn">from</span> <span class="nn">.peripheral</span> <span class="k">import</span> <span class="n">Peripheral</span>
@@ -65,6 +68,13 @@
 <span class="sd">        Unlike the train motors, these motors have a built-in sensor for sending back</span>
 <span class="sd">        the motor&#39;s current speed and position.  You don&#39;t need to use the sensors, and</span>
 <span class="sd">        can treat this as strictly an output.</span>
+
+<span class="sd">        .. graphviz::</span>
+
+<span class="sd">            digraph {</span>
+<span class="sd">               &quot;from&quot; -&gt; &quot;to&quot;</span>
+<span class="sd">            }</span>
+
 
 <span class="sd">        Examples::</span>
 
@@ -112,13 +122,13 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">capabilities</span><span class="p">)</span>
     
 <div class="viewcode-block" id="InternalMotor.set_speed"><a class="viewcode-back" href="../../bluebrick.html#bluebrick.sensor.InternalMotor.set_speed">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets the speed of the motor, and calls the :func:`bluebrick.peripheral.Peripheral._convert_speed` method</span>
+        <span class="sd">&quot;&quot;&quot;Sets the speed of the motor, and calls the :func:`bluebrick.peripheral.Peripheral._convert_speed_to_val` method</span>
 <span class="sd">           to do some sanity checking and bounding.</span>
 
 <span class="sd">           Args:</span>
 <span class="sd">               speed (int) : -100 to 100 (I believe this is a percentage)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+        <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_speed_to_val</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">speed</span><span class="p">)</span></div></div>
         
@@ -324,22 +334,89 @@
 
 <span class="sd">            self.train.set_speed(speed)</span>
 
+<span class="sd">        Attributes:</span>
+<span class="sd">            speed (int) : Keep track of the current speed in order to ramp it</span>
+
 <span class="sd">        See Also:</span>
-<span class="sd">            InternalMotor</span>
+<span class="sd">            `InternalMotor`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0002</span>
 
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize current speed to 0&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ramp_in_progress_task</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">capabilities</span><span class="p">)</span>
+
 <div class="viewcode-block" id="TrainMotor.set_speed"><a class="viewcode-back" href="../../bluebrick.html#bluebrick.sensor.TrainMotor.set_speed">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Validate and set the train speed</span>
+
+<span class="sd">            If there is an in-progress ramp, and this command is not part of that ramp, </span>
+<span class="sd">            then cancel that in-progress ramp first, before issuing this set_speed command.</span>
 
 <span class="sd">            Args:</span>
 <span class="sd">                speed (int) : Range -100 to 100 where negative numbers are reverse.</span>
 <span class="sd">                    Use 0 to put the motor into neutral.</span>
 <span class="sd">                    255 will do a hard brake</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">speed</span><span class="p">)</span></div></div>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancel_existing_differet_ramp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Setting speed to </span><span class="si">{speed}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_speed_to_val</span><span class="p">(</span><span class="n">speed</span><span class="p">))</span></div>
         
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_cancel_existing_differet_ramp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cancel the existing speed ramp if it was from a different task</span>
+
+<span class="sd">            Remember that speed ramps must be a task with daemon=True, so there is no </span>
+<span class="sd">            one awaiting its future.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if there&#39;s a ramp task in progress</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ramp_in_progress_task</span><span class="p">:</span>
+            <span class="c1"># Check if it&#39;s this current task or not</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="k">await</span> <span class="n">current_task</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">current</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ramp_in_progress_task</span><span class="p">:</span>
+                <span class="c1"># We&#39;re trying to set the speed </span>
+                <span class="c1"># outside a previously in-progress ramp, so cancel the previous ramp</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">ramp_in_progress_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ramp_in_progress_task</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Canceling previous speed ramp in progress&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TrainMotor.ramp_speed"><a class="viewcode-back" href="../../bluebrick.html#bluebrick.sensor.TrainMotor.ramp_speed">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">ramp_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_speed</span><span class="p">,</span> <span class="n">ramp_time_ms</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ramp the speed by 10 units in the time given</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">TIME_STEP_MS</span> <span class="o">=</span> <span class="mi">100</span> 
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancel_existing_differet_ramp</span><span class="p">()</span>
+
+        <span class="c1"># 500ms ramp time, 100ms per step</span>
+        <span class="c1"># Therefore, number of steps = 500/100 = 5</span>
+        <span class="c1"># Therefore speed_step = speed_diff/5</span>
+        <span class="n">number_of_steps</span> <span class="o">=</span> <span class="n">ramp_time_ms</span><span class="o">/</span><span class="n">TIME_STEP_MS</span>
+        <span class="n">speed_diff</span> <span class="o">=</span> <span class="n">target_speed</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span>
+        <span class="n">speed_step</span> <span class="o">=</span> <span class="n">speed_diff</span><span class="o">/</span><span class="n">number_of_steps</span>
+        <span class="n">start_speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ramp_speed steps: </span><span class="si">{number_of_steps}</span><span class="s1">, speed_diff: </span><span class="si">{speed_diff}</span><span class="s1">, speed_step: </span><span class="si">{speed_step}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">current_step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">async</span> <span class="k">def</span> <span class="nf">_ramp_speed</span><span class="p">():</span>
+            <span class="k">nonlocal</span> <span class="n">current_step</span>  <span class="c1"># Since this is being assigned to, we need to mark it as coming from the enclosed scope</span>
+            <span class="k">while</span> <span class="n">current_step</span> <span class="o">&lt;</span> <span class="n">number_of_steps</span><span class="p">:</span>
+                <span class="n">next_speed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start_speed</span> <span class="o">+</span> <span class="n">current_step</span><span class="o">*</span><span class="n">speed_step</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Setting next_speed: </span><span class="si">{next_speed}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">current_step</span> <span class="o">+=</span><span class="mi">1</span> 
+                <span class="k">if</span> <span class="n">current_step</span> <span class="o">==</span> <span class="n">number_of_steps</span><span class="p">:</span> 
+                    <span class="n">next_speed</span> <span class="o">=</span> <span class="n">target_speed</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">next_speed</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="n">TIME_STEP_MS</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ramp_in_progress_task</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Starting ramp of speed: </span><span class="si">{start_speed}</span><span class="s1"> -&gt; </span><span class="si">{target_speed}</span><span class="s1"> ({ramp_time_ms/1000}s)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ramp_in_progress_task</span> <span class="o">=</span> <span class="k">await</span> <span class="n">spawn</span><span class="p">(</span><span class="n">_ramp_speed</span><span class="p">,</span> <span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></div></div>
+
+
+
+
 <div class="viewcode-block" id="Button"><a class="viewcode-back" href="../../bluebrick.html#bluebrick.sensor.Button">[docs]</a><span class="k">class</span> <span class="nc">Button</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Register to be notified of button presses on the Hub (Boost or PoweredUp)</span>
 

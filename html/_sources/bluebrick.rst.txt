@@ -20,3 +20,11 @@ bluebrick.sensor module
     :undoc-members:
     :show-inheritance:
 
+bluebrick.const module
+------------------------
+
+.. automodule:: bluebrick.const
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

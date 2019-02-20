@@ -9,6 +9,7 @@
     <title>bluebrick.peripheral &#8212; BlueBrick 0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
@@ -118,7 +119,7 @@
         <span class="k">elif</span> <span class="n">byte_count</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span> <span class="c1"># uint32 little-endian</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Cannot convert array of </span><span class="si">{msg_bytes}</span><span class="s1"> length {len(msg_bytes)} to python datatype&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Cannot convert array of </span><span class="si">{msg_bytes}</span><span class="s1"> length {len(msg_bytes)} to python datatype&#39;</span><span class="p">)</span>
             <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">val</span></div>
 
@@ -137,7 +138,10 @@
                     <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">byte_count</span><span class="p">]</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">byte_count</span><span class="p">:]</span>
                     <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">byte_count</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="p">][</span><span class="n">dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                    <span class="k">if</span> <span class="n">n_datasets</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="p">][</span><span class="n">dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
                 <span class="n">dataset_i</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 
@@ -148,7 +152,7 @@
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_handler</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">)</span></div>
 
     <span class="c1"># Use this for motors and leds</span>
-<div class="viewcode-block" id="Peripheral._convert_speed"><a class="viewcode-back" href="../../bluebrick.html#bluebrick.peripheral.Peripheral._convert_speed">[docs]</a>    <span class="k">def</span> <span class="nf">_convert_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
+<div class="viewcode-block" id="Peripheral._convert_speed_to_val"><a class="viewcode-back" href="../../bluebrick.html#bluebrick.peripheral.Peripheral._convert_speed_to_val">[docs]</a>    <span class="k">def</span> <span class="nf">_convert_speed_to_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
         <span class="c1"># -100 to 100 (negative means reverse)</span>
         <span class="c1"># 0 is floating</span>
         <span class="c1"># 127 is brake</span>
@@ -158,6 +162,7 @@
             <span class="c1"># Now, truncate to 8-bits</span>
             <span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span> <span class="o">&amp;</span> <span class="mi">255</span> <span class="c1"># Or I guess I could do 256-abs(s)</span>
         <span class="k">return</span> <span class="n">speed</span></div>
+
 
 <div class="viewcode-block" id="Peripheral.set_output"><a class="viewcode-back" href="../../bluebrick.html#bluebrick.peripheral.Peripheral.set_output">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Don&#39;t change this unless you&#39;re changing the way you do a Port Output command&quot;&quot;&quot;</span>
@@ -186,7 +191,7 @@
 
 <div class="viewcode-block" id="Peripheral.activate_updates"><a class="viewcode-back" href="../../bluebrick.html#bluebrick.peripheral.Peripheral.activate_updates">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">activate_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Send a message to the sensor to activate updates&quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="s2">&quot;Cannot activate sensor before it&#39;s been attached!&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;Cannot activate updates on sensor before it&#39;s been attached to </span><span class="si">{self.name}</span><span class="s2">!&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
             <span class="c1"># Nothing to do since no capabilities defined</span>
             <span class="k">return</span>

@@ -9,6 +9,7 @@
     <title>blubrick package &#8212; BlueBrick 0.1 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
@@ -45,6 +46,7 @@
 <li><a class="reference internal" href="#submodules">Submodules</a><ul>
 <li><a class="reference internal" href="#module-bluebrick.peripheral">bluebrick.peripheral module</a></li>
 <li><a class="reference internal" href="#module-bluebrick.sensor">bluebrick.sensor module</a></li>
+<li><a class="reference internal" href="#module-bluebrick.const">bluebrick.const module</a></li>
 </ul>
 </li>
 </ul>
@@ -204,8 +206,8 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bluebrick.peripheral.Peripheral._convert_speed">
-<code class="descname">_convert_speed</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral._convert_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral._convert_speed" title="Permalink to this definition">¶</a></dt>
+<dt id="bluebrick.peripheral.Peripheral._convert_speed_to_val">
+<code class="descname">_convert_speed_to_val</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral._convert_speed_to_val"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral._convert_speed_to_val" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -282,6 +284,9 @@ from a given sensor.</p>
 <p>Unlike the train motors, these motors have a built-in sensor for sending back
 the motor’s current speed and position.  You don’t need to use the sensors, and
 can treat this as strictly an output.</p>
+<div class="graphviz"><img src="_images/graphviz-817cf1f4298cde85746f7215d31dee70b1beaf75.png" alt="digraph {
+   &quot;from&quot; -&gt; &quot;to&quot;
+}" class="graphviz" /></div>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the motor on Port A</span>
 <span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;left_motor&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
@@ -354,7 +359,7 @@ can treat this as strictly an output.</p>
 <dl class="method">
 <dt id="bluebrick.sensor.InternalMotor.set_speed">
 <code class="descname">set_speed</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#InternalMotor.set_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.InternalMotor.set_speed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the speed of the motor, and calls the <a class="reference internal" href="#bluebrick.peripheral.Peripheral._convert_speed" title="bluebrick.peripheral.Peripheral._convert_speed"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral._convert_speed()</span></code></a> method
+<dd><p>Sets the speed of the motor, and calls the <a class="reference internal" href="#bluebrick.peripheral.Peripheral._convert_speed_to_val" title="bluebrick.peripheral.Peripheral._convert_speed_to_val"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral._convert_speed_to_val()</span></code></a> method
 to do some sanity checking and bounding.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -542,14 +547,36 @@ sets the speed.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
 </pre></div>
 </div>
+<dl class="attribute">
+<dt id="bluebrick.sensor.TrainMotor.speed">
+<code class="descname">speed</code><a class="headerlink" href="#bluebrick.sensor.TrainMotor.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep track of the current speed in order to ramp it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last">InternalMotor</p>
+<p class="last"><cite>InternalMotor</cite></p>
 </div>
+<dl class="method">
+<dt id="bluebrick.sensor.TrainMotor.ramp_speed">
+<code class="descname">ramp_speed</code><span class="sig-paren">(</span><em>target_speed</em>, <em>ramp_time_ms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#TrainMotor.ramp_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.TrainMotor.ramp_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ramp the speed by 10 units in the time given</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="bluebrick.sensor.TrainMotor.set_speed">
 <code class="descname">set_speed</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#TrainMotor.set_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.TrainMotor.set_speed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate and set the train speed</p>
+<p>If there is an in-progress ramp, and this command is not part of that ramp,
+then cancel that in-progress ramp first, before issuing this set_speed command.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -660,6 +687,71 @@ enabled, the following values will be stored and updated:</p>
 <dl class="attribute">
 <dt id="bluebrick.sensor.VisionSensor.datasets">
 <code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_color: 0&gt;: (1, 1), &lt;capability.sense_distance: 1&gt;: (1, 1), &lt;capability.sense_count: 2&gt;: (1, 4), &lt;capability.sense_reflectivity: 3&gt;: (1, 1), &lt;capability.sense_ambient: 4&gt;: (1, 1), &lt;capability.sense_rgb: 6&gt;: (3, 2)}</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bluebrick.const">
+<span id="bluebrick-const-module"></span><h3>bluebrick.const module<a class="headerlink" href="#module-bluebrick.const" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="bluebrick.const.Color">
+<em class="property">class </em><code class="descclassname">bluebrick.const.</code><code class="descname">Color</code><a class="reference internal" href="_modules/bluebrick/const.html#Color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.const.Color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.const.Color.black">
+<code class="descname">black</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.const.Color.black" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.blue">
+<code class="descname">blue</code><em class="property"> = 3</em><a class="headerlink" href="#bluebrick.const.Color.blue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.cyan">
+<code class="descname">cyan</code><em class="property"> = 5</em><a class="headerlink" href="#bluebrick.const.Color.cyan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.green">
+<code class="descname">green</code><em class="property"> = 6</em><a class="headerlink" href="#bluebrick.const.Color.green" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.light_blue">
+<code class="descname">light_blue</code><em class="property"> = 4</em><a class="headerlink" href="#bluebrick.const.Color.light_blue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.orange">
+<code class="descname">orange</code><em class="property"> = 8</em><a class="headerlink" href="#bluebrick.const.Color.orange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.pink">
+<code class="descname">pink</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.const.Color.pink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.purple">
+<code class="descname">purple</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.const.Color.purple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.red">
+<code class="descname">red</code><em class="property"> = 9</em><a class="headerlink" href="#bluebrick.const.Color.red" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.white">
+<code class="descname">white</code><em class="property"> = 10</em><a class="headerlink" href="#bluebrick.const.Color.white" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.yellow">
+<code class="descname">yellow</code><em class="property"> = 7</em><a class="headerlink" href="#bluebrick.const.Color.yellow" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
