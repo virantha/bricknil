@@ -1,0 +1,203 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>BlueBrick - Control LEGO Bluetooth Sensors and Motors with Python &#8212; BlueBrick 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="BlueBrick Docs (version 0.1)" href="index.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="contributing.html" title="Contributing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="BlueBrick Docs (version 0.1)"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">BlueBrick 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bluebrick-control-lego-bluetooth-sensors-and-motors-with-python">
+<h1>BlueBrick - Control LEGO Bluetooth Sensors and Motors with Python<a class="headerlink" href="#bluebrick-control-lego-bluetooth-sensors-and-motors-with-python" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://pypi.python.org/pypi/bluebrick"><img alt="image_pypi" src="https://badge.fury.io/py/bluebrick.png" /></a> <a class="reference external" href="https://crate.io/packages/bluebrick?version=latest"><img alt="image_downloads" src="https://pypip.in/d/bluebrick/badge.png" /></a> <img alt="image_license" src="https://pypip.in/license/bluebrick/badge.png" /> <img alt="passing" src="https://scrutinizer-ci.com/g/virantha/bluebrick/badges/build.png?b=master" /> <img alt="quality" src="https://scrutinizer-ci.com/g/virantha/bluebrick/badges/quality-score.png?b=master" /> <a class="reference external" href="https://coveralls.io/r/virantha/bluebrick"><img alt="Coverage Status" src="https://coveralls.io/repos/virantha/bluebrick/badge.png?branch=develop" /></a></p>
+<p>This library provides an easy way to connect to and program LEGO®
+Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
+Linux.  This work was inspired by this <a class="reference external" href="https://www.eurobricks.com/forum/index.php?/forums/topic/162288-powered-up-a-tear-down/">EuroBricks</a> thread, and the NodeJS <a class="reference external" href="https://github.com/nathankellenicki/node-poweredup">Powered-Up</a>
+library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
+event programming built on top of the <a class="reference external" href="http://curio.readthedocs.io">Curio</a> async library.</p>
+<ul class="simple">
+<li>Free and open-source software: ASL2 license</li>
+<li>Blog: <a class="reference external" href="http://virantha.com/category/projects/bluebrick">http://virantha.com/category/projects/bluebrick</a></li>
+<li>Documentation: <a class="reference external" href="http://virantha.github.io/bluebrick/html">http://virantha.github.io/bluebrick/html</a></li>
+<li>Source: <a class="reference external" href="https://github.com/virantha/bluebrick">https://github.com/virantha/bluebrick</a></li>
+</ul>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>Supports the following LEGO® Bluetooth systems:</dt>
+<dd><ul class="first last">
+<li>PoweredUp hubs for trains</li>
+<li>Boost Move hub</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Supports the following actuators/sensors:</dt>
+<dd><ul class="first last">
+<li>Internal motors</li>
+<li>Train motors</li>
+<li>Hub LED color</li>
+<li>Boost vision sensor (color, distance)</li>
+<li>Internal tilt/orientation/accelerometer</li>
+<li>Hub buttons</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li>Fully supports Python asynchronous keywords and co-routines</li>
+<li><dl class="first docutils">
+<dt>Allows expressive concurrent programming using async/await syntax</dt>
+<dd><ul class="first last">
+<li>Uses the async library <a class="reference external" href="http://curio.readthedocs.io">Curio</a> by David Beazley</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Leverages the Adafruit Bluefruit BluetoothLE library</dt>
+<dd><ul class="first last">
+<li>Supports Mac OS X (possibly the only BLE library in Python to support native CoreBluetooth access).</li>
+<li>Should also support Linux with BlueZ but currently not tested.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="usage">
+<h2>Usage:<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here’s a simple program that will let you control a PoweredUp train motor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="kn">from</span> <span class="nn">curio</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">bluebrick</span> <span class="kn">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
+<span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="kn">import</span> <span class="n">BoostHub</span>
+<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="kn">import</span> <span class="n">VisionSensor</span>
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+<span class="k">class</span> <span class="nc">Robot</span><span class="p">(</span><span class="n">BoostHub</span><span class="p">):</span>
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">vision_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;sensor change detected&#39;</span><span class="p">)</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">)</span>
+
+<span class="n">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="s1">&#39;vernie&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="disclaimer">
+<h2>Disclaimer<a class="headerlink" href="#disclaimer" title="Permalink to this headline">¶</a></h2>
+<p>The software is distributed on an “AS IS” BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under ASL 2.0</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">BlueBrick - Control LEGO Bluetooth Sensors and Motors with Python</a><ul>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#usage">Usage:</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#disclaimer">Disclaimer</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">BlueBrick Docs (version 0.1)</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">Contributing</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/readme.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>

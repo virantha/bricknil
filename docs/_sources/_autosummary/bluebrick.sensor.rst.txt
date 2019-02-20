@@ -1,0 +1,41 @@
+bluebrick.sensor
+================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bluebrick.sensor
+
+.. automodule:: bluebrick.sensor
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  Button
+	  
+	  InternalMotor
+	  
+	  InternalTiltSensor
+	  
+	  LED
+	  
+	  TrainMotor
+	  
+	  VisionSensor
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

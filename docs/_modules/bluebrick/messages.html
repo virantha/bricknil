@@ -1,0 +1,392 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>bluebrick.messages &#8212; BlueBrick 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">BlueBrick 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for bluebrick.messages</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">DEVICES</span>
+
+<div class="viewcode-block" id="UnknownMessageError"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.UnknownMessageError">[docs]</a><span class="k">class</span> <span class="nc">UnknownMessageError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hub</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hub</span> <span class="o">=</span> <span class="n">hub</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Message.parse"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="c1"># Remove the first byte that is the legnth</span>
+        <span class="c1"># Remove the second byte that is the hub id</span>
+        <span class="n">msg_bytes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">msg_bytes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+
+        <span class="n">msg_type</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># keep track of the parsed return message</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x01</span><span class="p">:</span> <span class="c1"># Hub properties</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_hub_properties</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x04</span><span class="p">:</span> <span class="c1"># Attached or detached I/O</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_attached_io</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x43</span><span class="p">:</span> <span class="c1"># Port information</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_information</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x44</span><span class="p">:</span> <span class="c1"># Port Mode information</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_mode_information</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x45</span><span class="p">:</span> <span class="c1"># Port Single Value</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x46</span><span class="p">:</span> <span class="c1"># Port Combo Value</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_combo_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x82</span><span class="p">:</span> <span class="c1"># Port output command feedback (messages from hub after a command is issued)</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_output_feedback</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UnknownMessageError</span>
+        <span class="k">except</span> <span class="n">UnknownMessageError</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_msg_bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">l</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_parse_msg_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
+        <span class="n">hex_bytes</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">msg_bytes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hex_bytes</span>
+
+<div class="viewcode-block" id="Message.parse_port_value"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse_port_value">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">port</span><span class="p">]</span>
+            <span class="n">sensor</span><span class="o">.</span><span class="n">update_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port </span><span class="si">{port}</span><span class="s1"> changed value to </span><span class="si">{sensor.value}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">sensor</span><span class="p">,</span> <span class="s1">&#39;value_change&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">l</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span></div>
+
+<div class="viewcode-block" id="Message.parse_port_combo_value"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse_port_combo_value">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_combo_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">port</span><span class="p">]</span>
+            <span class="n">sensor</span><span class="o">.</span><span class="n">update_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port </span><span class="si">{port}</span><span class="s1"> changed combo value to </span><span class="si">{sensor.value}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">sensor</span><span class="p">,</span> <span class="s1">&#39;value_change&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">l</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span></div>
+
+<div class="viewcode-block" id="Message.parse_port_information"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse_port_information">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="n">port_info</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Store all the information on this port</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port </span><span class="si">{port}</span><span class="s1"> Mode </span><span class="si">{mode}</span><span class="s1">:&#39;</span><span class="p">)</span>
+
+        <span class="n">port_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">modes_info</span> <span class="o">=</span> <span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;modes&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+        
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mh">0x01</span><span class="p">:</span>  <span class="c1"># MODE INFO</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; INFO:&#39;</span><span class="p">)</span>
+            <span class="n">capabilities</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">3</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sync&#39;</span><span class="p">)</span>
+                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;synchronizable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;comb&#39;</span><span class="p">)</span>
+                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;combinable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)</span>
+                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">nModes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;nModes:</span><span class="si">{nModes}</span><span class="s1">, input:&#39;</span><span class="p">)</span>
+            <span class="n">input_modes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">input_modes</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">output_modes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;, output(): &#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">output_modes</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">((</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]),</span> <span class="s1">&#39;update_port&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;port_info_received&#39;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mh">0x02</span><span class="p">:</span> <span class="c1"># Combination info</span>
+            <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;mode_combinations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            
+            <span class="n">mode_combo</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Combinations:&#39;</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">mode_combo</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">cmodes</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">mode_combo</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
+                        <span class="n">cmodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span><span class="s1">&#39;Mode </span><span class="si">{m}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">cmodes</span><span class="p">]))</span>
+                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;mode_combinations&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmodes</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">mode_combo</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mode_combo</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">((</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]),</span> <span class="s1">&#39;update_port&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">l</span></div>
+
+
+<div class="viewcode-block" id="Message.parse_port_mode_information"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse_port_mode_information">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_mode_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mode_type</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">port_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">modes_info</span> <span class="o">=</span> <span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;modes&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;MODE INFO Port:</span><span class="si">{port}</span><span class="s1"> Mode:</span><span class="si">{mode}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># Name of mode</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Name:&#39;</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">msg_bytes</span> <span class="k">if</span> <span class="n">b</span><span class="o">!=</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">elif</span> <span class="n">mode_type</span> <span class="o">==</span><span class="mh">0x80</span><span class="p">:</span>  <span class="c1"># Value format of modej</span>
+            <span class="c1"># 4 bytes</span>
+            <span class="c1"># [0] = Number of datasets (e.g. RBG has 3 for each color)</span>
+            <span class="c1"># [1] = Dataset type.  00-byte, 01=16b, 10=32b, 11=float</span>
+            <span class="c1"># [2] = Total figures</span>
+            <span class="c1"># [3] = Decimals if any</span>
+            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;datasets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">dataset_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;8b&#39;</span><span class="p">,</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span> <span class="s1">&#39;32b&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">]</span>
+            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset_types</span><span class="p">[</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">((</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]),</span> <span class="s1">&#39;update_port&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">l</span></div>
+
+<div class="viewcode-block" id="Message.parse_port_output_feedback"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse_port_output_feedback">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_output_feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Command feedback: Port </span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">feedback</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">feedback</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Buffer empty, Command in progess&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">feedback</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Buffer empty, Command completed&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">feedback</span> <span class="o">&amp;</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Command discarded&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">feedback</span> <span class="o">&amp;</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Idle&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">feedback</span> <span class="o">&amp;</span> <span class="mi">16</span><span class="p">:</span> 
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Busy/Full&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">l</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_hub_registerd_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_name</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">peripheral_name</span><span class="p">,</span> <span class="n">peripheral</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripherals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">port</span> <span class="o">==</span> <span class="n">port</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">device_name</span> <span class="o">==</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">sensor_name</span>
+                <span class="k">return</span> <span class="n">peripheral</span>
+        <span class="c1"># No matching port name, so let&#39;s just search for the name and assign the port</span>
+        <span class="k">for</span> <span class="n">peripheral_name</span><span class="p">,</span> <span class="n">peripheral</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripherals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">sensor_name</span> <span class="o">==</span> <span class="n">device_name</span> <span class="ow">and</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">port</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">peripheral</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;ASSIGNING PORT </span><span class="si">{port}</span><span class="s2"> on </span><span class="si">{peripheral.name}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">peripheral</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+                <span class="k">return</span> <span class="n">peripheral</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+
+    <span class="k">def</span> <span class="nf">_add_port_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">info_key</span><span class="p">,</span> <span class="n">info_val</span><span class="p">):</span>
+        <span class="n">port_info_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">port_info_item</span><span class="p">[</span><span class="n">info_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">port_info_item</span>
+
+
+<div class="viewcode-block" id="Message.parse_attached_io"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse_attached_io">[docs]</a>    <span class="k">def</span> <span class="nf">parse_attached_io</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="c1"># 5-bytes = detached</span>
+        <span class="c1"># 15 bytes = attached</span>
+        <span class="c1"># 9 bytes = virtual attached</span>
+        <span class="c1"># Subtract 3 bytes for what we&#39;ve already popped off</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">detach</span><span class="p">,</span> <span class="n">attach</span><span class="p">,</span> <span class="n">virtual_attach</span> <span class="o">=</span> <span class="p">[</span><span class="n">event</span><span class="o">==</span><span class="n">x</span>  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">detach</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Detached IO Port:</span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">attach</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Attached IO Port:</span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">virtual_attach</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Attached VirtualIO Port:</span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">attach</span> <span class="ow">or</span> <span class="n">virtual_attach</span><span class="p">:</span>
+            <span class="c1"># Next two bytes (little-endian) is the device number (MSB is not used)</span>
+            <span class="n">device_id</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">device_name</span> <span class="o">=</span> <span class="n">DEVICES</span><span class="p">[</span><span class="n">device_id</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">device_name</span><span class="p">)</span>
+
+            <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># pop off MSB that&#39;s always 0 </span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{device_name}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Send a message saying this port is detected, in case the hub</span>
+            <span class="c1"># wants to query for more properties</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;port_detected&#39;</span><span class="p">))</span>
+
+            <span class="c1"># register the handler for this IO</span>
+            <span class="c1">#  - Check the hub to see if there&#39;s a matching device or port</span>
+            <span class="n">peripheral</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_hub_registerd_device</span><span class="p">(</span><span class="n">device_name</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">peripheral</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">peripheral</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;:Attached to handler:&#39;</span><span class="p">)</span>
+                <span class="c1"># Now, we should activate updates from this sensor</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">peripheral</span><span class="p">,</span> <span class="s1">&#39;attach&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">((</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]),</span> <span class="s1">&#39;update_port&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">attach</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ver_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;HW&#39;</span><span class="p">,</span> <span class="s1">&#39;SW&#39;</span><span class="p">]:</span>
+                <span class="c1"># NExt few bytes are fw versions</span>
+                <span class="n">build0</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="n">build1</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="n">bugfix</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="n">ver</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{ver_type}</span><span class="s1">:</span><span class="si">{ver}</span><span class="s1">.</span><span class="si">{bugfix}</span><span class="s1">.</span><span class="si">{build1}{build0}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">virtual_attach</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+            <span class="n">port0</span><span class="p">,</span> <span class="n">port1</span> <span class="o">=</span> <span class="n">msg_bytes</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port A: </span><span class="si">{port0}</span><span class="s1">, Port B: </span><span class="si">{port1}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;virtual&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">port0</span><span class="p">,</span> <span class="n">port1</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">l</span></div>
+
+
+<div class="viewcode-block" id="Message.parse_hub_properties"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse_hub_properties">[docs]</a>    <span class="k">def</span> <span class="nf">parse_hub_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Hub property: &#39;</span><span class="p">)</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">prop_names</span> <span class="o">=</span> <span class="p">{</span>  <span class="mh">0x01</span><span class="p">:</span> <span class="s1">&#39;Advertising Name&#39;</span><span class="p">,</span>
+                        <span class="mh">0x02</span><span class="p">:</span> <span class="s1">&#39;Button&#39;</span><span class="p">,</span>
+                        <span class="mh">0x03</span><span class="p">:</span> <span class="s1">&#39;FW Version&#39;</span><span class="p">,</span>
+                        <span class="mh">0x04</span><span class="p">:</span> <span class="s1">&#39;HW Version&#39;</span><span class="p">,</span>
+                        <span class="mh">0x05</span><span class="p">:</span> <span class="s1">&#39;RSSI&#39;</span><span class="p">,</span>
+                        <span class="mh">0x06</span><span class="p">:</span> <span class="s1">&#39;Battery Voltage&#39;</span><span class="p">,</span>
+                        <span class="mh">0x07</span><span class="p">:</span> <span class="s1">&#39;Battery Type&#39;</span><span class="p">,</span>
+                        <span class="mh">0x08</span><span class="p">:</span> <span class="s1">&#39;Manufacturer Name&#39;</span><span class="p">,</span>
+                        <span class="mh">0x09</span><span class="p">:</span> <span class="s1">&#39;Radio FW Version&#39;</span><span class="p">,</span>
+                        <span class="mh">0x0A</span><span class="p">:</span> <span class="s1">&#39;LEGO Wireles Protocol Version&#39;</span><span class="p">,</span>
+                        <span class="mh">0x0B</span><span class="p">:</span> <span class="s1">&#39;System Type ID&#39;</span><span class="p">,</span>
+                        <span class="mh">0x0C</span><span class="p">:</span> <span class="s1">&#39;HW Network ID&#39;</span><span class="p">,</span> 
+                        <span class="mh">0x0D</span><span class="p">:</span> <span class="s1">&#39;Primary MAC address&#39;</span><span class="p">,</span>
+                        <span class="mh">0x0E</span><span class="p">:</span> <span class="s1">&#39;Seconary MAC address&#39;</span><span class="p">,</span>
+                        <span class="mh">0X0F</span><span class="p">:</span> <span class="s1">&#39;HW Network Family&#39;</span><span class="p">,</span>
+                        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">prop</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prop_names</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop_names</span><span class="p">[</span><span class="n">prop</span><span class="p">])</span>
+
+        <span class="n">operation_names</span> <span class="o">=</span> <span class="p">{</span> <span class="mh">0x01</span><span class="p">:</span> <span class="s1">&#39;Set (downstream)&#39;</span><span class="p">,</span>
+                            <span class="mh">0x02</span><span class="p">:</span> <span class="s1">&#39;Enable Updates (Downstream)&#39;</span><span class="p">,</span>
+                            <span class="mh">0x03</span><span class="p">:</span> <span class="s1">&#39;Disable Updates (Downstream)&#39;</span><span class="p">,</span>
+                            <span class="mh">0x04</span><span class="p">:</span> <span class="s1">&#39;Reset (Downstream)&#39;</span><span class="p">,</span>
+                            <span class="mh">0x05</span><span class="p">:</span> <span class="s1">&#39;Request Update (Downstream)&#39;</span><span class="p">,</span>
+                            <span class="mh">0x06</span><span class="p">:</span> <span class="s1">&#39;Update (Downstream)&#39;</span><span class="p">,</span>
+                            <span class="p">}</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">operation_names</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
+
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operation_names</span><span class="p">[</span><span class="n">op</span><span class="p">])</span>
+
+        <span class="c1"># Now, just append the number </span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_msg_bytes</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">))</span>
+
+        <span class="c1"># Now forward any button presses as if it were a &quot;port value&quot; change</span>
+        <span class="k">if</span> <span class="n">prop</span><span class="o">==</span><span class="mh">0x02</span> <span class="ow">and</span> <span class="n">op</span> <span class="o">==</span> <span class="mh">0x06</span><span class="p">:</span>  <span class="c1"># Button and update op</span>
+            <span class="n">msg_bytes</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">)</span>  <span class="c1"># Insert Dummy port value of 255</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">l</span></div></div>
+
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation index</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>

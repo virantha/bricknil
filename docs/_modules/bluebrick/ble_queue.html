@@ -1,0 +1,202 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>bluebrick.ble_queue &#8212; BlueBrick 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">BlueBrick 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for bluebrick.ble_queue</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">Adafruit_BluefruitLE</span>
+<span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">CancelledError</span>
+
+<span class="kn">from</span> <span class="nn">.sensor</span> <span class="k">import</span> <span class="n">Button</span> <span class="c1"># Hack! only to get the button sensor_id for the fake attach message</span>
+<span class="kn">from</span> <span class="nn">.process</span> <span class="k">import</span> <span class="n">Process</span>
+<span class="kn">from</span> <span class="nn">.messages</span> <span class="k">import</span> <span class="n">Message</span>
+
+<span class="c1"># Need a class to represent the bluetooth adapter provided</span>
+<span class="c1"># by adafruit that receives messages</span>
+<div class="viewcode-block" id="BLEventQ"><a class="viewcode-back" href="../../_autosummary/bluebrick.ble_queue.html#bluebrick.ble_queue.BLEventQ">[docs]</a><span class="k">class</span> <span class="nc">BLEventQ</span><span class="p">(</span><span class="n">Process</span><span class="p">):</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ble</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;BLE Event Q&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ble</span> <span class="o">=</span> <span class="n">ble</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="s1">&#39;Clearing BLE cache data&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ble</span><span class="o">.</span><span class="n">clear_cached_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adapter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ble</span><span class="o">.</span><span class="n">get_default_adapter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Found adapter </span><span class="si">{self.adapter.name}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Powering up adapter </span><span class="si">{self.adapter.name}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adapter</span><span class="o">.</span><span class="n">power_on</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hubs</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="BLEventQ.run"><a class="viewcode-back" href="../../_autosummary/bluebrick.ble_queue.html#bluebrick.ble_queue.BLEventQ.run">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">msg_type</span><span class="p">,</span> <span class="n">hub</span><span class="p">,</span> <span class="n">msg_val</span> <span class="o">=</span> <span class="n">msg</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Got msg: </span><span class="si">{msg_type}</span><span class="s1"> = </span><span class="si">{msg_val}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">hub</span><span class="o">.</span><span class="n">tx</span><span class="p">,</span> <span class="n">msg_val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CancelledError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Terminating and disconnecxting&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BLEventQ.send_message"><a class="viewcode-back" href="../../_autosummary/bluebrick.ble_queue.html#bluebrick.ble_queue.BLEventQ.send_message">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">characteristic</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="c1"># Message needs to have length prepended</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">([</span><span class="n">length</span><span class="p">]</span><span class="o">+</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">characteristic</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BLEventQ.get_messages"><a class="viewcode-back" href="../../_autosummary/bluebrick.ble_queue.html#bluebrick.ble_queue.BLEventQ.get_messages">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hub</span><span class="p">):</span>
+        <span class="c1"># Register  Message instance to parse and handle messages from this hub</span>
+        <span class="n">msg_parser</span> <span class="o">=</span> <span class="n">Message</span><span class="p">(</span><span class="n">hub</span><span class="p">)</span>
+
+        <span class="c1"># Create a fake attach message on port 255, so that we can attach any instantiated Button listeners if present</span>
+        <span class="n">msg_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">([</span><span class="mi">15</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Button</span><span class="o">.</span><span class="n">_sensor_id</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="k">def</span> <span class="nf">received</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">msg_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> Received: </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hub</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+        <span class="n">hub</span><span class="o">.</span><span class="n">tx</span><span class="o">.</span><span class="n">start_notify</span><span class="p">(</span><span class="n">received</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BLEventQ.connect"><a class="viewcode-back" href="../../_autosummary/bluebrick.ble_queue.html#bluebrick.ble_queue.BLEventQ.connect">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hub</span><span class="p">):</span>
+        <span class="c1"># Connect the messaging queue for communication between self and the hub</span>
+        <span class="n">hub</span><span class="o">.</span><span class="n">message_queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span>
+
+        <span class="n">uart_uuid</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">uart_uuid</span>
+        <span class="n">char_uuid</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">char_uuid</span>
+        <span class="c1">#self.message(&#39;Disconnecting any connected UART devices&#39;)</span>
+        <span class="c1">#self.ble.disconnect_devices([uart_uuid])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Starting scan for UART </span><span class="si">{uart_uuid}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Set hub.ble_id to a specific hub id if you want it to connect to a</span>
+        <span class="c1"># particular hardware hub instance</span>
+        <span class="k">if</span> <span class="n">hub</span><span class="o">.</span><span class="n">ble_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Looking for specific hub id </span><span class="si">{hub.ble_id}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Looking for first matching hub&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">adapter</span><span class="o">.</span><span class="n">start_scan</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="mi">60</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">found</span> <span class="ow">and</span> <span class="n">timeout</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">:</span>
+                <span class="c1">#self.device = self.ble.find_device(service_uuids=[uart_uuid])</span>
+                <span class="n">devices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ble</span><span class="o">.</span><span class="n">find_devices</span><span class="p">(</span><span class="n">service_uuids</span><span class="o">=</span><span class="p">[</span><span class="n">uart_uuid</span><span class="p">])</span>
+                
+                <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">devices</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">hub</span><span class="o">.</span><span class="n">ble_name</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">hub</span><span class="o">.</span><span class="n">ble_id</span> <span class="ow">or</span> <span class="n">hub</span><span class="o">.</span><span class="n">ble_id</span> <span class="o">==</span> <span class="n">device</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+                            <span class="k">break</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;found device id</span><span class="si">{device.id}</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;found device id {type(device.id)}&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Rescanning for </span><span class="si">{uart_uuid}</span><span class="s1"> (</span><span class="si">{timeout}</span><span class="s1">sec left)&#39;</span><span class="p">)</span>
+                    <span class="n">timeout</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Failed to find UART device!&#39;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">hub</span><span class="o">.</span><span class="n">ble_name</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adapter</span><span class="o">.</span><span class="n">stop_scan</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="s2">&quot;found device!&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Connected to device&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Discover services</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">discover</span><span class="p">([</span><span class="n">uart_uuid</span><span class="p">],</span> <span class="p">[</span><span class="n">char_uuid</span><span class="p">])</span>
+        <span class="n">uart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">find_service</span><span class="p">(</span><span class="n">uart_uuid</span><span class="p">)</span>
+        <span class="n">rx</span> <span class="o">=</span> <span class="n">uart</span><span class="o">.</span><span class="n">find_characteristic</span><span class="p">(</span><span class="n">char_uuid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Device name </span><span class="si">{self.device.name}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Device id </span><span class="si">{self.device.id}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Device advertised </span><span class="si">{self.device.advertised}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">hub</span><span class="o">.</span><span class="n">ble_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">hub</span><span class="o">.</span><span class="n">tx</span> <span class="o">=</span> <span class="n">rx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hubs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">hub</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_messages</span><span class="p">(</span><span class="n">hub</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter</span></div></div>
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation index</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>

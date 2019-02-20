@@ -1,0 +1,31 @@
+bluebrick.messages
+==================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bluebrick.messages
+
+.. automodule:: bluebrick.messages
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  Message
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

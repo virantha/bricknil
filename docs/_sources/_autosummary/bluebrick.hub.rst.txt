@@ -1,0 +1,35 @@
+bluebrick.hub
+=============
+
+.. contents::
+    :local:
+
+.. currentmodule:: bluebrick.hub
+
+.. automodule:: bluebrick.hub
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  BoostHub
+	  
+	  Hub
+	  
+	  PoweredUpHub
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

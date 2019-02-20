@@ -1,0 +1,31 @@
+bluebrick.peripheral
+====================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bluebrick.peripheral
+
+.. automodule:: bluebrick.peripheral
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  Peripheral
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+
