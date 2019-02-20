@@ -3,27 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-BlueBrick Documentation (version |release|)
+BlueBrick Docs (version |release|)
 ====================================================
 
-API
-=================
-:doc:`bluebrick`
-
-.. autosummary::
-   :toctree: _autosummary
-
-   bluebrick.bluebrick
-   bluebrick.hub
-   bluebrick.ble_queue
-   bluebrick.messages
-   bluebrick.sensor
-   bluebrick.peripheral
-   bluebrick.process
-   bluebrick.const
-   
-
-Other Documentation
+Contents
 ===================
 
 .. toctree::
@@ -32,6 +15,7 @@ Other Documentation
    readme
    contributing
    authors
+   api
 
 Recent Changes
 ==============
@@ -39,7 +23,7 @@ Recent Changes
 
 Testing
 ================
-    `Coverage <http://virantha.github.io/bluebrick/html/testing/index.html>`_
+    `Coverage <http://virantha.github.io/bluebrick/docs/testing/index.html>`_
 
 Changelog
 =========

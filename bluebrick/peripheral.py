@@ -7,22 +7,15 @@ from .const import DEVICES
 class Peripheral(Process):
     """ Abstract base class for any Lego Boost/PoweredUp/WeDo peripherals
 
-        Attributes
-        ----------
-        port : int
-            Physical port on the hub this Peripheral attaches to
-        sensor_name : str
-            Name coming out of `const.DEVICES`
-        enabled : bool
-            `True` when the Hub sends an attach message. For future use
-        value: dict
-            Sensor readings get dumped into this dict
-        message_handler : func
-            Outgoing message queue to `BLEventQ` that's set by the Hub when an attach message is seen
-        capabilites : list [ `capability` ]
-            Support capabilities 
-        thresholds : list [ int ]
-            Integer list of thresholds for updates for each of the sensing capabilities
+        Attributes:
+
+            port (int) : Physical port on the hub this Peripheral attaches to
+            sensor_name (str) : Name coming out of `const.DEVICES`
+            enabled (bool) : `True` when the Hub sends an attach message. For future use
+            value (dict) : Sensor readings get dumped into this dict
+            message_handler (func) : Outgoing message queue to `BLEventQ` that's set by the Hub when an attach message is seen
+            capabilites (list [ `capability` ]) : Support capabilities 
+            thresholds (list [ int ]) : Integer list of thresholds for updates for each of the sensing capabilities
 
     """
     _DEFAULT_THRESHOLD = 1

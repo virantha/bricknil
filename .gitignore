@@ -1,5 +1,6 @@
 *.py[cod]
 *.swp
+*.bak
 
 # adafruit checkout
 Adafruit_Python_BluefruitLE/*
@@ -38,3 +39,4 @@ output/*/index.html
 
 # Sphinx
 docs/_build
+docs/_autosummary

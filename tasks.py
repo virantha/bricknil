@@ -11,9 +11,11 @@ def docs(c):
     with c.cd("docs"):
         print("Running sphinx in docs/ and building to ~/dev/githubpages/bluebrick")
         c.run("make clean")
+        c.run('rm -rf _auto_summary')
         c.run("make html")
         #c.run("cp -R ../test/htmlcov %s/html/testing" % githubpages)
     with c.cd(githubpages):
+        #c.run("mv html/* .")
         c.run("git add .")
         c.run('git commit -am "doc update"')
         c.run('git push origin gh-pages')
