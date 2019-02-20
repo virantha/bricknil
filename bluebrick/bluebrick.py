@@ -39,7 +39,8 @@ class attach():
     """
     def __init__(self, peripheral_type, **kwargs):
         # TODO: check here to make sure parameters were entered
-        print(f'decorating with {peripheral_type}')
+        if Process.level == Process.MSG_LEVEL.DEBUG:
+            print(f'decorating with {peripheral_type}')
         self.peripheral_type = peripheral_type
         self.kwargs = kwargs
 
@@ -59,11 +60,11 @@ class attach():
               `Hub.attach_sensor` method
 
         """
-        print(f"Decorating class {cls.__name__} with {self.peripheral_type.__name__}")
+        #print(f"Decorating class {cls.__name__} with {self.peripheral_type.__name__}")
         # Define a wrapper function to capture the actual instantiation and __init__ params
         @wraps(cls)
         def wrapper_f(*args):
-            print(f'type of cls is {type(cls)}')
+            #print(f'type of cls is {type(cls)}')
             peripheral = self.peripheral_type(**self.kwargs)
 
             # Ugly, but scan through and check if any of the capabilities are sense_*
@@ -72,6 +73,7 @@ class attach():
                 assert hasattr(cls, handler_name), f'{cls.__name__} needs a handler {handler_name}'
             # Create the hub process and attach this peripheral
             o = cls(*args)
+            o.message_debug(f"Decorating class {cls.__name__} with {self.peripheral_type.__name__}")
             o.attach_sensor(peripheral)
             return o
         return wrapper_f
@@ -106,7 +108,7 @@ async def _run_all(ble, system):
         # Need to wait here until all the ports are set
         for name, peripheral in hub.peripherals.items():
             while peripheral.port is None:
-                print(f"Waiting for peripheral {name} to attach to a port")
+                hub.message_info(f"Waiting for peripheral {name} to attach to a port")
                 await sleep(1)
 
         # Start each hub
@@ -120,6 +122,11 @@ async def _run_all(ble, system):
     for task in hub_peripheral_listen_tasks:
         await task.cancel()
     await task_ble_q.cancel()
+
+    # Print out the port information in debug mode
+    for hub in Hub.hubs:
+        hub.message(pprint.pformat(hub.port_info))
+        
 
 
 def _curio_event_run(ble, system):

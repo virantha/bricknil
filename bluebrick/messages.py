@@ -189,7 +189,7 @@ class Message:
         # No matching port name, so let's just search for the name and assign the port
         for peripheral_name, peripheral in self.hub.peripherals.items():
             if peripheral.sensor_name == device_name and peripheral.port == None:
-                print(f"ASSIGNING PORT {port} on {peripheral.name}")
+                peripheral.message(f"ASSIGNING PORT {port} on {peripheral.name}")
                 peripheral.port = port
                 return peripheral
         return None

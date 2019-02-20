@@ -65,9 +65,9 @@ class BLEventQ(Process):
         # Set hub.ble_id to a specific hub id if you want it to connect to a
         # particular hardware hub instance
         if hub.ble_id:
-            self.message(f'Looking for specific hub id {hub.ble_id}')
+            self.message_info(f'Looking for specific hub id {hub.ble_id}')
         else:
-            self.message(f'Looking for first matching hub')
+            self.message_info(f'Looking for first matching hub')
 
         self.adapter.start_scan()
         try:
@@ -75,11 +75,9 @@ class BLEventQ(Process):
             found = False
             while not found and timeout > 0 :
                 #self.device = self.ble.find_device(service_uuids=[uart_uuid])
-                print("not found")
                 devices = self.ble.find_devices(service_uuids=[uart_uuid])
                 
                 for device in devices:
-                    print('{device.name}')
                     if device.name == hub.ble_name:
                         if not hub.ble_id or hub.ble_id == device.id:
                             found = True
@@ -93,7 +91,6 @@ class BLEventQ(Process):
                     timeout -= 1
                     self.device = None
                     await sleep(1)
-                    print("done sleeping")
             if self.device is None:
                 raise RuntimeError('Failed to find UART device!')
             assert self.device.name == hub.ble_name
@@ -103,15 +100,15 @@ class BLEventQ(Process):
             self.adapter.stop_scan()
         self.message("found device!")
         self.device.connect()
-        self.message("Connected to device")
+        self.message_info("Connected to device")
 
         # Discover services
         self.device.discover([uart_uuid], [char_uuid])
         uart = self.device.find_service(uart_uuid)
         rx = uart.find_characteristic(char_uuid)
-        self.message(f'Device name {self.device.name}')
-        self.message(f'Device id {self.device.id}')
-        self.message(f'Device advertised {self.device.advertised}')
+        self.message_info(f'Device name {self.device.name}')
+        self.message_info(f'Device id {self.device.id}')
+        self.message_info(f'Device advertised {self.device.advertised}')
         hub.ble_id = self.device.id
         hub.tx = rx
         self.hubs[self.device.id] = hub

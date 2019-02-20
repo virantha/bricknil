@@ -1,7 +1,7 @@
 """Hub process that the Boost and PoweredUp hubs inherit from
 
 """
-import uuid, pprint
+import uuid
 from collections import OrderedDict
 from curio import sleep, UniversalQueue, CancelledError
 from enum import Enum
@@ -76,7 +76,6 @@ class Hub(Process):
     
     async def _get_port_info(self, port, msg):
         if msg == 'port_detected':
-            pprint.pprint(self.port_info)
             # Request mode info
             b = [0x00, 0x21, port, 0x01]
             await self.send_message(f'req mode info on {port}', b)

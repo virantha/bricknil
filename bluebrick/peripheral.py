@@ -63,7 +63,7 @@ class Peripheral(Process):
         elif byte_count == 4: # uint32 little-endian
             val = struct.unpack('<I', msg_bytes)[0]
         else:
-            self.message(f'Cannot convert array of {msg_bytes} length {len(msg_bytes)} to python datatype')
+            self.message_error(f'Cannot convert array of {msg_bytes} length {len(msg_bytes)} to python datatype')
             val = None
         return val
 
@@ -82,7 +82,10 @@ class Peripheral(Process):
                     data = msg[0:byte_count]
                     msg = msg[byte_count:]
                     val = self._convert_bytes(data, byte_count)
-                    self.value[cap][dataset] = val
+                    if n_datasets == 1:
+                        self.value[cap] = val
+                    else:
+                        self.value[cap][dataset] = val
                 dataset_i += 1
 
 

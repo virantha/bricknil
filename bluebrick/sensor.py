@@ -295,38 +295,44 @@ class TrainMotor(Peripheral):
     async def set_speed(self, speed):
         """ Validate and set the train speed
 
+            If there is an in-progress ramp, and this command is not part of that ramp, 
+            then cancel that in-progress ramp first, before issuing this set_speed command.
+
             Args:
                 speed (int) : Range -100 to 100 where negative numbers are reverse.
                     Use 0 to put the motor into neutral.
                     255 will do a hard brake
         """
 
+        await self._cancel_existing_differet_ramp()
+        self.speed = speed
+        self.message_info(f'Setting speed to {speed}')
+        await self.set_output(0, self._convert_speed_to_val(speed))
+        
+    async def _cancel_existing_differet_ramp(self):
+        """Cancel the existing speed ramp if it was from a different task
+
+            Remember that speed ramps must be a task with daemon=True, so there is no 
+            one awaiting its future.
+        """
         # Check if there's a ramp task in progress
         if self.ramp_in_progress_task:
             # Check if it's this current task or not
             current = await current_task()
-            if current == self.ramp_in_progress_task:
-                # Everything is ok!
-                pass
-            else:
-                # Someone else is trying to set the speed
-                # outside the ramp, so cancel the ramp!
+            if current != self.ramp_in_progress_task:
+                # We're trying to set the speed 
+                # outside a previously in-progress ramp, so cancel the previous ramp
                 await self.ramp_in_progress_task.cancel()
                 self.ramp_in_progress_task = None
+                self.message_info(f'Canceling previous speed ramp in progress')
 
-        # WHo's trying t
-        self.speed = speed
-        await self.set_output(0, self._convert_speed_to_val(speed))
-        
+
     async def ramp_speed(self, target_speed, ramp_time_ms):
         """Ramp the speed by 10 units in the time given
 
         """
         TIME_STEP_MS = 100 
-        #target_speed = self._convert_speed_to_val(target_speed)
-        if self.ramp_in_progress_task:
-            # IF there's a ramp already in progress, cancel it
-            await self.ramp_in_progress_task.cancel()
+        await self._cancel_existing_differet_ramp()
 
         # 500ms ramp time, 100ms per step
         # Therefore, number of steps = 500/100 = 5
@@ -336,7 +342,6 @@ class TrainMotor(Peripheral):
         speed_step = speed_diff/number_of_steps
         start_speed = self.speed
         self.message(f'ramp_speed steps: {number_of_steps}, speed_diff: {speed_diff}, speed_step: {speed_step}')
-
         current_step = 0
         async def _ramp_speed():
             nonlocal current_step  # Since this is being assigned to, we need to mark it as coming from the enclosed scope
@@ -348,7 +353,9 @@ class TrainMotor(Peripheral):
                     next_speed = target_speed
                 await self.set_speed(next_speed)
                 await sleep(TIME_STEP_MS/1000)
+            self.ramp_in_progress_task = None
 
+        self.message_info(f'Starting ramp of speed: {start_speed} -> {target_speed} ({ramp_time_ms/1000}s)')
         self.ramp_in_progress_task = await spawn(_ramp_speed, daemon = True)
 
 
