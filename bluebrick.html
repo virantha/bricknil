@@ -1,0 +1,844 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>BlueBrick API Documentation &#8212; BlueBrick 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">BlueBrick 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">BlueBrick API Documentation</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a><ul>
+<li><a class="reference internal" href="#module-bluebrick.bluebrick">bluebrick.bluebrick module</a></li>
+<li><a class="reference internal" href="#module-bluebrick.peripheral">bluebrick.peripheral module</a></li>
+<li><a class="reference internal" href="#module-bluebrick.sensor">bluebrick.sensor module</a></li>
+<li><a class="reference internal" href="#module-bluebrick.const">bluebrick.const module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bluebrick.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bluebrick-api-documentation">
+<h1>BlueBrick API Documentation<a class="headerlink" href="#bluebrick-api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-bluebrick.bluebrick">
+<span id="bluebrick-bluebrick-module"></span><h3>bluebrick.bluebrick module<a class="headerlink" href="#module-bluebrick.bluebrick" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="bluebrick.bluebrick._curio_event_run">
+<code class="descclassname">bluebrick.bluebrick.</code><code class="descname">_curio_event_run</code><span class="sig-paren">(</span><em>ble</em>, <em>system</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/bluebrick.html#_curio_event_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.bluebrick._curio_event_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>One line function to start the Curio Event loop,
+starting all the hubs with the message queue to the bluetooth
+communcation thread loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ble</strong> – The Adafruit_BluefruitLE interface object</li>
+<li><strong>system</strong> – Coroutine that the user provided to instantate their system</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bluebrick.bluebrick._run_all">
+<code class="descclassname">bluebrick.bluebrick.</code><code class="descname">_run_all</code><span class="sig-paren">(</span><em>ble</em>, <em>system</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/bluebrick.html#_run_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.bluebrick._run_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Curio run loop</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.bluebrick.attach">
+<em class="property">class </em><code class="descclassname">bluebrick.bluebrick.</code><code class="descname">attach</code><span class="sig-paren">(</span><em>peripheral_type</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/bluebrick.html#attach"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.bluebrick.attach" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class-decorator to attach peripherals onto a Hub</p>
+<p>Injects sub-classes of <cite>Peripheral</cite> as instance variables on a Hub
+such as the PoweredUp Hub, akin to “attaching” a physical sensor or
+motor onto the Hub.</p>
+<p>Before you attach a peripheral with sensing capabilities,
+you need to ensure your <cite>Peripheral</cite> sub-class has the matching
+call-back method ‘peripheralname_change’.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">PeripheralType</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;instance name&quot;</span><span class="p">,</span>
+        <span class="n">port</span><span class="o">=</span><span class="s1">&#39;port&#39;</span><span class="p">,</span>
+        <span class="n">capabilities</span><span class="o">=</span><span class="p">[])</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<ul class="last simple">
+<li>No support for checking to make sure user put in correct parameters</li>
+<li>Identifies capabilities that need a callback update handler based purely on
+checking if the capability name starts with the string “sense*”</li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="bluebrick.bluebrick.start">
+<code class="descclassname">bluebrick.bluebrick.</code><code class="descname">start</code><span class="sig-paren">(</span><em>user_system_setup_func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/bluebrick.html#start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.bluebrick.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entry point into running everything.</p>
+<p>Just pass in the async co-routine that instantiates all your hubs, and this
+function will take care of the rest.  This includes:</p>
+<ul class="simple">
+<li>Initializing the Adafruit bluetooth interface object</li>
+<li>Starting a run loop inside this bluetooth interface for executing the
+Curio event loop</li>
+<li>Starting up the user async co-routines inside the Curio event loop</li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="module-bluebrick.peripheral">
+<span id="bluebrick-peripheral-module"></span><h3>bluebrick.peripheral module<a class="headerlink" href="#module-bluebrick.peripheral" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="bluebrick.peripheral.Peripheral">
+<em class="property">class </em><code class="descclassname">bluebrick.peripheral.</code><code class="descname">Peripheral</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.process.Process</span></code></p>
+<p>Abstract base class for any Lego Boost/PoweredUp/WeDo peripherals</p>
+<dl class="attribute">
+<dt id="bluebrick.peripheral.Peripheral.port">
+<code class="descname">port</code><a class="headerlink" href="#bluebrick.peripheral.Peripheral.port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Physical port on the hub this Peripheral attaches to</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.peripheral.Peripheral.sensor_name">
+<code class="descname">sensor_name</code><a class="headerlink" href="#bluebrick.peripheral.Peripheral.sensor_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name coming out of <cite>const.DEVICES</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.peripheral.Peripheral.enabled">
+<code class="descname">enabled</code><a class="headerlink" href="#bluebrick.peripheral.Peripheral.enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>True</cite> when the Hub sends an attach message. For future use</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.peripheral.Peripheral.value">
+<code class="descname">value</code><a class="headerlink" href="#bluebrick.peripheral.Peripheral.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sensor readings get dumped into this dict</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.peripheral.Peripheral.message_handler">
+<code class="descname">message_handler</code><a class="headerlink" href="#bluebrick.peripheral.Peripheral.message_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outgoing message queue to <cite>BLEventQ</cite> that’s set by the Hub when an attach message is seen</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">func</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.peripheral.Peripheral.capabilites">
+<code class="descname">capabilites</code><a class="headerlink" href="#bluebrick.peripheral.Peripheral.capabilites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Support capabilities</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list [ <cite>capability</cite> ]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.peripheral.Peripheral.thresholds">
+<code class="descname">thresholds</code><a class="headerlink" href="#bluebrick.peripheral.Peripheral.thresholds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer list of thresholds for updates for each of the sensing capabilities</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list [ int ]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.peripheral.Peripheral._DEFAULT_THRESHOLD">
+<code class="descname">_DEFAULT_THRESHOLD</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.peripheral.Peripheral._DEFAULT_THRESHOLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.peripheral.Peripheral._convert_bytes">
+<code class="descname">_convert_bytes</code><span class="sig-paren">(</span><em>msg_bytes: bytearray</em>, <em>byte_count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral._convert_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral._convert_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.peripheral.Peripheral._convert_speed_to_val">
+<code class="descname">_convert_speed_to_val</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral._convert_speed_to_val"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral._convert_speed_to_val" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.peripheral.Peripheral._get_validated_capabilities">
+<code class="descname">_get_validated_capabilities</code><span class="sig-paren">(</span><em>caps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral._get_validated_capabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral._get_validated_capabilities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.peripheral.Peripheral._parse_combined_sensor_values">
+<code class="descname">_parse_combined_sensor_values</code><span class="sig-paren">(</span><em>msg: bytearray</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral._parse_combined_sensor_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral._parse_combined_sensor_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.peripheral.Peripheral.activate_updates">
+<code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.activate_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a message to the sensor to activate updates</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.peripheral.Peripheral.send_message">
+<code class="descname">send_message</code><span class="sig-paren">(</span><em>msg</em>, <em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.send_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send outgoing message to BLEventQ</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.peripheral.Peripheral.set_output">
+<code class="descname">set_output</code><span class="sig-paren">(</span><em>mode</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral.set_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.set_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Don’t change this unless you’re changing the way you do a Port Output command</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.peripheral.Peripheral.update_value">
+<code class="descname">update_value</code><span class="sig-paren">(</span><em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/peripheral.html#Peripheral.update_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.update_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback from message parser to update a value from a sensor incoming message</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bluebrick.sensor">
+<span id="bluebrick-sensor-module"></span><h3>bluebrick.sensor module<a class="headerlink" href="#module-bluebrick.sensor" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="bluebrick.sensor.Button">
+<em class="property">class </em><code class="descclassname">bluebrick.sensor.</code><code class="descname">Button</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#Button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.Button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bluebrick.peripheral.Peripheral" title="bluebrick.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral</span></code></a></p>
+<p>Register to be notified of button presses on the Hub (Boost or PoweredUp)</p>
+<p>This is actually a slight hack, since the Hub button is not a peripheral that is
+attached like other sensors in the Lego protocol.  Instead, the buttons are accessed
+through Hub property messages.  We abstract away these special messages to make the
+button appear to be like any other peripheral sensor.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">Button</span><span class="p">,</span> <span class="s1">&#39;hub_btn&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>Since there is no attach I/O message from the hub to trigger the
+<a class="reference internal" href="#bluebrick.sensor.Button.activate_updates" title="bluebrick.sensor.Button.activate_updates"><code class="xref py py-func docutils literal notranslate"><span class="pre">activate_updates()</span></code></a> method, we instead insert a fake
+“attaach” message from this fake sensor on port 255 in the
+<cite>BLEventQ.get_messages</cite> method that is used to register for updates
+from a given sensor.</p>
+<dl class="method">
+<dt id="bluebrick.sensor.Button.activate_updates">
+<code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#Button.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.Button.activate_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use a special Hub Properties button message updates activation message</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.InternalMotor">
+<em class="property">class </em><code class="descclassname">bluebrick.sensor.</code><code class="descname">InternalMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#InternalMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.InternalMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bluebrick.peripheral.Peripheral" title="bluebrick.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral</span></code></a></p>
+<p>Access the internal motor(s) in the Boost Move Hub.</p>
+<p>Unlike the train motors, these motors have a built-in sensor for sending back
+the motor’s current speed and position.  You don’t need to use the sensors, and
+can treat this as strictly an output.</p>
+<div class="graphviz"><img src="_images/graphviz-817cf1f4298cde85746f7215d31dee70b1beaf75.png" alt="digraph {
+   &quot;from&quot; -&gt; &quot;to&quot;
+}" class="graphviz" /></div>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the motor on Port A</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;left_motor&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># Basic connection to both motors at the same time (virtual I/O port).</span>
+<span class="c1"># Any speed command will cause both motors to rotate at the same speed</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">AB</span><span class="p">)</span>
+
+<span class="c1"># Report back when motor speed changes. You must have a motors_change method defined</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">])</span>
+<span class="c1"># Only report back when speed change exceeds 5 units</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#bluebrick.sensor.TrainMotor" title="bluebrick.sensor.TrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainMotor</span></code></a> for connecting to a train motor</p>
+</div>
+<dl class="class">
+<dt id="bluebrick.sensor.InternalMotor.Port">
+<em class="property">class </em><code class="descname">Port</code><a class="headerlink" href="#bluebrick.sensor.InternalMotor.Port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Address either motor A or Motor B, or both AB at the same time</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalMotor.Port.A">
+<code class="descname">A</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.sensor.InternalMotor.Port.A" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalMotor.Port.AB">
+<code class="descname">AB</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.sensor.InternalMotor.Port.AB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalMotor.Port.B">
+<code class="descname">B</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.sensor.InternalMotor.Port.B" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalMotor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_speed: 1&gt;, &lt;capability.sense_pos: 2&gt;]</em><a class="headerlink" href="#bluebrick.sensor.InternalMotor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.InternalMotor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bluebrick.sensor.InternalMotor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalMotor.capability.sense_pos">
+<code class="descname">sense_pos</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.sensor.InternalMotor.capability.sense_pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalMotor.capability.sense_speed">
+<code class="descname">sense_speed</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.sensor.InternalMotor.capability.sense_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalMotor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_speed: 1&gt;: (1, 1), &lt;capability.sense_pos: 2&gt;: (1, 4)}</em><a class="headerlink" href="#bluebrick.sensor.InternalMotor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dict of (num_datasets, bytes_per_dataset).
+<cite>sense_speed</cite> (1-byte), and <cite>sense_pos</cite> (uint32)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.sensor.InternalMotor.set_speed">
+<code class="descname">set_speed</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#InternalMotor.set_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.InternalMotor.set_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the speed of the motor, and calls the <a class="reference internal" href="#bluebrick.peripheral.Peripheral._convert_speed_to_val" title="bluebrick.peripheral.Peripheral._convert_speed_to_val"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral._convert_speed_to_val()</span></code></a> method
+to do some sanity checking and bounding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speed</strong> (<em>int</em>) – -100 to 100 (I believe this is a percentage)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.InternalTiltSensor">
+<em class="property">class </em><code class="descclassname">bluebrick.sensor.</code><code class="descname">InternalTiltSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#InternalTiltSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bluebrick.peripheral.Peripheral" title="bluebrick.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral</span></code></a></p>
+<p>Access the internal tilt sensor in the Boost Move Hub.</p>
+<p>The various modes are:</p>
+<ul class="simple">
+<li><strong>sense_angle</strong> - X, Y angles.  Both are 0 if hub is lying flat with button up</li>
+<li><strong>sense_tilt</strong> - value from 0-9 if hub is tilted around any of its axis. Seems to be
+a rough mesaure of how much the hub is tilted away from lying flat.
+There is no update for just a translation along an axis</li>
+<li><dl class="first docutils">
+<dt><strong>sense_orientation</strong> - returns one of the nine orientations below (0-9)</dt>
+<dd><ul class="first last">
+<li><cite>InternalTiltSensor.orientation</cite>.up = flat with button on top</li>
+<li><cite>InternalTiltSensor.orientation</cite>.right - standing up on side closest to button</li>
+<li><cite>InternalTiltSensor.orientation</cite>.left - standing up on side furthest from button</li>
+<li><cite>InternalTiltSensor.orientation</cite>.far_side - on long face facing away</li>
+<li><cite>InternalTiltSensor.orientation</cite>.near_side -  on long face facing you</li>
+<li><cite>InternalTiltSensor.orientation</cite>.down - upside down</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>sense_impact</strong> - 32-bit count of impacts to sensor</li>
+<li><strong>sense_acceleration_3_axis</strong> - 3 bytes of raw accelerometer data.</li>
+</ul>
+<p>Any combination of the above modes are allowed.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic tilt sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_tilt&#39;</span><span class="p">])</span>
+<span class="c1"># Or use the capability Enum</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">sense_tilt</span><span class="p">])</span>
+
+<span class="c1"># Tilt and orientation sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_tilt, sense_orientation&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The values returned by the sensor will always be available in the
+instance variable <cite>self.value</cite>.  For example, when the <cite>sense_angle</cite>
+and <cite>sense_orientation</cite> capabilities are enabled, the following values
+will be stored and updated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{</span> <span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_angle</span><span class="p">:</span>  <span class="p">[</span><span class="n">uint8</span><span class="p">,</span> <span class="n">uint8</span><span class="p">],</span>
+               <span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_orientation</span><span class="p">:</span>
+                                <span class="n">Enum</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">orientation</span><span class="p">)</span>
+             <span class="p">}</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_angle: 0&gt;, &lt;capability.sense_tilt: 1&gt;, &lt;capability.sense_orientation: 2&gt;, &lt;capability.sense_impact: 3&gt;, &lt;capability.sense_acceleration_3_axis: 4&gt;]</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.InternalTiltSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.capability.sense_acceleration_3_axis">
+<code class="descname">sense_acceleration_3_axis</code><em class="property"> = 4</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.capability.sense_acceleration_3_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.capability.sense_angle">
+<code class="descname">sense_angle</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.capability.sense_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.capability.sense_impact">
+<code class="descname">sense_impact</code><em class="property"> = 3</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.capability.sense_impact" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.capability.sense_orientation">
+<code class="descname">sense_orientation</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.capability.sense_orientation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.capability.sense_tilt">
+<code class="descname">sense_tilt</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.capability.sense_tilt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_angle: 0&gt;: (2, 1), &lt;capability.sense_tilt: 1&gt;: (1, 1), &lt;capability.sense_orientation: 2&gt;: (1, 1), &lt;capability.sense_impact: 3&gt;: (1, 4), &lt;capability.sense_acceleration_3_axis: 4&gt;: (3, 1)}</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.InternalTiltSensor.orientation">
+<em class="property">class </em><code class="descname">orientation</code><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.orientation.down">
+<code class="descname">down</code><em class="property"> = 5</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.orientation.down" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.orientation.far_side">
+<code class="descname">far_side</code><em class="property"> = 3</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.orientation.far_side" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.orientation.left">
+<code class="descname">left</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.orientation.left" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.orientation.near_side">
+<code class="descname">near_side</code><em class="property"> = 4</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.orientation.near_side" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.orientation.right">
+<code class="descname">right</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.orientation.right" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.InternalTiltSensor.orientation.up">
+<code class="descname">up</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.orientation.up" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.sensor.InternalTiltSensor.update_value">
+<code class="descname">update_value</code><span class="sig-paren">(</span><em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#InternalTiltSensor.update_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.InternalTiltSensor.update_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>If sense_orientation, then substitute the <cite>IntenalTiltSensor.orientation</cite>
+enumeration value into the self.value dict.  Otherwise, don’t do anything
+special to the self.value dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.LED">
+<em class="property">class </em><code class="descclassname">bluebrick.sensor.</code><code class="descname">LED</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#LED"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.LED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bluebrick.peripheral.Peripheral" title="bluebrick.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral</span></code></a></p>
+<p>Changes the LED color on the Hubs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="s1">&#39;hub_led&#39;</span><span class="p">)</span>
+
+<span class="bp">self</span><span class="o">.</span><span class="n">hub_led</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">No support yet for the standalone LEDs that connect to the Hub ports.</p>
+</div>
+<dl class="method">
+<dt id="bluebrick.sensor.LED.set_output">
+<code class="descname">set_output</code><span class="sig-paren">(</span><em>color: bluebrick.const.Color</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#LED.set_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.LED.set_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a Color enumeration to a color value</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.TrainMotor">
+<em class="property">class </em><code class="descclassname">bluebrick.sensor.</code><code class="descname">TrainMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#TrainMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.TrainMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bluebrick.peripheral.Peripheral" title="bluebrick.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral</span></code></a></p>
+<p>Connects to the train motors.</p>
+<p>TrainMotor has no sensing capabilities and only supports a single output mode that
+sets the speed.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And then within the run body, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="bluebrick.sensor.TrainMotor.speed">
+<code class="descname">speed</code><a class="headerlink" href="#bluebrick.sensor.TrainMotor.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep track of the current speed in order to ramp it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><cite>InternalMotor</cite></p>
+</div>
+<dl class="method">
+<dt id="bluebrick.sensor.TrainMotor.ramp_speed">
+<code class="descname">ramp_speed</code><span class="sig-paren">(</span><em>target_speed</em>, <em>ramp_time_ms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#TrainMotor.ramp_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.TrainMotor.ramp_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ramp the speed by 10 units in the time given</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.sensor.TrainMotor.set_speed">
+<code class="descname">set_speed</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#TrainMotor.set_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.TrainMotor.set_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate and set the train speed</p>
+<p>If there is an in-progress ramp, and this command is not part of that ramp,
+then cancel that in-progress ramp first, before issuing this set_speed command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speed</strong> (<em>int</em>) – Range -100 to 100 where negative numbers are reverse.
+Use 0 to put the motor into neutral.
+255 will do a hard brake</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.VisionSensor">
+<em class="property">class </em><code class="descclassname">bluebrick.sensor.</code><code class="descname">VisionSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bluebrick/sensor.html#VisionSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.VisionSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bluebrick.peripheral.Peripheral" title="bluebrick.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral</span></code></a></p>
+<p>Access the Boost Vision/Distance Sensor</p>
+<p>Only the sensing capabilities of this sensor is supported right now.</p>
+<ul class="simple">
+<li><em>sense_color</em>: Returns one of the 10 predefined colors</li>
+<li><em>sense_distance</em>: Distance from 0-7 in roughly inches</li>
+<li><em>sense_count</em>: Running count of waving your hand/item over the sensor (32-bit)</li>
+<li><em>sense_reflectivity</em>: Under distances of one inch, the inverse of the distance</li>
+<li><em>sense_ambient</em>: Distance under one inch (so inverse of the preceeding)</li>
+<li><em>sense_rgb</em>: R, G, B values (3 sets of uint16)</li>
+</ul>
+<p>Any combination of sense_color, sense_distance, sense_count, sense_reflectivity,
+and sense_rgb is supported.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic distance sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">])</span>
+<span class="c1"># Or use the capability Enum</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">])</span>
+
+<span class="c1"># Distance and color sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+
+<span class="c1"># Distance and rgb sensor with different thresholds to trigger updates</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>The values returned by the sensor will always be available in the instance variable
+<cite>self.value</cite>.  For example, when the <cite>sense_color</cite> and <cite>sense_rgb</cite> capabilities are
+enabled, the following values will be stored and updated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{</span> <span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">:</span>  <span class="n">uint8</span><span class="p">,</span>
+               <span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_rgb</span><span class="p">:</span>
+                                <span class="p">[</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint16</span> <span class="p">]</span>
+             <span class="p">}</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>The actual modes supported by the sensor are as follows:</p>
+<ul class="simple">
+<li>0 = color (0-10)</li>
+<li>1 = IR proximity (0-7)</li>
+<li>2 = count (32-bit int)</li>
+<li>3 = Reflt   (inverse of distance when closer than 1”)</li>
+<li>4 = Amb  (distance when closer than 1”)</li>
+<li>5 = COL (output) ?</li>
+<li>6 = RGB I</li>
+<li>7 = IR tx (output) ?</li>
+<li>8 = combined:  Color byte, Distance byte, 0xFF, Reflected light</li>
+</ul>
+<dl class="attribute">
+<dt id="bluebrick.sensor.VisionSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_color: 0&gt;, &lt;capability.sense_distance: 1&gt;, &lt;capability.sense_count: 2&gt;, &lt;capability.sense_reflectivity: 3&gt;, &lt;capability.sense_rgb: 6&gt;]</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.VisionSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bluebrick.sensor.VisionSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.VisionSensor.capability.sense_ambient">
+<code class="descname">sense_ambient</code><em class="property"> = 4</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.capability.sense_ambient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.VisionSensor.capability.sense_color">
+<code class="descname">sense_color</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.capability.sense_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.VisionSensor.capability.sense_count">
+<code class="descname">sense_count</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.capability.sense_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.VisionSensor.capability.sense_distance">
+<code class="descname">sense_distance</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.capability.sense_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.VisionSensor.capability.sense_reflectivity">
+<code class="descname">sense_reflectivity</code><em class="property"> = 3</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.capability.sense_reflectivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.VisionSensor.capability.sense_rgb">
+<code class="descname">sense_rgb</code><em class="property"> = 6</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.capability.sense_rgb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.VisionSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_color: 0&gt;: (1, 1), &lt;capability.sense_distance: 1&gt;: (1, 1), &lt;capability.sense_count: 2&gt;: (1, 4), &lt;capability.sense_reflectivity: 3&gt;: (1, 1), &lt;capability.sense_ambient: 4&gt;: (1, 1), &lt;capability.sense_rgb: 6&gt;: (3, 2)}</em><a class="headerlink" href="#bluebrick.sensor.VisionSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bluebrick.const">
+<span id="bluebrick-const-module"></span><h3>bluebrick.const module<a class="headerlink" href="#module-bluebrick.const" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="bluebrick.const.Color">
+<em class="property">class </em><code class="descclassname">bluebrick.const.</code><code class="descname">Color</code><a class="reference internal" href="_modules/bluebrick/const.html#Color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.const.Color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.const.Color.black">
+<code class="descname">black</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.const.Color.black" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.blue">
+<code class="descname">blue</code><em class="property"> = 3</em><a class="headerlink" href="#bluebrick.const.Color.blue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.cyan">
+<code class="descname">cyan</code><em class="property"> = 5</em><a class="headerlink" href="#bluebrick.const.Color.cyan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.green">
+<code class="descname">green</code><em class="property"> = 6</em><a class="headerlink" href="#bluebrick.const.Color.green" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.light_blue">
+<code class="descname">light_blue</code><em class="property"> = 4</em><a class="headerlink" href="#bluebrick.const.Color.light_blue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.orange">
+<code class="descname">orange</code><em class="property"> = 8</em><a class="headerlink" href="#bluebrick.const.Color.orange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.pink">
+<code class="descname">pink</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.const.Color.pink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.purple">
+<code class="descname">purple</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.const.Color.purple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.red">
+<code class="descname">red</code><em class="property"> = 9</em><a class="headerlink" href="#bluebrick.const.Color.red" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.white">
+<code class="descname">white</code><em class="property"> = 10</em><a class="headerlink" href="#bluebrick.const.Color.white" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.const.Color.yellow">
+<code class="descname">yellow</code><em class="property"> = 7</em><a class="headerlink" href="#bluebrick.const.Color.yellow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">BlueBrick 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Virantha N. Ekanayake.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

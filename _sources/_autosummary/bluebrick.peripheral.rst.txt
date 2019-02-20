@@ -1,0 +1,22 @@
+bluebrick.peripheral
+====================
+
+.. automodule:: bluebrick.peripheral
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Peripheral
+   
+   
+
+   
+   
+   

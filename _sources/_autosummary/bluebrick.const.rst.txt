@@ -1,0 +1,22 @@
+bluebrick.const
+===============
+
+.. automodule:: bluebrick.const
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Color
+   
+   
+
+   
+   
+   

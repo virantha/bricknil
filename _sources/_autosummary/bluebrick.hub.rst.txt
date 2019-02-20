@@ -1,0 +1,24 @@
+bluebrick.hub
+=============
+
+.. automodule:: bluebrick.hub
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      BoostHub
+      Hub
+      PoweredUpHub
+   
+   
+
+   
+   
+   

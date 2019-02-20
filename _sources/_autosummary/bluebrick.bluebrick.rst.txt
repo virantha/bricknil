@@ -1,0 +1,28 @@
+bluebrick.bluebrick
+===================
+
+.. automodule:: bluebrick.bluebrick
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      start
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      attach
+   
+   
+
+   
+   
+   
