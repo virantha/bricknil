@@ -17,7 +17,7 @@
     <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="bluebrick.hub" href="bluebrick.hub.html" />
+    <link rel="next" title="bluebrick.process" href="bluebrick.process.html" />
     <link rel="prev" title="API Documentation" href="../api.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -36,7 +36,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="bluebrick.hub.html" title="bluebrick.hub"
+          <a href="bluebrick.process.html" title="bluebrick.process"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../api.html" title="API Documentation"
@@ -60,7 +60,13 @@
 <li><a class="reference internal" href="#members" id="id3">Members</a></li>
 </ul>
 </div>
-<span class="target" id="module-bluebrick.bluebrick"></span><div class="section" id="classes">
+<span class="target" id="module-bluebrick.bluebrick"></span><p>Utility functions to attach sensors/motors and start the whole event loop</p>
+<ol class="arabic simple">
+<li>The decorator <a class="reference internal" href="#bluebrick.bluebrick.attach" title="bluebrick.bluebrick.attach"><code class="xref py py-class docutils literal notranslate"><span class="pre">attach</span></code></a> to specify peripherals that
+connect to a hub (which enables sensing and motor control functions),</li>
+<li>The function <a class="reference internal" href="#bluebrick.bluebrick.start" title="bluebrick.bluebrick.start"><code class="xref py py-func docutils literal notranslate"><span class="pre">start()</span></code></a> that starts running the BLE communication queue, and all the hubs, in the event-loop system</li>
+</ol>
+<div class="section" id="classes">
 <h2><a class="toc-backref" href="#id1">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -155,7 +161,7 @@ Curio event loop</li>
   <li><a href="../index.html">Documentation index</a><ul>
   <li><a href="../api.html">API Documentation</a><ul>
       <li>Previous: <a href="../api.html" title="previous chapter">API Documentation</a></li>
-      <li>Next: <a href="bluebrick.hub.html" title="next chapter">bluebrick.hub</a></li>
+      <li>Next: <a href="bluebrick.process.html" title="next chapter">bluebrick.process</a></li>
   </ul></li>
   </ul></li>
 </ul>

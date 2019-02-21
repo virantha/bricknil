@@ -44,7 +44,14 @@
           <div class="body" role="main">
             
   <h1>Source code for bluebrick.bluebrick</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pprint</span>
+<span></span><span class="sd">&quot;&quot;&quot;Utility functions to attach sensors/motors and start the whole event loop</span>
+<span class="sd">    </span>
+<span class="sd">    #. The decorator :class:`attach` to specify peripherals that</span>
+<span class="sd">       connect to a hub (which enables sensing and motor control functions), </span>
+<span class="sd">    #. The function :func:`start` that starts running the BLE communication queue, and all the hubs, in the event-loop system</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">run</span><span class="p">,</span> <span class="n">spawn</span><span class="p">,</span>  <span class="n">sleep</span>
 <span class="kn">import</span> <span class="nn">Adafruit_BluefruitLE</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>

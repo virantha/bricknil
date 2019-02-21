@@ -52,12 +52,14 @@
             
   <div class="section" id="bluebrick-control-lego-bluetooth-sensors-and-motors-with-python">
 <h1>BlueBrick - Control LEGO Bluetooth Sensors and Motors with Python<a class="headerlink" href="#bluebrick-control-lego-bluetooth-sensors-and-motors-with-python" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference external" href="https://pypi.python.org/pypi/bluebrick"><img alt="image_pypi" src="https://badge.fury.io/py/bluebrick.png" /></a> <img alt="image_downloads" src="https://img.shields.io/pypi/dd/bluebrick.svg" /> <img alt="image_license" src="https://img.shields.io/pypi/l/bluebrick.svg" /> <img alt="passing" src="https://scrutinizer-ci.com/g/virantha/bluebrick/badges/build.png?b=master" /> <img alt="quality" src="https://scrutinizer-ci.com/g/virantha/bluebrick/badges/quality-score.png?b=master" /> <a class="reference external" href="https://coveralls.io/r/virantha/bluebrick"><img alt="Coverage Status" src="https://coveralls.io/repos/virantha/bluebrick/badge.png?branch=develop" /></a></p>
+<p><a class="reference external" href="https://pypi.python.org/pypi/bluebrick"><img alt="image_pypi" src="https://badge.fury.io/py/bluebrick.png" /></a> <img alt="image_downloads" src="https://img.shields.io/pypi/mm/bluebrick.svg" /> <a class="reference external" href="https://www.apache.org/licenses/LICENSE-2.0"><img alt="image_license" src="https://img.shields.io/pypi/l/bluebrick.svg" /></a> <img alt="passing" src="https://scrutinizer-ci.com/g/virantha/bluebrick/badges/build.png?b=master" /> <a class="reference external" href="https://scrutinizer-ci.com/g/virantha/bluebrick"><img alt="quality" src="https://scrutinizer-ci.com/g/virantha/bluebrick/badges/quality-score.png?b=master" /></a> <a class="reference external" href="https://coveralls.io/r/virantha/bluebrick"><img alt="Coverage Status" src="https://coveralls.io/repos/virantha/bluebrick/badge.png?branch=develop" /></a></p>
 <p>This library provides an easy way to connect to and program LEGO®
 Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
 Linux.  This work was inspired by this <a class="reference external" href="https://www.eurobricks.com/forum/index.php?/forums/topic/162288-powered-up-a-tear-down/">EuroBricks</a> thread, and the NodeJS <a class="reference external" href="https://github.com/nathankellenicki/node-poweredup">Powered-Up</a>
 library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
-event programming built on top of the <a class="reference external" href="http://curio.readthedocs.io">Curio</a> async library.</p>
+event programming built on top of the <a class="reference external" href="http://curio.readthedocs.io">Curio</a> async library.  As an aside, the choice of
+async library is fairly arbitrary; and conceivably enabling another library such as asyncio or Trio
+should be straightforward.</p>
 <ul class="simple">
 <li>Free and open-source software: ASL2 license</li>
 <li>Blog: <a class="reference external" href="http://virantha.com/category/projects/bluebrick">http://virantha.com/category/projects/bluebrick</a></li>
@@ -93,7 +95,7 @@ event programming built on top of the <a class="reference external" href="http:/
 <li><dl class="first docutils">
 <dt>Allows expressive concurrent programming using async/await syntax</dt>
 <dd><ul class="first last">
-<li>Uses the async library <a class="reference external" href="http://curio.readthedocs.io">Curio</a> by David Beazley</li>
+<li>The current implmentation uses the async library <a class="reference external" href="http://curio.readthedocs.io">Curio</a> by David Beazley</li>
 </ul>
 </dd>
 </dl>
@@ -179,9 +181,9 @@ comes to a stop, it will stay stopped for 1 second, then repeat this sequence of
 once more before exiting.</p>
 <p>It’s also useful to print out what’s happening as we run our program. In order to facilitate that,
 there is some rudimentary logging capability built-in to <cite>bluebrick</cite> via the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.process.Process</span></code> class that all of these concurrent processes are sub-classed from.
+<a class="reference internal" href="_autosummary/bluebrick.process.html#bluebrick.process.Process" title="bluebrick.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.process.Process</span></code></a> class that all of these concurrent processes are sub-classed from.
 Here’s the run coroutine with logging statements via
-<code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.process.Process.message_info()</span></code> enabled:</p>
+<a class="reference internal" href="_autosummary/bluebrick.process.html#bluebrick.process.Process.message_info" title="bluebrick.process.Process.message_info"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.process.Process.message_info()</span></code></a> enabled:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
@@ -463,6 +465,34 @@ while at the same time changing the LED color orange if it’s responding to a d
 </pre></div>
 </div>
 </div>
+<div class="section" id="multiple-hubs">
+<h3>Multiple hubs<a class="headerlink" href="#multiple-hubs" title="Permalink to this headline">¶</a></h3>
+<p>TODO: Need to show an example here; maybe two trains or a Boost-hub-controlled switch with a train hub.</p>
+</div>
+</div>
+<div class="section" id="bluebrick-architecture">
+<h2>BlueBrick Architecture<a class="headerlink" href="#bluebrick-architecture" title="Permalink to this headline">¶</a></h2>
+<p>This section documents the internal architecture of BlueBrick and how all the components communicate with
+each other.</p>
+<div class="section" id="run-loops">
+<h3>Run loops<a class="headerlink" href="#run-loops" title="Permalink to this headline">¶</a></h3>
+<p>There are actually two threads of execution in the current system architecture.
+The main Bluetooth radio communication loop is provided by the BluetoothLE
+library, which manages everything in the background and can callback directly
+into user code.  In parallel with this, inside this library, a separate
+execution loop is running the Curio event library, which provides the async
+event loop that executes our user code. Thus, we need to be careful about
+maintaining thread safety between the Curio async event loop and the background
+Bluetooth event processing.</p>
+<div class="figure align-center" id="id1">
+<img alt="_images/run_loops.svg" src="_images/run_loops.svg" /><p class="caption"><span class="caption-text">BlueBrick running inside Curio’s event loop, which in turn is run by the
+Adafruit_BluefruitLE library run loop</span></p>
+</div>
+<p>I’d much have preferred to have the Bluetooth library be implemented via an
+async library like Curio, asyncio, or Trio, but I wasn’t able to find any such
+library. This admitted kludge of nested run loops was the only way I could get everything
+working.</p>
+</div>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
@@ -494,6 +524,11 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 <li><a class="reference internal" href="#integrating-a-vision-sensor-into-a-simple-train-controller">Integrating a vision sensor into a simple train controller</a></li>
 <li><a class="reference internal" href="#further-examples">Further examples</a><ul>
 <li><a class="reference internal" href="#hub-buttons-and-led-colors">Hub buttons and LED colors</a></li>
+<li><a class="reference internal" href="#multiple-hubs">Multiple hubs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bluebrick-architecture">BlueBrick Architecture</a><ul>
+<li><a class="reference internal" href="#run-loops">Run loops</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#installation">Installation</a></li>

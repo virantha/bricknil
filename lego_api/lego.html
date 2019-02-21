@@ -1,0 +1,390 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Notes on LEGO wireless BLE protocol &#8212; BlueBrick 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="bluebrick.sensor" href="../_autosummary/bluebrick.sensor.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../_autosummary/bluebrick.sensor.html" title="bluebrick.sensor"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">BlueBrick 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="notes-on-lego-wireless-ble-protocol">
+<h1>Notes on LEGO wireless BLE protocol<a class="headerlink" href="#notes-on-lego-wireless-ble-protocol" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#vision-sensor-information" id="id1">Vision sensor information</a></li>
+<li><a class="reference internal" href="#tilt-sensor-information" id="id2">Tilt sensor information</a></li>
+<li><a class="reference internal" href="#internal-motor-information" id="id3">Internal Motor  information</a></li>
+<li><a class="reference internal" href="#external-motor-information" id="id4">External Motor information</a></li>
+<li><a class="reference internal" href="#current-voltage-information" id="id5">Current/Voltage information</a></li>
+<li><a class="reference internal" href="#hub-led-information" id="id6">Hub LED information</a></li>
+</ul>
+</div>
+<div class="section" id="vision-sensor-information">
+<h2><a class="toc-backref" href="#id1">Vision sensor information</a><a class="headerlink" href="#vision-sensor-information" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;combinable&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span>
+    <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">&#39;mode_combinations&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">]],</span>
+    <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;COLOR&#39;</span><span class="p">},</span>
+              <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;PROX&#39;</span><span class="p">},</span>
+              <span class="mi">2</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;32b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;COUNT&#39;</span><span class="p">},</span>
+              <span class="mi">3</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;REFLT&#39;</span><span class="p">},</span>
+              <span class="mi">4</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;AMBI&#39;</span><span class="p">},</span>
+              <span class="mi">5</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;COL O&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+              <span class="mi">6</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                  <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;RGB I&#39;</span><span class="p">},</span>
+              <span class="mi">7</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;IR Tx&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+              <span class="mi">9</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                  <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                  <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">},</span>
+              <span class="mi">10</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CALIB&#39;</span><span class="p">}},</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Vision Sensor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tilt-sensor-information">
+<h2><a class="toc-backref" href="#id2">Tilt sensor information</a><a class="headerlink" href="#tilt-sensor-information" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">58</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;combinable&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span>
+     <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;mode_combinations&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span>
+     <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ANGLE&#39;</span><span class="p">},</span>
+               <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;TILT&#39;</span><span class="p">},</span>
+               <span class="mi">2</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ORINT&#39;</span><span class="p">},</span>
+               <span class="mi">3</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;32b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;IMPCT&#39;</span><span class="p">},</span>
+               <span class="mi">4</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ACCEL&#39;</span><span class="p">},</span>
+               <span class="mi">5</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;OR_CF&#39;</span><span class="p">},</span>
+               <span class="mi">6</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;IM_CF&#39;</span><span class="p">},</span>
+               <span class="mi">7</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CALIB&#39;</span><span class="p">}},</span>
+     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Internal Tilt&#39;</span><span class="p">},</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="internal-motor-information">
+<h2><a class="toc-backref" href="#id3">Internal Motor  information</a><a class="headerlink" href="#internal-motor-information" title="Permalink to this headline">¶</a></h2>
+<p>Two motors on ports 55 and 56 on the Boost Hub</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">55</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;combinable&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">39</span><span class="p">,</span>
+     <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;mode_combinations&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+     <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;POWER&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+               <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;SPEED&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+               <span class="mi">2</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;32b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;POS&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}},</span>
+     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Internal Motor with Tacho&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;synchronizable&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+<span class="mi">56</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;combinable&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">39</span><span class="p">,</span>
+     <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;mode_combinations&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+     <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;POWER&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+               <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;SPEED&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+               <span class="mi">2</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;32b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;POS&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}},</span>
+     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Internal Motor with Tacho&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;synchronizable&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="external-motor-information">
+<h2><a class="toc-backref" href="#id4">External Motor information</a><a class="headerlink" href="#external-motor-information" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;combinable&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+     <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;mode_combinations&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+     <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;POWER&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+               <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;SPEED&#39;</span><span class="p">},</span>
+               <span class="mi">2</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;32b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;POS&#39;</span><span class="p">}},</span>
+     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;External Motor with Tacho&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="current-voltage-information">
+<h2><a class="toc-backref" href="#id5">Current/Voltage information</a><a class="headerlink" href="#current-voltage-information" title="Permalink to this headline">¶</a></h2>
+<p>Ports 59 and 60 on the Boost hub</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">59</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+   <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CUR L&#39;</span><span class="p">},</span>
+             <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CUR S&#39;</span><span class="p">}},</span>
+   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Current&#39;</span><span class="p">},</span>
+<span class="mi">60</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+   <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;VLT L&#39;</span><span class="p">},</span>
+             <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;VLT S&#39;</span><span class="p">}},</span>
+   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Voltage&#39;</span><span class="p">},</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="hub-led-information">
+<h2><a class="toc-backref" href="#id6">Hub LED information</a><a class="headerlink" href="#hub-led-information" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">50</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span>
+     <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;COL O&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+               <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;8b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;RGB O&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}},</span>
+     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;RGB Light&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Notes on LEGO wireless BLE protocol</a><ul>
+<li><a class="reference internal" href="#vision-sensor-information">Vision sensor information</a></li>
+<li><a class="reference internal" href="#tilt-sensor-information">Tilt sensor information</a></li>
+<li><a class="reference internal" href="#internal-motor-information">Internal Motor  information</a></li>
+<li><a class="reference internal" href="#external-motor-information">External Motor information</a></li>
+<li><a class="reference internal" href="#current-voltage-information">Current/Voltage information</a></li>
+<li><a class="reference internal" href="#hub-led-information">Hub LED information</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation index</a><ul>
+      <li>Previous: <a href="../_autosummary/bluebrick.sensor.html" title="previous chapter">bluebrick.sensor</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/lego_api/lego.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>

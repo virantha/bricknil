@@ -59,7 +59,8 @@
 <li><a class="reference internal" href="#members" id="id2">Members</a></li>
 </ul>
 </div>
-<span class="target" id="module-bluebrick.peripheral"></span><div class="section" id="classes">
+<span class="target" id="module-bluebrick.peripheral"></span><p>Base class for all sensors and motors</p>
+<div class="section" id="classes">
 <h2><a class="toc-backref" href="#id1">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -78,8 +79,103 @@
 <dl class="class">
 <dt id="bluebrick.peripheral.Peripheral">
 <em class="property">class </em><code class="descclassname">bluebrick.peripheral.</code><code class="descname">Peripheral</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/peripheral.html#Peripheral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.process.Process</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="bluebrick.process.html#bluebrick.process.Process" title="bluebrick.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.process.Process</span></code></a></p>
 <p>Abstract base class for any Lego Boost/PoweredUp/WeDo peripherals</p>
+<p>A LEGO sensor can provide either a <a class="reference external" href="https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#port-input-format-single">single</a> sensing capability, or a <a class="reference external" href="https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#port-input-format-combinedmode">combined</a>  mode where it returns multiple
+sensing values.  All the details can be found in the official protocol description.</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><strong>Single capability</strong> - This is the easiest to handle:</dt>
+<dd><ul class="first last">
+<li>Send a 0x41 Port Input Format Setup command to put the sensor port into the respective mode and activate updates</li>
+<li>Read back the 0x45 Port Value(Single) messages with updates from the sensor on the respective mode</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>Multiple capabilities</strong> - This is more complicated because we need to put the sensor port into CombinedMode</dt>
+<dd><ul class="first last">
+<li>Send a [0x42, port, 0x02] message to lock the port</li>
+<li>Send multiple 0x41 messages to activate each capability/mode we want updates from</li>
+<li><dl class="first docutils">
+<dt>Send a [0x42, port, 0x01, ..] message with the following bytes:</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>0x00 = Row entry 0 in the supported combination mode table</dt>
+<dd>(hard-coded for simplicity here because LEGO seems to only use this entry most of the time)</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>For each mode/capability, send a byte like the following:</dt>
+<dd><ul class="first last">
+<li>Upper 4-bits is mode number</li>
+<li>Lower 4-bits is the dataset number</li>
+<li><dl class="first docutils">
+<dt>For example, for getting RGB values, it’s mode 6, and we want all three datasets</dt>
+<dd>(for each color), so we’d add three bytes [0x60, 0x61, 0x62].
+If you just wanted the Red value, you just append [0x60]</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li>Send a [0x42, port, 0x03] message to unlock the port</li>
+<li><dl class="first docutils">
+<dt>Now, when the sensor sends back values, it uses 0x46 messages with the following byte sequence:</dt>
+<dd><ul class="first last">
+<li>Port id</li>
+<li><dl class="first docutils">
+<dt>16-bit entry where the true bits mark which mode has values included in this message</dt>
+<dd>(So 0x00 0x05 means values from Modes 2 and 0)</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Then the set of values from the sensor, which are ordered by Mode number</dt>
+<dd>(so the sensor reading from mode 0 would come before the reading from mode 2)</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Each set of values includes however many bytes are needed to represent each dataset</dt>
+<dd>(for example, up to 3 for RGB colors), and the byte-width of each value (4 bytes for a 32-bit int)</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>capabilities</strong> – <p>can be input in the following formats (where the
+number in the tuple can be a threshold to trigger updates)</p>
+<blockquote>
+<div><ul>
+<li>[‘sense_color’, ‘sense_distannce’]</li>
+<li>[capability.sense_color, capability.sense_distance]</li>
+<li>[(‘sense_color’, 1), (‘sense_distance’, 2)]</li>
+</ul>
+</div></blockquote>
+</li>
+<li><strong>name</strong> (<em>str</em>) – Human readable name</li>
+<li><strong>port</strong> (<em>int</em>) – Port to connect to (otherwise will connect to first matching peripheral with defined sensor_id)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="bluebrick.peripheral.Peripheral.port">
 <code class="descname">port</code><a class="headerlink" href="#bluebrick.peripheral.Peripheral.port" title="Permalink to this definition">¶</a></dt>
@@ -179,9 +275,34 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="bluebrick.peripheral.Peripheral.update_value">
+<code class="descname">update_value</code><span class="sig-paren">(</span><em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/peripheral.html#Peripheral.update_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.update_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback from message parser to update a value from a sensor incoming message
+Depending on the number of capabilities enabled, we end up with different processing:</p>
+<p>If zero, then just set the <cite>self.value</cite> field to the raw message.</p>
+<dl class="docutils">
+<dt>If one, then:</dt>
+<dd><ul class="first last simple">
+<li>Parse the single sensor message which may have multiple data items (like an RGB color value)</li>
+<li><cite>self.value</cite> dict entry for this capability becomes a list of these values</li>
+</ul>
+</dd>
+<dt>If multiple, then:</dt>
+<dd><ul class="first last simple">
+<li>Parse multiple sensor messages (could be any combination of the enabled modes)</li>
+<li>Set each dict entry to <cite>self.value</cite> to either a list of multiple values or a single value</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="bluebrick.peripheral.Peripheral.activate_updates">
 <code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/peripheral.html#Peripheral.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.activate_updates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a message to the sensor to activate updates</p>
+<p>Called via an ‘attach’ message from
+<a class="reference internal" href="bluebrick.messages.html#bluebrick.messages.Message.parse_attached_io" title="bluebrick.messages.Message.parse_attached_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.messages.Message.parse_attached_io()</span></code></a> that triggers
+this call from <code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.Hub.peripheral_message_loop()</span></code></p>
 </dd></dl>
 
 <dl class="method">
@@ -194,12 +315,6 @@
 <dt id="bluebrick.peripheral.Peripheral.set_output">
 <code class="descname">set_output</code><span class="sig-paren">(</span><em>mode</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/peripheral.html#Peripheral.set_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.set_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Don’t change this unless you’re changing the way you do a Port Output command</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bluebrick.peripheral.Peripheral.update_value">
-<code class="descname">update_value</code><span class="sig-paren">(</span><em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/peripheral.html#Peripheral.update_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.update_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Callback from message parser to update a value from a sensor incoming message</p>
 </dd></dl>
 
 </dd></dl>

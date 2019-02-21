@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="bluebrick.ble_queue" href="bluebrick.ble_queue.html" />
-    <link rel="prev" title="bluebrick.bluebrick" href="bluebrick.bluebrick.html" />
+    <link rel="prev" title="bluebrick.process" href="bluebrick.process.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -39,7 +39,7 @@
           <a href="bluebrick.ble_queue.html" title="bluebrick.ble_queue"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="bluebrick.bluebrick.html" title="bluebrick.bluebrick"
+          <a href="bluebrick.process.html" title="bluebrick.process"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">BlueBrick 0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Documentation</a> &#187;</li> 
@@ -59,7 +59,7 @@
 <li><a class="reference internal" href="#members" id="id2">Members</a></li>
 </ul>
 </div>
-<span class="target" id="module-bluebrick.hub"></span><p>Hub process that the Boost and PoweredUp hubs inherit from</p>
+<span class="target" id="module-bluebrick.hub"></span><p>Hub processes for the Boost Move and PoweredUp hubs</p>
 <div class="section" id="classes">
 <h2><a class="toc-backref" href="#id1">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
@@ -72,7 +72,7 @@
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hub</span></code></a>(name)</td>
-<td></td>
+<td>Base class for all Lego hubs</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#bluebrick.hub.PoweredUpHub" title="bluebrick.hub.PoweredUpHub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoweredUpHub</span></code></a>(name)</td>
 <td></td>
@@ -83,23 +83,108 @@
 <div class="section" id="members">
 <h2><a class="toc-backref" href="#id2">Members</a><a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="bluebrick.hub.BoostHub">
-<em class="property">class </em><code class="descclassname">bluebrick.hub.</code><code class="descname">BoostHub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#BoostHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.BoostHub" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.hub.Hub</span></code></a></p>
-</dd></dl>
-
-<dl class="class">
 <dt id="bluebrick.hub.Hub">
 <em class="property">class </em><code class="descclassname">bluebrick.hub.</code><code class="descname">Hub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#Hub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.Hub" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.process.Process</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="bluebrick.process.html#bluebrick.process.Process" title="bluebrick.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.process.Process</span></code></a></p>
+<p>Base class for all Lego hubs</p>
+<dl class="attribute">
+<dt id="bluebrick.hub.Hub.hubs">
+<code class="descname">hubs</code><a class="headerlink" href="#bluebrick.hub.Hub.hubs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class attr to keep track of all Hub (and subclasses) instances</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list [<cite>Hub</cite>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.hub.Hub.message_queue">
+<code class="descname">message_queue</code><a class="headerlink" href="#bluebrick.hub.Hub.message_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outgoing message queue to <a class="reference internal" href="bluebrick.ble_queue.html#bluebrick.ble_queue.BLEventQ" title="bluebrick.ble_queue.BLEventQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.ble_queue.BLEventQ</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>curio.Queue</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.hub.Hub.peripheral_queue">
+<code class="descname">peripheral_queue</code><a class="headerlink" href="#bluebrick.hub.Hub.peripheral_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Incoming messages from <a class="reference internal" href="bluebrick.ble_queue.html#bluebrick.ble_queue.BLEventQ" title="bluebrick.ble_queue.BLEventQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.ble_queue.BLEventQ</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>curio.UniversalQueue</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.hub.Hub.uart_uuid">
+<code class="descname">uart_uuid</code><a class="headerlink" href="#bluebrick.hub.Hub.uart_uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p>UUID broadcast by LEGO UARTs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>uuid.UUID</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.hub.Hub.char_uuid">
+<code class="descname">char_uuid</code><a class="headerlink" href="#bluebrick.hub.Hub.char_uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lego uses only one service characteristic for communicating with the UART services</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>uuid.UUID</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.hub.Hub.tx">
+<code class="descname">tx</code><a class="headerlink" href="#bluebrick.hub.Hub.tx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Service characteristic for tx/rx messages that’s set by <a class="reference internal" href="bluebrick.ble_queue.html#bluebrick.ble_queue.BLEventQ.connect" title="bluebrick.ble_queue.BLEventQ.connect"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.ble_queue.BLEventQ.connect()</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.hub.Hub.peripherals">
+<code class="descname">peripherals</code><a class="headerlink" href="#bluebrick.hub.Hub.peripherals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Peripheral name =&gt; <cite>bluebrick.Peripheral</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">hubs</code><em class="property"> = []</em></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="bluebrick.hub.Hub.attach_sensor">
 <code class="descname">attach_sensor</code><span class="sig-paren">(</span><em>sensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#Hub.attach_sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.Hub.attach_sensor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bluebrick.hub.Hub.hubs">
-<code class="descname">hubs</code><em class="property"> = []</em><a class="headerlink" href="#bluebrick.hub.Hub.hubs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -117,6 +202,12 @@
 <dl class="class">
 <dt id="bluebrick.hub.PoweredUpHub">
 <em class="property">class </em><code class="descclassname">bluebrick.hub.</code><code class="descname">PoweredUpHub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#PoweredUpHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.PoweredUpHub" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.hub.Hub</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.hub.BoostHub">
+<em class="property">class </em><code class="descclassname">bluebrick.hub.</code><code class="descname">BoostHub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#BoostHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.BoostHub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.hub.Hub</span></code></a></p>
 </dd></dl>
 
@@ -141,7 +232,7 @@
 <ul>
   <li><a href="../index.html">Documentation index</a><ul>
   <li><a href="../api.html">API Documentation</a><ul>
-      <li>Previous: <a href="bluebrick.bluebrick.html" title="previous chapter">bluebrick.bluebrick</a></li>
+      <li>Previous: <a href="bluebrick.process.html" title="previous chapter">bluebrick.process</a></li>
       <li>Next: <a href="bluebrick.ble_queue.html" title="next chapter">bluebrick.ble_queue</a></li>
   </ul></li>
   </ul></li>

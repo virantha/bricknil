@@ -75,6 +75,12 @@
 </div>
 <div class="section" id="members">
 <h2><a class="toc-backref" href="#id2">Members</a><a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="bluebrick.messages.UnknownMessageError">
+<em class="property">exception </em><code class="descclassname">bluebrick.messages.</code><code class="descname">UnknownMessageError</code><a class="reference internal" href="../_modules/bluebrick/messages.html#UnknownMessageError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.UnknownMessageError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
 <dl class="class">
 <dt id="bluebrick.messages.Message">
 <em class="property">class </em><code class="descclassname">bluebrick.messages.</code><code class="descname">Message</code><span class="sig-paren">(</span><em>hub</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message" title="Permalink to this definition">¶</a></dt>
@@ -85,13 +91,8 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bluebrick.messages.Message.parse_attached_io">
-<code class="descname">parse_attached_io</code><span class="sig-paren">(</span><em>msg_bytes</em>, <em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message.parse_attached_io"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message.parse_attached_io" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bluebrick.messages.Message.parse_hub_properties">
-<code class="descname">parse_hub_properties</code><span class="sig-paren">(</span><em>msg_bytes</em>, <em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message.parse_hub_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message.parse_hub_properties" title="Permalink to this definition">¶</a></dt>
+<dt id="bluebrick.messages.Message.parse_port_value">
+<code class="descname">parse_port_value</code><span class="sig-paren">(</span><em>msg_bytes</em>, <em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message.parse_port_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message.parse_port_value" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -115,16 +116,15 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bluebrick.messages.Message.parse_port_value">
-<code class="descname">parse_port_value</code><span class="sig-paren">(</span><em>msg_bytes</em>, <em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message.parse_port_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message.parse_port_value" title="Permalink to this definition">¶</a></dt>
+<dt id="bluebrick.messages.Message.parse_attached_io">
+<code class="descname">parse_attached_io</code><span class="sig-paren">(</span><em>msg_bytes</em>, <em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message.parse_attached_io"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message.parse_attached_io" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</dd></dl>
+<dl class="method">
+<dt id="bluebrick.messages.Message.parse_hub_properties">
+<code class="descname">parse_hub_properties</code><span class="sig-paren">(</span><em>msg_bytes</em>, <em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message.parse_hub_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message.parse_hub_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="exception">
-<dt id="bluebrick.messages.UnknownMessageError">
-<em class="property">exception </em><code class="descclassname">bluebrick.messages.</code><code class="descname">UnknownMessageError</code><a class="reference internal" href="../_modules/bluebrick/messages.html#UnknownMessageError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.UnknownMessageError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 </div>

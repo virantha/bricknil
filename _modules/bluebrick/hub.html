@@ -44,7 +44,7 @@
           <div class="body" role="main">
             
   <h1>Source code for bluebrick.hub</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Hub process that the Boost and PoweredUp hubs inherit from</span>
+<span></span><span class="sd">&quot;&quot;&quot;Hub processes for the Boost Move and PoweredUp hubs</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
@@ -55,6 +55,19 @@
 <span class="kn">from</span> <span class="nn">.sensor</span> <span class="k">import</span> <span class="n">Button</span> <span class="c1"># Hack to get sensor_id of Button</span>
 
 <div class="viewcode-block" id="Hub"><a class="viewcode-back" href="../../_autosummary/bluebrick.hub.html#bluebrick.hub.Hub">[docs]</a><span class="k">class</span> <span class="nc">Hub</span><span class="p">(</span><span class="n">Process</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for all Lego hubs</span>
+
+<span class="sd">       Attributes:</span>
+<span class="sd">      </span>
+<span class="sd">            hubs (list [`Hub`]) : Class attr to keep track of all Hub (and subclasses) instances</span>
+<span class="sd">            message_queue (`curio.Queue`) : Outgoing message queue to :class:`bluebrick.ble_queue.BLEventQ`</span>
+<span class="sd">            peripheral_queue (`curio.UniversalQueue`) : Incoming messages from :class:`bluebrick.ble_queue.BLEventQ`</span>
+<span class="sd">            uart_uuid (`uuid.UUID`) : UUID broadcast by LEGO UARTs</span>
+<span class="sd">            char_uuid (`uuid.UUID`) : Lego uses only one service characteristic for communicating with the UART services</span>
+<span class="sd">            tx : Service characteristic for tx/rx messages that&#39;s set by :func:`bluebrick.ble_queue.BLEventQ.connect`</span>
+<span class="sd">            peripherals (dict) : Peripheral name =&gt; `bluebrick.Peripheral`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">hubs</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>

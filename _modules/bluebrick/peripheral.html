@@ -44,17 +44,63 @@
           <div class="body" role="main">
             
   <h1>Source code for bluebrick.peripheral</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">struct</span>
+<span></span><span class="sd">&quot;&quot;&quot;Base class for all sensors and motors</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">from</span> <span class="nn">.process</span> <span class="k">import</span> <span class="n">Process</span>
 <span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">DEVICES</span>
 
 
 <div class="viewcode-block" id="Peripheral"><a class="viewcode-back" href="../../_autosummary/bluebrick.peripheral.html#bluebrick.peripheral.Peripheral">[docs]</a><span class="k">class</span> <span class="nc">Peripheral</span><span class="p">(</span><span class="n">Process</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Abstract base class for any Lego Boost/PoweredUp/WeDo peripherals</span>
+    <span class="sd">&quot;&quot;&quot;Abstract base class for any Lego Boost/PoweredUp/WeDo peripherals</span>
 
-<span class="sd">        Attributes:</span>
+<span class="sd">       A LEGO sensor can provide either a single_ sensing capability, or a combined_  mode where it returns multiple</span>
+<span class="sd">       sensing values.  All the details can be found in the official protocol description.</span>
 
+<span class="sd">       * **Single capability** - This is the easiest to handle:</span>
+<span class="sd">            * Send a 0x41 Port Input Format Setup command to put the sensor port into the respective mode and activate updates</span>
+<span class="sd">            * Read back the 0x45 Port Value(Single) messages with updates from the sensor on the respective mode</span>
+<span class="sd">       * **Multiple capabilities** - This is more complicated because we need to put the sensor port into CombinedMode</span>
+<span class="sd">            * Send a [0x42, port, 0x02] message to lock the port</span>
+<span class="sd">            * Send multiple 0x41 messages to activate each capability/mode we want updates from</span>
+<span class="sd">            * Send a [0x42, port, 0x01, ..] message with the following bytes:</span>
+<span class="sd">                * 0x00 = Row entry 0 in the supported combination mode table</span>
+<span class="sd">                    (hard-coded for simplicity here because LEGO seems to only use this entry most of the time)</span>
+<span class="sd">                * For each mode/capability, send a byte like the following:</span>
+<span class="sd">                    * Upper 4-bits is mode number</span>
+<span class="sd">                    * Lower 4-bits is the dataset number</span>
+<span class="sd">                    * For example, for getting RGB values, it&#39;s mode 6, and we want all three datasets </span>
+<span class="sd">                        (for each color), so we&#39;d add three bytes [0x60, 0x61, 0x62].  </span>
+<span class="sd">                        If you just wanted the Red value, you just append [0x60]</span>
+<span class="sd">            * Send a [0x42, port, 0x03] message to unlock the port</span>
+<span class="sd">            * Now, when the sensor sends back values, it uses 0x46 messages with the following byte sequence:</span>
+<span class="sd">                * Port id</span>
+<span class="sd">                * 16-bit entry where the true bits mark which mode has values included in this message</span>
+<span class="sd">                    (So 0x00 0x05 means values from Modes 2 and 0)</span>
+<span class="sd">                * Then the set of values from the sensor, which are ordered by Mode number </span>
+<span class="sd">                    (so the sensor reading from mode 0 would come before the reading from mode 2)</span>
+<span class="sd">                * Each set of values includes however many bytes are needed to represent each dataset</span>
+<span class="sd">                    (for example, up to 3 for RGB colors), and the byte-width of each value (4 bytes for a 32-bit int)</span>
+
+
+<span class="sd">       .. _single: https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#port-input-format-single</span>
+<span class="sd">       .. _combined: https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#port-input-format-combinedmode</span>
+
+<span class="sd">       Args:</span>
+<span class="sd">          capabilities : can be input in the following formats (where the</span>
+<span class="sd">            number in the tuple can be a threshold to trigger updates)</span>
+
+<span class="sd">               * [&#39;sense_color&#39;, &#39;sense_distannce&#39;] </span>
+<span class="sd">               * [capability.sense_color, capability.sense_distance]</span>
+<span class="sd">               * [(&#39;sense_color&#39;, 1), (&#39;sense_distance&#39;, 2)]</span>
+
+<span class="sd">          name (str) : Human readable name</span>
+<span class="sd">          port (int) : Port to connect to (otherwise will connect to first matching peripheral with defined sensor_id)</span>
+<span class="sd">           </span>
+
+<span class="sd">       Attributes:</span>
 <span class="sd">            port (int) : Physical port on the hub this Peripheral attaches to</span>
 <span class="sd">            sensor_name (str) : Name coming out of `const.DEVICES`</span>
 <span class="sd">            enabled (bool) : `True` when the Hub sends an attach message. For future use</span>
@@ -75,6 +121,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_validated_capabilities</span><span class="p">(</span><span class="n">capabilities</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_validated_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert capabilities in different formats (string, tuple, etc)</span>
+
+<span class="sd">           Returns:</span>
+<span class="sd">                </span>
+<span class="sd">                validated_caps, thresholds  (list[`capability`], list[int]): list of capabilities and list of associated thresholds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">validated_caps</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">thresholds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">validated_caps</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="n">caps</span><span class="p">:</span>
@@ -95,6 +147,17 @@
         <span class="k">return</span> <span class="n">validated_caps</span><span class="p">,</span> <span class="n">thresholds</span>
 
     <span class="k">def</span> <span class="nf">_convert_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">:</span><span class="nb">bytearray</span><span class="p">,</span> <span class="n">byte_count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert bytearry into a set of values based on byte_count per value</span>
+
+<span class="sd">           Args:</span>
+<span class="sd">                msg_bytes (bytearray): Bytes to convert</span>
+<span class="sd">                byte_count (int): How many bytes per value to use when computer (can be 1, 2, or 4)</span>
+
+<span class="sd">           Returns:</span>
+<span class="sd">                If a single value, then just that value</span>
+<span class="sd">                If multiple values, then a list of those values</span>
+<span class="sd">                Value can be either uint8, uint16, or uint32 depending on value of `byte_count`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">byte_count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>   <span class="c1"># just a uint8</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">byte_count</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c1"># uint16 little-endian</span>
@@ -155,7 +218,22 @@
 
     <span class="c1"># Use these for sensor readings</span>
 <div class="viewcode-block" id="Peripheral.update_value"><a class="viewcode-back" href="../../_autosummary/bluebrick.peripheral.html#bluebrick.peripheral.Peripheral.update_value">[docs]</a>    <span class="k">def</span> <span class="nf">update_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Callback from message parser to update a value from a sensor incoming message &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Callback from message parser to update a value from a sensor incoming message</span>
+<span class="sd">            Depending on the number of capabilities enabled, we end up with different processing:</span>
+
+<span class="sd">            If zero, then just set the `self.value` field to the raw message.</span>
+
+<span class="sd">            If one, then:</span>
+<span class="sd">                * Parse the single sensor message which may have multiple data items (like an RGB color value)</span>
+<span class="sd">                * `self.value` dict entry for this capability becomes a list of these values</span>
+
+<span class="sd">            If multiple, then:</span>
+<span class="sd">                * Parse multiple sensor messages (could be any combination of the enabled modes)</span>
+<span class="sd">                * Set each dict entry to `self.value` to either a list of multiple values or a single value</span>
+
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">msg</span>
@@ -173,8 +251,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_combined_sensor_values</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Peripheral.activate_updates"><a class="viewcode-back" href="../../_autosummary/bluebrick.peripheral.html#bluebrick.peripheral.Peripheral.activate_updates">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">activate_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Send a message to the sensor to activate updates&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Send a message to the sensor to activate updates</span>
+
+<span class="sd">            Called via an &#39;attach&#39; message from</span>
+<span class="sd">            :func:`bluebrick.messages.Message.parse_attached_io` that triggers</span>
+<span class="sd">            this call from :func:`bluebrick.Hub.peripheral_message_loop`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;Cannot activate updates on sensor before it&#39;s been attached to </span><span class="si">{self.name}</span><span class="s2">!&quot;</span>
+        
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
             <span class="c1"># Nothing to do since no capabilities defined</span>
             <span class="k">return</span>
