@@ -3,13 +3,37 @@ BlueBrick - Control LEGO Bluetooth Sensors and Motors with Python
 
 |image_pypi| |image_downloads| |image_license| |passing| |quality| |Coverage Status|
 
-This library provides an easy way to connect to and program LEGO\ |reg|
+BlueBrick provides an easy way to connect to and program LEGO\ |reg|
 Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
 Linux.  This work was inspired by this EuroBricks_ thread, and the NodeJS Powered-Up_
 library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
 event programming built on top of the Curio_ async library.  As an aside, the choice of
 async library is fairly arbitrary; and conceivably enabling another library such as asyncio or Trio 
 should be straightforward.
+
+An example BlueBrick program for controlling the Train motor speed is shown below::
+
+   from curio import sleep
+   from bluebrick import attach, start
+   from bluebrick.hub import PoweredUpHub
+   from bluebrick.sensor import TrainMotor
+
+   @attach(TrainMotor, name='motor')
+   class Train(PoweredUpHub):
+
+       async def run(self):
+           for i in range(2):  # Repeat this control two times
+               await self.motor.ramp_speed(80,5000) # Ramp speed to 80 over 5 seconds
+               await sleep(6)
+               await self.motor.ramp_speed(0,1000)  # Brake to 0 over 1 second
+               await sleep(2)
+
+   async def system():
+       train = Train('My train')
+
+   if __name__ == '__main__':
+       start(system)
+
 
 * Free and open-source software: ASL2 license
 * Blog: http://virantha.com/category/projects/bluebrick
