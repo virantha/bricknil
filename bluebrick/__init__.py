@@ -7,6 +7,7 @@ Submodules
     :toctree: _autosummary
 
     bluebrick
+    process
     hub
     ble_queue
     messages

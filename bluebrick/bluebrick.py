@@ -1,3 +1,10 @@
+"""Utility functions to attach sensors/motors and start the whole event loop
+    
+    #. The decorator :class:`attach` to specify peripherals that
+       connect to a hub (which enables sensing and motor control functions), 
+    #. The function :func:`start` that starts running the BLE communication queue, and all the hubs, in the event-loop system
+
+"""
 import pprint
 from curio import run, spawn,  sleep
 import Adafruit_BluefruitLE

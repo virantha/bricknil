@@ -7,7 +7,9 @@ This library provides an easy way to connect to and program LEGO\ |reg|
 Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
 Linux.  This work was inspired by this EuroBricks_ thread, and the NodeJS Powered-Up_
 library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
-event programming built on top of the Curio_ async library.  
+event programming built on top of the Curio_ async library.  As an aside, the choice of
+async library is fairly arbitrary; and conceivably enabling another library such as asyncio or Trio 
+should be straightforward.
 
 * Free and open-source software: ASL2 license
 * Blog: http://virantha.com/category/projects/bluebrick
@@ -29,7 +31,7 @@ Features
    * Hub buttons
 * Fully supports Python asynchronous keywords and coroutines
 * Allows expressive concurrent programming using async/await syntax
-   * Uses the async library Curio_ by David Beazley
+   * The current implmentation uses the async library Curio_ by David Beazley 
 * Leverages the Adafruit Bluefruit BluetoothLE library
    * Supports Mac OS X (possibly the only BLE library in Python to support native CoreBluetooth access). 
    * Should also support Linux with BlueZ but currently not tested.
@@ -333,7 +335,38 @@ while at the same time changing the LED color orange if it's responding to a dis
 
 .. literalinclude:: ../examples/train_all.py
     :language: python
+
+Multiple hubs
+-------------
+TODO: Need to show an example here; maybe two trains or a Boost-hub-controlled switch with a train hub.
    
+BlueBrick Architecture
+######################
+This section documents the internal architecture of BlueBrick and how all the components communicate with
+each other.
+
+Run loops
+---------
+There are actually two threads of execution in the current system architecture.
+The main Bluetooth radio communication loop is provided by the BluetoothLE
+library, which manages everything in the background and can callback directly
+into user code.  In parallel with this, inside this library, a separate
+execution loop is running the Curio event library, which provides the async
+event loop that executes our user code. Thus, we need to be careful about
+maintaining thread safety between the Curio async event loop and the background
+Bluetooth event processing.  
+
+.. figure:: images/run_loops.svg
+    :align: center
+
+    BlueBrick running inside Curio's event loop, which in turn is run by the
+    Adafruit_BluefruitLE library run loop
+
+I'd much have preferred to have the Bluetooth library be implemented via an
+async library like Curio, asyncio, or Trio, but I wasn't able to find any such
+library. This admitted kludge of nested run loops was the only way I could get everything
+working.  
+
 
 
 Installation
@@ -356,10 +389,12 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 
 .. |image_pypi| image:: https://badge.fury.io/py/bluebrick.png
    :target: https://pypi.python.org/pypi/bluebrick
-.. |image_downloads| image:: https://img.shields.io/pypi/dd/bluebrick.svg
+.. |image_downloads| image:: https://img.shields.io/pypi/mm/bluebrick.svg
 .. |image_license| image:: https://img.shields.io/pypi/l/bluebrick.svg
+   :target: https://www.apache.org/licenses/LICENSE-2.0
 .. |passing| image:: https://scrutinizer-ci.com/g/virantha/bluebrick/badges/build.png?b=master
 .. |quality| image:: https://scrutinizer-ci.com/g/virantha/bluebrick/badges/quality-score.png?b=master
+   :target: https://scrutinizer-ci.com/g/virantha/bluebrick
 .. |Coverage Status| image:: https://coveralls.io/repos/virantha/bluebrick/badge.png?branch=develop
    :target: https://coveralls.io/r/virantha/bluebrick
 

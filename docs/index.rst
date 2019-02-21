@@ -16,7 +16,7 @@ Contents
    contributing
    authors
    api
-
+   lego_api/lego
 
 Testing
 ================

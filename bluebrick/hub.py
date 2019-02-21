@@ -1,4 +1,4 @@
-"""Hub process that the Boost and PoweredUp hubs inherit from
+"""Hub processes for the Boost Move and PoweredUp hubs
 
 """
 import uuid
@@ -9,6 +9,19 @@ from .process import Process
 from .sensor import Button # Hack to get sensor_id of Button
 
 class Hub(Process):
+    """Base class for all Lego hubs
+
+       Attributes:
+      
+            hubs (list [`Hub`]) : Class attr to keep track of all Hub (and subclasses) instances
+            message_queue (`curio.Queue`) : Outgoing message queue to :class:`bluebrick.ble_queue.BLEventQ`
+            peripheral_queue (`curio.UniversalQueue`) : Incoming messages from :class:`bluebrick.ble_queue.BLEventQ`
+            uart_uuid (`uuid.UUID`) : UUID broadcast by LEGO UARTs
+            char_uuid (`uuid.UUID`) : Lego uses only one service characteristic for communicating with the UART services
+            tx : Service characteristic for tx/rx messages that's set by :func:`bluebrick.ble_queue.BLEventQ.connect`
+            peripherals (dict) : Peripheral name => `bluebrick.Peripheral`
+
+    """
     hubs = []
 
     def __init__(self, name):
