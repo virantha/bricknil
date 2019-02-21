@@ -53,13 +53,36 @@
   <div class="section" id="bluebrick-control-lego-bluetooth-sensors-and-motors-with-python">
 <h1>BlueBrick - Control LEGO Bluetooth Sensors and Motors with Python<a class="headerlink" href="#bluebrick-control-lego-bluetooth-sensors-and-motors-with-python" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference external" href="https://pypi.python.org/pypi/bluebrick"><img alt="image_pypi" src="https://badge.fury.io/py/bluebrick.png" /></a> <img alt="image_downloads" src="https://img.shields.io/pypi/mm/bluebrick.svg" /> <a class="reference external" href="https://www.apache.org/licenses/LICENSE-2.0"><img alt="image_license" src="https://img.shields.io/pypi/l/bluebrick.svg" /></a> <img alt="passing" src="https://scrutinizer-ci.com/g/virantha/bluebrick/badges/build.png?b=master" /> <a class="reference external" href="https://scrutinizer-ci.com/g/virantha/bluebrick"><img alt="quality" src="https://scrutinizer-ci.com/g/virantha/bluebrick/badges/quality-score.png?b=master" /></a> <a class="reference external" href="https://coveralls.io/r/virantha/bluebrick"><img alt="Coverage Status" src="https://coveralls.io/repos/virantha/bluebrick/badge.png?branch=develop" /></a></p>
-<p>This library provides an easy way to connect to and program LEGO®
+<p>BlueBrick provides an easy way to connect to and program LEGO®
 Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
 Linux.  This work was inspired by this <a class="reference external" href="https://www.eurobricks.com/forum/index.php?/forums/topic/162288-powered-up-a-tear-down/">EuroBricks</a> thread, and the NodeJS <a class="reference external" href="https://github.com/nathankellenicki/node-poweredup">Powered-Up</a>
 library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
 event programming built on top of the <a class="reference external" href="http://curio.readthedocs.io">Curio</a> async library.  As an aside, the choice of
 async library is fairly arbitrary; and conceivably enabling another library such as asyncio or Trio
 should be straightforward.</p>
+<p>An example BlueBrick program for controlling the Train motor speed is shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">bluebrick</span> <span class="k">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
+<span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="k">import</span> <span class="n">PoweredUpHub</span>
+<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="k">import</span> <span class="n">TrainMotor</span>
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>  <span class="c1"># Repeat this control two times</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="mi">5000</span><span class="p">)</span> <span class="c1"># Ramp speed to 80 over 5 seconds</span>
+            <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>  <span class="c1"># Brake to 0 over 1 second</span>
+            <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">train</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;My train&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
 <ul class="simple">
 <li>Free and open-source software: ASL2 license</li>
 <li>Blog: <a class="reference external" href="http://virantha.com/category/projects/bluebrick">http://virantha.com/category/projects/bluebrick</a></li>
