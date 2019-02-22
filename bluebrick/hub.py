@@ -7,6 +7,7 @@ from curio import sleep, UniversalQueue, CancelledError
 from enum import Enum
 from .process import Process
 from .sensor import Button # Hack to get sensor_id of Button
+from .peripheral import Peripheral # for type check
 
 class Hub(Process):
     """Base class for all Lego hubs
@@ -41,15 +42,22 @@ class Hub(Process):
         Hub.hubs.append(self)
 
     async def send_message(self, msg_name, msg_bytes):
+        """Insert a message to the hub into the queue(:func:`bluebrick.hub.Hub.message_queue`) connected to our BLE interface 
+
+        """
         while not self.tx:  # Need to make sure we have a handle to the uart
             await sleep(1)
         await self.message_queue.put( (msg_name, self, msg_bytes))
 
     async def peripheral_message_loop(self):
+        """The main loop that receives messages from the :class:`bluebrick.messages.Message` parser.
+
+           Waits for messages on a UniversalQueue and dispatches to the appropriate peripheral handler.
+        """
         try:
             self.message(f'starting peripheral message loop')
 
-            # Check if we have any hub botton peripherals attached
+            # Check if we have any hub button peripherals attached
             # - If so, we need to manually call peripheral.activate_updates()
             # - and then register the proper handler inside the message parser
             while True:
@@ -66,28 +74,30 @@ class Hub(Process):
                     peripheral.message_handler = self.send_message
                     peripheral.enabled = True
                     await peripheral.activate_updates()
-                    #await self._get_port_info(peripheral.port, msg)
                 elif msg == 'update_port':
                     port, info = peripheral
-                    #self.message(f'Port info update: {port} {info}')
                     self.port_info[port] = info
                 elif msg.startswith('port'):
                     await self._get_port_info(peripheral, msg)
-
                     
         except CancelledError:
             self.message(f'Terminating peripheral')
 
-    def attach_sensor(self, sensor):
+    def attach_sensor(self, sensor: Peripheral):
+        """Add instance variable for this decorated sensor
+
+           Called by the class decorator :class:`bluebrick.bluebrick.attach` when decorating the sensor
+        """
         # Check that we don't already have a sensor with the same name attached
         assert not sensor.name in self.peripherals, f'Duplicate {sensor.name} found!'
         self.peripherals[sensor.name] = sensor
         # Put this sensor as an attribute
         setattr(self, sensor.name, sensor)
 
-
-    
     async def _get_port_info(self, port, msg):
+        """Utility function to query information on available ports and modes from a hub.
+           
+        """
         if msg == 'port_detected':
             # Request mode info
             b = [0x00, 0x21, port, 0x01]
@@ -119,18 +129,28 @@ class Hub(Process):
             await self.send_message(f'req info on mode {mode} {port}', b)
 
 class PoweredUpHub(Hub):
+    """PoweredUp Hub class 
+
+       Override `ble_id` instance variable if you want to connect to a specific physical Hub. This
+       is useful if you have multiple hubs running at the same time performing different functions.
+    """
 
     def __init__(self, name):
         super().__init__(name)
         self.ble_name = 'HUB NO.4'
-        self.ble_id = None  # Override and set this if you want to connec ta known hub
+        self.ble_id = None  # Override and set this if you want to connect ta known hub
 
 
 class BoostHub(Hub):
+    """Boost Move Hub
+
+       Override `ble_id` instance variable if you want to connect to a specific physical Hub. This
+       is useful if you have multiple hubs running at the same time performing different functions.
+    """
 
     def __init__(self, name):
         super().__init__(name)
         self.ble_name = 'LEGO Move Hub'
-        self.ble_id = None  # Override and set this if you want to connec ta known hub
+        self.ble_id = None  # Override and set this if you want to connect ta known hub
 
 

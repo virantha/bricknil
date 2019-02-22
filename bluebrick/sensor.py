@@ -1,3 +1,5 @@
+"""Actual sensor and motor peripheral definitions from Boost and PoweredUp
+"""
 from curio import sleep, current_task, spawn  # Needed for motor speed ramp
 
 from enum import Enum

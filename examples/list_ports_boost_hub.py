@@ -1,0 +1,37 @@
+from itertools import cycle
+from curio import sleep
+from bluebrick import attach, start
+from bluebrick.hub import BoostHub
+from bluebrick.sensor import TrainMotor, VisionSensor, Button, LED, InternalTiltSensor, InternalMotor
+from bluebrick.process import Process
+from bluebrick.const import Color
+
+@attach(Button, name='hub_btn', capabilities=['sense_press'])
+@attach(LED, name='hub_led')
+@attach(VisionSensor, name='vision_sensor', capabilities=['sense_count', 'sense_distance'])
+@attach(InternalTiltSensor, name='tilt_sensor', capabilities=['sense_angle'])
+@attach(InternalMotor, name='motor_l')
+@attach(InternalMotor, name='motor_r')
+class Robot(BoostHub):
+
+    async def hub_btn_change(self):
+        pass
+    async def vision_sensor_change(self):
+        pass
+    async def motor_l_change(self):
+        pass
+    async def motor_r_change(self):
+        pass
+    async def tilt_sensor_change(self):
+        pass
+
+    async def run(self):
+        self.message_info("Running")
+        await sleep(10) # Give it enough time to gather data
+
+async def system():
+    hub = Robot('robot')
+
+if __name__ == '__main__':
+    Process.level = Process.MSG_LEVEL.DEBUG
+    start(system)

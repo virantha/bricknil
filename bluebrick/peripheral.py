@@ -124,6 +124,24 @@ class Peripheral(Process):
         return val
 
     def _parse_combined_sensor_values(self, msg: bytearray):
+        """
+            Byte sequence is as follows:
+                # uint16 where each set bit indicates data value from that mode is present 
+                  (e.g. 0x00 0x05 means Mode 2 and Mode 0 data is present
+                # The data from the lowest Mode number comes first in the subsequent bytes
+                # Each Mode has a number of datasets associated with it (RGB for example is 3 datasets), and
+                  a byte-width per dataset (RGB dataset is each a uint8)
+
+            Args:
+                msg (bytearray) : the sensor message
+
+            Returns:
+                None
+
+            Side-effects:
+                self.value
+          
+        """
         msg.pop(0)  # Remove the leading 0 (since we never have more than 7 datasets even with all the combo modes activated
         # The next byte is a bit mask of the mode/dataset entries present in this value
         modes = msg.pop(0)
@@ -151,11 +169,16 @@ class Peripheral(Process):
             await sleep(1)
         await self.message_handler(msg, msg_bytes)
 
-    # Use this for motors and leds
     def _convert_speed_to_val(self, speed):
-        # -100 to 100 (negative means reverse)
-        # 0 is floating
-        # 127 is brake
+        """Map speed of -100 to 100 to a byte range
+
+            * -100 to 100 (negative means reverse)
+            * 0 is floating
+            * 127 is brake
+
+            Returns:
+                byte
+        """
         if speed == 127: return 127
         if speed > 100: speed = 100
         if speed < 0: 
@@ -165,7 +188,17 @@ class Peripheral(Process):
 
 
     async def set_output(self, mode, value):
-        """Don't change this unless you're changing the way you do a Port Output command"""
+        """Don't change this unless you're changing the way you do a Port Output command
+        
+           Outputs the following sequence to the sensor
+            * 0x00 = hub id from common header
+            * 0x81 = Port Output Command
+            * port
+            * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)
+            * 0x51 = WriteDirectModeData
+            * mode
+            * value(s)
+        """
         b = [0x00, 0x81, self.port, 0x11, 0x51, mode, value ]
         await self.send_message('set output', b)
 
@@ -184,8 +217,6 @@ class Peripheral(Process):
             If multiple, then:
                 * Parse multiple sensor messages (could be any combination of the enabled modes)
                 * Set each dict entry to `self.value` to either a list of multiple values or a single value
-
-
 
         """
         msg = bytearray(msg_bytes)
@@ -209,7 +240,13 @@ class Peripheral(Process):
 
             Called via an 'attach' message from
             :func:`bluebrick.messages.Message.parse_attached_io` that triggers
-            this call from :func:`bluebrick.Hub.peripheral_message_loop`
+            this call from :func:`bluebrick.hub.Hub.peripheral_message_loop`
+
+            See class description for explanation on how Combined Mode updates are done.
+            
+            Returns:
+                None
+
         """
         
         assert self.port is not None, f"Cannot activate updates on sensor before it's been attached to {self.name}!"

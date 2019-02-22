@@ -1,3 +1,4 @@
+"""Singleton interface to the Adafruit Bluetooth library"""
 import Adafruit_BluefruitLE
 from curio import Queue, sleep, CancelledError
 

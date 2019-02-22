@@ -1,5 +1,8 @@
+"""Useful constants for BlueBrick
+"""
 from enum import Enum
 class Color(Enum):
+    """11 colors"""
     black = 0 
     pink = 1
     purple = 2
@@ -26,3 +29,4 @@ DEVICES = {     0x0001:   'Motor',
                 0x0027:   'Internal Motor with Tacho',
                 0x0028:   'Internal Tilt'
             }
+

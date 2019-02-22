@@ -1,16 +1,41 @@
+"""Message parser for parsing incoming messages from a Hub
+
+   Called exclusively by the method :func:`bluebrick.ble_queue.BLEventQ.get_message` that is the callback
+   running inside the Adafruit_BluefruitLE library thread.
+
+   All communication to the event system in Curio-land should happen through the UniversalQueue instance
+   to ensure thread safety.  However, for now, value updates happen through a direct method call into
+   the :func:`bluebrick.peripheral.Peripheral.update_value` method of a peripheral instance.  We may want
+   to change to go through the peripheral_queue in the future.
+
+   TODO: change msg_bytes to use a Deque instead of a list for faster pop(0) operations
+
+"""
 from .const import DEVICES
 
 class UnknownMessageError(Exception):
     pass
 
 class Message:
+    """ Each hub has its own Message parser instance
+
+        Attributes:
+            hub (:class:`bluebrick.hub.Hub`): hub subclass this is sending messages to be parsed
+            handlers (dict(port => peripheral)): dict of peripherals for each port
+            port_info (dict (port => port_info)): dict containing all the port/mode information
+    """
 
     def __init__(self, hub):
         self.hub = hub
         self.handlers = {}
         self.port_info = {}
 
-    def parse(self, msg):
+    def parse(self, msg:bytearray):
+        """Main parse method called by bluetooth event queur
+           
+           Args:
+                msg (bytearray) : The raw message bytes
+        """
         # Remove the first byte that is the legnth
         # Remove the second byte that is the hub id
         msg_bytes = list(msg)
