@@ -4,8 +4,12 @@ build:
 
     nodes:
         my_tests:
+
             dependencies:
                 before:
                     - pip install pyyaml
 
+            tests:
+                override:
+                    -command: 'tox'
 
