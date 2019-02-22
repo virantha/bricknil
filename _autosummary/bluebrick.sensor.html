@@ -514,6 +514,93 @@ Use 0 to put the motor into neutral.
 </dd></dl>
 
 <dl class="class">
+<dt id="bluebrick.sensor.RemoteButtons">
+<em class="property">class </em><code class="descclassname">bluebrick.sensor.</code><code class="descname">RemoteButtons</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/sensor.html#RemoteButtons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.RemoteButtons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bluebrick.peripheral.html#bluebrick.peripheral.Peripheral" title="bluebrick.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral</span></code></a></p>
+<p>Represents one set of ‘+’, ‘-‘, ‘red’ buttons on the PoweredHub Remote</p>
+<p>Each remote has two sets of buttons, on the left and right side.  Pick the one
+your want to attach to by using the port argument with either Port.L or Port.R.</p>
+<p>There are actually a few different modes that the hardware supports, but we are
+only going to use one of them called ‘KEYSD’ (see the notes in the documentation on the
+raw values reported by the hub).  This mode makes the remote send three values back
+in a list.  To access each button state, see the example below.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the left buttons</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">RemoteButtons</span><span class="p">,</span> <span class="s1">&#39;left_buttons&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+
+<span class="c1"># Getting values back in the handler</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">left_buttons_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_buttons</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">is_plus_pressed</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">PLUS</span><span class="p">]</span>  <span class="c1"># 1 if pressed, 0 if released</span>
+    <span class="n">is_minus_pressed</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">MINUS</span><span class="p">]</span>
+    <span class="n">is_red_pressed</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">RED</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="bluebrick.sensor.RemoteButtons.Port">
+<em class="property">class </em><code class="descname">Port</code><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.RemoteButtons.Port.L">
+<code class="descname">L</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Port.L" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.RemoteButtons.Port.R">
+<code class="descname">R</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Port.R" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.RemoteButtons.Button">
+<em class="property">class </em><code class="descname">Button</code><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.RemoteButtons.Button.MINUS">
+<code class="descname">MINUS</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Button.MINUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.RemoteButtons.Button.PLUS">
+<code class="descname">PLUS</code><em class="property"> = 0</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Button.PLUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.RemoteButtons.Button.RED">
+<code class="descname">RED</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Button.RED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.sensor.RemoteButtons.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bluebrick.sensor.RemoteButtons.capability.sense_press">
+<code class="descname">sense_press</code><em class="property"> = 4</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.capability.sense_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.RemoteButtons.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_press: 4&gt;: (3, 1)}</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.sensor.RemoteButtons.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = []</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="bluebrick.sensor.Button">
 <em class="property">class </em><code class="descclassname">bluebrick.sensor.</code><code class="descname">Button</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/sensor.html#Button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.Button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bluebrick.peripheral.html#bluebrick.peripheral.Peripheral" title="bluebrick.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral</span></code></a></p>

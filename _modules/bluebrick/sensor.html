@@ -427,7 +427,40 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ramp_in_progress_task</span> <span class="o">=</span> <span class="k">await</span> <span class="n">spawn</span><span class="p">(</span><span class="n">_ramp_speed</span><span class="p">,</span> <span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="RemoteButtons"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.RemoteButtons">[docs]</a><span class="k">class</span> <span class="nc">RemoteButtons</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents one set of &#39;+&#39;, &#39;-&#39;, &#39;red&#39; buttons on the PoweredHub Remote</span>
 
+<span class="sd">       Each remote has two sets of buttons, on the left and right side.  Pick the one</span>
+<span class="sd">       your want to attach to by using the port argument with either Port.L or Port.R.</span>
+
+<span class="sd">       There are actually a few different modes that the hardware supports, but we are</span>
+<span class="sd">       only going to use one of them called &#39;KEYSD&#39; (see the notes in the documentation on the</span>
+<span class="sd">       raw values reported by the hub).  This mode makes the remote send three values back</span>
+<span class="sd">       in a list.  To access each button state, see the example below.</span>
+
+<span class="sd">       Examples::</span>
+
+<span class="sd">            # Basic connection to the left buttons</span>
+<span class="sd">            @attach(RemoteButtons, &#39;left_buttons&#39;, port=RemoteButtons.Port.L)</span>
+
+<span class="sd">            # Getting values back in the handler</span>
+<span class="sd">            async def left_buttons_change(self):</span>
+
+<span class="sd">                value = self.left_buttons.value</span>
+<span class="sd">                is_plus_pressed = value[RemoteButtons.Button.PLUS]  # 1 if pressed, 0 if released</span>
+<span class="sd">                is_minus_pressed = value[RemoteButtons.Button.MINUS]</span>
+<span class="sd">                is_red_pressed = value[RemoteButtons.Button.RED]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0037</span>
+    <span class="n">Port</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;Port&#39;</span><span class="p">,</span> <span class="s1">&#39;L R&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">Button</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;Button&#39;</span><span class="p">,</span> <span class="s1">&#39;PLUS RED MINUS&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;capability&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sense_press&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">},)</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="Button"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.Button">[docs]</a><span class="k">class</span> <span class="nc">Button</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Register to be notified of button presses on the Hub (Boost or PoweredUp)</span>

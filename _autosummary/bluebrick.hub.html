@@ -199,7 +199,8 @@
 <dl class="method">
 <dt id="bluebrick.hub.Hub.send_message">
 <code class="descname">send_message</code><span class="sig-paren">(</span><em>msg_name</em>, <em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#Hub.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.Hub.send_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert a message to the hub into the queue(<a class="reference internal" href="#bluebrick.hub.Hub.message_queue" title="bluebrick.hub.Hub.message_queue"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.hub.Hub.message_queue()</span></code></a>) connected to our BLE interface</p>
+<dd><p>Insert a message to the hub into the queue(<a class="reference internal" href="#bluebrick.hub.Hub.message_queue" title="bluebrick.hub.Hub.message_queue"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.hub.Hub.message_queue()</span></code></a>) connected to our BLE
+interface</p>
 </dd></dl>
 
 </dd></dl>
@@ -209,6 +210,15 @@
 <em class="property">class </em><code class="descclassname">bluebrick.hub.</code><code class="descname">PoweredUpHub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#PoweredUpHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.PoweredUpHub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.hub.Hub</span></code></a></p>
 <p>PoweredUp Hub class</p>
+<p>Override <cite>ble_id</cite> instance variable if you want to connect to a specific physical Hub. This
+is useful if you have multiple hubs running at the same time performing different functions.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bluebrick.hub.PoweredUpRemote">
+<em class="property">class </em><code class="descclassname">bluebrick.hub.</code><code class="descname">PoweredUpRemote</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#PoweredUpRemote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.PoweredUpRemote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.hub.Hub</span></code></a></p>
+<p>PoweredUp Remote class</p>
 <p>Override <cite>ble_id</cite> instance variable if you want to connect to a specific physical Hub. This
 is useful if you have multiple hubs running at the same time performing different functions.</p>
 </dd></dl>
