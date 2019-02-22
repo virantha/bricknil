@@ -53,6 +53,7 @@
 <span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">.process</span> <span class="k">import</span> <span class="n">Process</span>
 <span class="kn">from</span> <span class="nn">.sensor</span> <span class="k">import</span> <span class="n">Button</span> <span class="c1"># Hack to get sensor_id of Button</span>
+<span class="kn">from</span> <span class="nn">.peripheral</span> <span class="k">import</span> <span class="n">Peripheral</span> <span class="c1"># for type check</span>
 
 <div class="viewcode-block" id="Hub"><a class="viewcode-back" href="../../_autosummary/bluebrick.hub.html#bluebrick.hub.Hub">[docs]</a><span class="k">class</span> <span class="nc">Hub</span><span class="p">(</span><span class="n">Process</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Base class for all Lego hubs</span>
@@ -87,15 +88,22 @@
         <span class="n">Hub</span><span class="o">.</span><span class="n">hubs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Hub.send_message"><a class="viewcode-back" href="../../_autosummary/bluebrick.hub.html#bluebrick.hub.Hub.send_message">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_name</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert a message to the hub into the queue(:func:`bluebrick.hub.Hub.message_queue`) connected to our BLE interface </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">tx</span><span class="p">:</span>  <span class="c1"># Need to make sure we have a handle to the uart</span>
             <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">msg_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Hub.peripheral_message_loop"><a class="viewcode-back" href="../../_autosummary/bluebrick.hub.html#bluebrick.hub.Hub.peripheral_message_loop">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">peripheral_message_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The main loop that receives messages from the :class:`bluebrick.messages.Message` parser.</span>
+
+<span class="sd">           Waits for messages on a UniversalQueue and dispatches to the appropriate peripheral handler.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;starting peripheral message loop&#39;</span><span class="p">)</span>
 
-            <span class="c1"># Check if we have any hub botton peripherals attached</span>
+            <span class="c1"># Check if we have any hub button peripherals attached</span>
             <span class="c1"># - If so, we need to manually call peripheral.activate_updates()</span>
             <span class="c1"># - and then register the proper handler inside the message parser</span>
             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -112,28 +120,30 @@
                     <span class="n">peripheral</span><span class="o">.</span><span class="n">message_handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span>
                     <span class="n">peripheral</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">await</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">activate_updates</span><span class="p">()</span>
-                    <span class="c1">#await self._get_port_info(peripheral.port, msg)</span>
                 <span class="k">elif</span> <span class="n">msg</span> <span class="o">==</span> <span class="s1">&#39;update_port&#39;</span><span class="p">:</span>
                     <span class="n">port</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">peripheral</span>
-                    <span class="c1">#self.message(f&#39;Port info update: {port} {info}&#39;)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
                 <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">):</span>
                     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_port_info</span><span class="p">(</span><span class="n">peripheral</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
                     
         <span class="k">except</span> <span class="n">CancelledError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Terminating peripheral&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Hub.attach_sensor"><a class="viewcode-back" href="../../_autosummary/bluebrick.hub.html#bluebrick.hub.Hub.attach_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">attach_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">):</span>
+<div class="viewcode-block" id="Hub.attach_sensor"><a class="viewcode-back" href="../../_autosummary/bluebrick.hub.html#bluebrick.hub.Hub.attach_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">attach_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">:</span> <span class="n">Peripheral</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add instance variable for this decorated sensor</span>
+
+<span class="sd">           Called by the class decorator :class:`bluebrick.bluebrick.attach` when decorating the sensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check that we don&#39;t already have a sensor with the same name attached</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">sensor</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">peripherals</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;Duplicate </span><span class="si">{sensor.name}</span><span class="s1"> found!&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">peripherals</span><span class="p">[</span><span class="n">sensor</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensor</span>
         <span class="c1"># Put this sensor as an attribute</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">sensor</span><span class="p">)</span></div>
 
-
-    
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_port_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Utility function to query information on available ports and modes from a hub.</span>
+<span class="sd">           </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">msg</span> <span class="o">==</span> <span class="s1">&#39;port_detected&#39;</span><span class="p">:</span>
             <span class="c1"># Request mode info</span>
             <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x21</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">]</span>
@@ -165,19 +175,29 @@
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;req info on mode </span><span class="si">{mode}</span><span class="s1"> </span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PoweredUpHub"><a class="viewcode-back" href="../../_autosummary/bluebrick.hub.html#bluebrick.hub.PoweredUpHub">[docs]</a><span class="k">class</span> <span class="nc">PoweredUpHub</span><span class="p">(</span><span class="n">Hub</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;PoweredUp Hub class </span>
+
+<span class="sd">       Override `ble_id` instance variable if you want to connect to a specific physical Hub. This</span>
+<span class="sd">       is useful if you have multiple hubs running at the same time performing different functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ble_name</span> <span class="o">=</span> <span class="s1">&#39;HUB NO.4&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ble_id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Override and set this if you want to connec ta known hub</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ble_id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Override and set this if you want to connect ta known hub</span></div>
 
 
 <div class="viewcode-block" id="BoostHub"><a class="viewcode-back" href="../../_autosummary/bluebrick.hub.html#bluebrick.hub.BoostHub">[docs]</a><span class="k">class</span> <span class="nc">BoostHub</span><span class="p">(</span><span class="n">Hub</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Boost Move Hub</span>
+
+<span class="sd">       Override `ble_id` instance variable if you want to connect to a specific physical Hub. This</span>
+<span class="sd">       is useful if you have multiple hubs running at the same time performing different functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ble_name</span> <span class="o">=</span> <span class="s1">&#39;LEGO Move Hub&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ble_id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Override and set this if you want to connec ta known hub</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ble_id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Override and set this if you want to connect ta known hub</span></div>
 
 
 </pre></div>

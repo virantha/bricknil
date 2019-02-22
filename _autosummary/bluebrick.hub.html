@@ -69,13 +69,13 @@
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#bluebrick.hub.BoostHub" title="bluebrick.hub.BoostHub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoostHub</span></code></a>(name)</td>
-<td></td>
+<td>Boost Move Hub</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hub</span></code></a>(name)</td>
 <td>Base class for all Lego hubs</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#bluebrick.hub.PoweredUpHub" title="bluebrick.hub.PoweredUpHub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoweredUpHub</span></code></a>(name)</td>
-<td></td>
+<td>PoweredUp Hub class</td>
 </tr>
 </tbody>
 </table>
@@ -184,18 +184,23 @@
 
 <dl class="method">
 <dt id="bluebrick.hub.Hub.attach_sensor">
-<code class="descname">attach_sensor</code><span class="sig-paren">(</span><em>sensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#Hub.attach_sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.Hub.attach_sensor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">attach_sensor</code><span class="sig-paren">(</span><em>sensor: bluebrick.peripheral.Peripheral</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#Hub.attach_sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.Hub.attach_sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add instance variable for this decorated sensor</p>
+<p>Called by the class decorator <a class="reference internal" href="bluebrick.bluebrick.html#bluebrick.bluebrick.attach" title="bluebrick.bluebrick.attach"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.bluebrick.attach</span></code></a> when decorating the sensor</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bluebrick.hub.Hub.peripheral_message_loop">
 <code class="descname">peripheral_message_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#Hub.peripheral_message_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.Hub.peripheral_message_loop" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The main loop that receives messages from the <a class="reference internal" href="bluebrick.messages.html#bluebrick.messages.Message" title="bluebrick.messages.Message"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.messages.Message</span></code></a> parser.</p>
+<p>Waits for messages on a UniversalQueue and dispatches to the appropriate peripheral handler.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bluebrick.hub.Hub.send_message">
 <code class="descname">send_message</code><span class="sig-paren">(</span><em>msg_name</em>, <em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#Hub.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.Hub.send_message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Insert a message to the hub into the queue(<a class="reference internal" href="#bluebrick.hub.Hub.message_queue" title="bluebrick.hub.Hub.message_queue"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.hub.Hub.message_queue()</span></code></a>) connected to our BLE interface</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -203,12 +208,18 @@
 <dt id="bluebrick.hub.PoweredUpHub">
 <em class="property">class </em><code class="descclassname">bluebrick.hub.</code><code class="descname">PoweredUpHub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#PoweredUpHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.PoweredUpHub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.hub.Hub</span></code></a></p>
+<p>PoweredUp Hub class</p>
+<p>Override <cite>ble_id</cite> instance variable if you want to connect to a specific physical Hub. This
+is useful if you have multiple hubs running at the same time performing different functions.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="bluebrick.hub.BoostHub">
 <em class="property">class </em><code class="descclassname">bluebrick.hub.</code><code class="descname">BoostHub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/hub.html#BoostHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.hub.BoostHub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.hub.Hub</span></code></a></p>
+<p>Boost Move Hub</p>
+<p>Override <cite>ble_id</cite> instance variable if you want to connect to a specific physical Hub. This
+is useful if you have multiple hubs running at the same time performing different functions.</p>
 </dd></dl>
 
 </div>

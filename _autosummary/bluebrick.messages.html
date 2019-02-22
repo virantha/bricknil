@@ -59,7 +59,15 @@
 <li><a class="reference internal" href="#members" id="id2">Members</a></li>
 </ul>
 </div>
-<span class="target" id="module-bluebrick.messages"></span><div class="section" id="classes">
+<span class="target" id="module-bluebrick.messages"></span><p>Message parser for parsing incoming messages from a Hub</p>
+<p>Called exclusively by the method <code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.ble_queue.BLEventQ.get_message()</span></code> that is the callback
+running inside the Adafruit_BluefruitLE library thread.</p>
+<p>All communication to the event system in Curio-land should happen through the UniversalQueue instance
+to ensure thread safety.  However, for now, value updates happen through a direct method call into
+the <a class="reference internal" href="bluebrick.peripheral.html#bluebrick.peripheral.Peripheral.update_value" title="bluebrick.peripheral.Peripheral.update_value"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.peripheral.Peripheral.update_value()</span></code></a> method of a peripheral instance.  We may want
+to change to go through the peripheral_queue in the future.</p>
+<p>TODO: change msg_bytes to use a Deque instead of a list for faster pop(0) operations</p>
+<div class="section" id="classes">
 <h2><a class="toc-backref" href="#id1">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -68,7 +76,7 @@
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#bluebrick.messages.Message" title="bluebrick.messages.Message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Message</span></code></a>(hub)</td>
-<td></td>
+<td>Each hub has its own Message parser instance</td>
 </tr>
 </tbody>
 </table>
@@ -85,10 +93,62 @@
 <dt id="bluebrick.messages.Message">
 <em class="property">class </em><code class="descclassname">bluebrick.messages.</code><code class="descname">Message</code><span class="sig-paren">(</span><em>hub</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Each hub has its own Message parser instance</p>
+<dl class="attribute">
+<dt id="bluebrick.messages.Message.hub">
+<code class="descname">hub</code><a class="headerlink" href="#bluebrick.messages.Message.hub" title="Permalink to this definition">¶</a></dt>
+<dd><p>hub subclass this is sending messages to be parsed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="bluebrick.hub.html#bluebrick.hub.Hub" title="bluebrick.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bluebrick.hub.Hub</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.messages.Message.handlers">
+<code class="descname">handlers</code><a class="headerlink" href="#bluebrick.messages.Message.handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict of peripherals for each port</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">dict(port =&gt; peripheral)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bluebrick.messages.Message.port_info">
+<code class="descname">port_info</code><a class="headerlink" href="#bluebrick.messages.Message.port_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict containing all the port/mode information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">dict (port =&gt; port_info)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="bluebrick.messages.Message.parse">
-<code class="descname">parse</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message.parse" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">parse</code><span class="sig-paren">(</span><em>msg: bytearray</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/messages.html#Message.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.messages.Message.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main parse method called by bluetooth event queur</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>bytearray</em>) – The raw message bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="bluebrick.messages.Message.parse_port_value">

@@ -302,7 +302,16 @@ Depending on the number of capabilities enabled, we end up with different proces
 <dd><p>Send a message to the sensor to activate updates</p>
 <p>Called via an ‘attach’ message from
 <a class="reference internal" href="bluebrick.messages.html#bluebrick.messages.Message.parse_attached_io" title="bluebrick.messages.Message.parse_attached_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.messages.Message.parse_attached_io()</span></code></a> that triggers
-this call from <code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.Hub.peripheral_message_loop()</span></code></p>
+this call from <a class="reference internal" href="bluebrick.hub.html#bluebrick.hub.Hub.peripheral_message_loop" title="bluebrick.hub.Hub.peripheral_message_loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluebrick.hub.Hub.peripheral_message_loop()</span></code></a></p>
+<p>See class description for explanation on how Combined Mode updates are done.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -315,6 +324,19 @@ this call from <code class="xref py py-func docutils literal notranslate"><span 
 <dt id="bluebrick.peripheral.Peripheral.set_output">
 <code class="descname">set_output</code><span class="sig-paren">(</span><em>mode</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/peripheral.html#Peripheral.set_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.peripheral.Peripheral.set_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Don’t change this unless you’re changing the way you do a Port Output command</p>
+<dl class="docutils">
+<dt>Outputs the following sequence to the sensor</dt>
+<dd><ul class="first last simple">
+<li>0x00 = hub id from common header</li>
+<li>0x81 = Port Output Command</li>
+<li>port</li>
+<li>0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</li>
+<li>0x51 = WriteDirectModeData</li>
+<li>mode</li>
+<li>value(s)</li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

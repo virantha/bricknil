@@ -44,7 +44,8 @@
           <div class="body" role="main">
             
   <h1>Source code for bluebrick.ble_queue</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">Adafruit_BluefruitLE</span>
+<span></span><span class="sd">&quot;&quot;&quot;Singleton interface to the Adafruit Bluetooth library&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">Adafruit_BluefruitLE</span>
 <span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">CancelledError</span>
 
 <span class="kn">from</span> <span class="nn">.sensor</span> <span class="k">import</span> <span class="n">Button</span> <span class="c1"># Hack! only to get the button sensor_id for the fake attach message</span>

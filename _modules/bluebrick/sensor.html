@@ -44,7 +44,9 @@
           <div class="body" role="main">
             
   <h1>Source code for bluebrick.sensor</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">current_task</span><span class="p">,</span> <span class="n">spawn</span>  <span class="c1"># Needed for motor speed ramp</span>
+<span></span><span class="sd">&quot;&quot;&quot;Actual sensor and motor peripheral definitions from Boost and PoweredUp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">current_task</span><span class="p">,</span> <span class="n">spawn</span>  <span class="c1"># Needed for motor speed ramp</span>
 
 <span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">Color</span>

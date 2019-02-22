@@ -170,6 +170,24 @@
         <span class="k">return</span> <span class="n">val</span>
 
     <span class="k">def</span> <span class="nf">_parse_combined_sensor_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Byte sequence is as follows:</span>
+<span class="sd">                # uint16 where each set bit indicates data value from that mode is present </span>
+<span class="sd">                  (e.g. 0x00 0x05 means Mode 2 and Mode 0 data is present</span>
+<span class="sd">                # The data from the lowest Mode number comes first in the subsequent bytes</span>
+<span class="sd">                # Each Mode has a number of datasets associated with it (RGB for example is 3 datasets), and</span>
+<span class="sd">                  a byte-width per dataset (RGB dataset is each a uint8)</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                msg (bytearray) : the sensor message</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Side-effects:</span>
+<span class="sd">                self.value</span>
+<span class="sd">          </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Remove the leading 0 (since we never have more than 7 datasets even with all the combo modes activated</span>
         <span class="c1"># The next byte is a bit mask of the mode/dataset entries present in this value</span>
         <span class="n">modes</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -197,11 +215,16 @@
             <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_handler</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">)</span></div>
 
-    <span class="c1"># Use this for motors and leds</span>
     <span class="k">def</span> <span class="nf">_convert_speed_to_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
-        <span class="c1"># -100 to 100 (negative means reverse)</span>
-        <span class="c1"># 0 is floating</span>
-        <span class="c1"># 127 is brake</span>
+        <span class="sd">&quot;&quot;&quot;Map speed of -100 to 100 to a byte range</span>
+
+<span class="sd">            * -100 to 100 (negative means reverse)</span>
+<span class="sd">            * 0 is floating</span>
+<span class="sd">            * 127 is brake</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                byte</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">speed</span> <span class="o">==</span> <span class="mi">127</span><span class="p">:</span> <span class="k">return</span> <span class="mi">127</span>
         <span class="k">if</span> <span class="n">speed</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span> <span class="n">speed</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="k">if</span> <span class="n">speed</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> 
@@ -211,7 +234,17 @@
 
 
 <div class="viewcode-block" id="Peripheral.set_output"><a class="viewcode-back" href="../../_autosummary/bluebrick.peripheral.html#bluebrick.peripheral.Peripheral.set_output">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Don&#39;t change this unless you&#39;re changing the way you do a Port Output command&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Don&#39;t change this unless you&#39;re changing the way you do a Port Output command</span>
+<span class="sd">        </span>
+<span class="sd">           Outputs the following sequence to the sensor</span>
+<span class="sd">            * 0x00 = hub id from common header</span>
+<span class="sd">            * 0x81 = Port Output Command</span>
+<span class="sd">            * port</span>
+<span class="sd">            * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</span>
+<span class="sd">            * 0x51 = WriteDirectModeData</span>
+<span class="sd">            * mode</span>
+<span class="sd">            * value(s)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x11</span><span class="p">,</span> <span class="mh">0x51</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">value</span> <span class="p">]</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s1">&#39;set output&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
 
@@ -230,8 +263,6 @@
 <span class="sd">            If multiple, then:</span>
 <span class="sd">                * Parse multiple sensor messages (could be any combination of the enabled modes)</span>
 <span class="sd">                * Set each dict entry to `self.value` to either a list of multiple values or a single value</span>
-
-
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
@@ -255,7 +286,13 @@
 
 <span class="sd">            Called via an &#39;attach&#39; message from</span>
 <span class="sd">            :func:`bluebrick.messages.Message.parse_attached_io` that triggers</span>
-<span class="sd">            this call from :func:`bluebrick.Hub.peripheral_message_loop`</span>
+<span class="sd">            this call from :func:`bluebrick.hub.Hub.peripheral_message_loop`</span>
+
+<span class="sd">            See class description for explanation on how Combined Mode updates are done.</span>
+<span class="sd">            </span>
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;Cannot activate updates on sensor before it&#39;s been attached to </span><span class="si">{self.name}</span><span class="s2">!&quot;</span>

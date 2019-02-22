@@ -44,19 +44,44 @@
           <div class="body" role="main">
             
   <h1>Source code for bluebrick.messages</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">DEVICES</span>
+<span></span><span class="sd">&quot;&quot;&quot;Message parser for parsing incoming messages from a Hub</span>
+
+<span class="sd">   Called exclusively by the method :func:`bluebrick.ble_queue.BLEventQ.get_message` that is the callback</span>
+<span class="sd">   running inside the Adafruit_BluefruitLE library thread.</span>
+
+<span class="sd">   All communication to the event system in Curio-land should happen through the UniversalQueue instance</span>
+<span class="sd">   to ensure thread safety.  However, for now, value updates happen through a direct method call into</span>
+<span class="sd">   the :func:`bluebrick.peripheral.Peripheral.update_value` method of a peripheral instance.  We may want</span>
+<span class="sd">   to change to go through the peripheral_queue in the future.</span>
+
+<span class="sd">   TODO: change msg_bytes to use a Deque instead of a list for faster pop(0) operations</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">DEVICES</span>
 
 <div class="viewcode-block" id="UnknownMessageError"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.UnknownMessageError">[docs]</a><span class="k">class</span> <span class="nc">UnknownMessageError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Each hub has its own Message parser instance</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            hub (:class:`bluebrick.hub.Hub`): hub subclass this is sending messages to be parsed</span>
+<span class="sd">            handlers (dict(port =&gt; peripheral)): dict of peripherals for each port</span>
+<span class="sd">            port_info (dict (port =&gt; port_info)): dict containing all the port/mode information</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hub</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hub</span> <span class="o">=</span> <span class="n">hub</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="Message.parse"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<div class="viewcode-block" id="Message.parse"><a class="viewcode-back" href="../../_autosummary/bluebrick.messages.html#bluebrick.messages.Message.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="nb">bytearray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Main parse method called by bluetooth event queur</span>
+<span class="sd">           </span>
+<span class="sd">           Args:</span>
+<span class="sd">                msg (bytearray) : The raw message bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Remove the first byte that is the legnth</span>
         <span class="c1"># Remove the second byte that is the hub id</span>
         <span class="n">msg_bytes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
