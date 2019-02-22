@@ -1,6 +1,9 @@
 build:
     environment:
         python: 3.7.1
+        dependencies:
+            before:
+                - pip install pyyaml
 
     nodes:
         my_tests:
