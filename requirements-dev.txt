@@ -10,5 +10,6 @@ twine
 pytest
 mock
 pytest-cov
+pytest-curio
 coveralls
 pyyaml
