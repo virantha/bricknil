@@ -1,2 +1,3 @@
+pyyaml
 curio
 bluebrick-Adafruit_BluefruitLE

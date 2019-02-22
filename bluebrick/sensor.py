@@ -330,6 +330,25 @@ class TrainMotor(Peripheral):
                 self.message_info(f'Canceling previous speed ramp in progress')
 
 
+    async def ramp_speed2(self, target_speed, ramp_time_ms):
+        
+        # Set acceleration profile
+        delta_speed = target_speed - self.speed
+        zero_100_ramp_time_ms = int(ramp_time_ms/delta_speed * 100.0) 
+        zero_100_ramp_time_ms = zero_100_ramp_time_ms % 10000 # limit time to 10s
+
+        hi = (zero_100_ramp_time_ms >> 8) & 255
+        lo = zero_100_ramp_time_ms & 255
+
+        profile = 1
+        b = [0x00, 0x81, self.port, 0x01, 0x08, 50,50, 80, 3]
+        await self.send_message('set speed', b)
+        b = [0x00, 0x81, self.port, 0x01, 0x05, 10, 10, profile]
+        await self.send_message(f'set accel profile {zero_100_ramp_time_ms} {hi} {lo} ', b)
+        b = [0x00, 0x81, self.port, 0x01, 0x07, self._convert_speed_to_val(target_speed), 80, 0]
+        await self.send_message('set speed', b)
+
+
     async def ramp_speed(self, target_speed, ramp_time_ms):
         """Ramp the speed by 10 units in the time given
 

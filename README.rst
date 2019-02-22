@@ -411,15 +411,15 @@ Disclaimer
 The software is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under ASL 2.0
 
-.. |image_pypi| image:: https://badge.fury.io/py/bluebrick.png
+.. |image_pypi| image:: https://img.shields.io/pypi/v/bluebrick.svg
    :target: https://pypi.python.org/pypi/bluebrick
-.. |image_downloads| image:: https://img.shields.io/pypi/mm/bluebrick.svg
+.. |image_downloads| image:: https://img.shields.io/pypi/dd/bluebrick.svg
 .. |image_license| image:: https://img.shields.io/pypi/l/bluebrick.svg
    :target: https://www.apache.org/licenses/LICENSE-2.0
 .. |passing| image:: https://scrutinizer-ci.com/g/virantha/bluebrick/badges/build.png?b=master
 .. |quality| image:: https://scrutinizer-ci.com/g/virantha/bluebrick/badges/quality-score.png?b=master
    :target: https://scrutinizer-ci.com/g/virantha/bluebrick
-.. |Coverage Status| image:: https://coveralls.io/repos/virantha/bluebrick/badge.png?branch=develop
+.. |Coverage Status| image:: https://img.shields.io/coveralls/github/virantha/bluebrick.svg
    :target: https://coveralls.io/r/virantha/bluebrick
 
 .. |reg|    unicode:: U+000AE .. REGISTERED SIGN
