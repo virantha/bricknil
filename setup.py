@@ -4,11 +4,8 @@ from setuptools import setup, find_packages
 import io
 import os
 from setuptools import Command
-import yaml, pkg_resources
+from bluebrick.version import __version__
 
-with open('bluebrick/config.yml') as f:
-    d = yaml.load(f)
-    __version__ = d['version']
 
 class PyTest(Command):
     user_options = []
