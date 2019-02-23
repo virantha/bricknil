@@ -365,6 +365,14 @@ Controlling Vernie (Boost Hub) with the PoweredUp Remote
 Here's a nice example of controlling two hubs (the remote is also a type of hub) and 
 feeding the button presses of the remote to make Vernie move forward, backward, left, and right.
 
+.. raw:: html
+
+    <div style="position: relative; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/Mme2gFRiMI0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+And here's the code that's being used in the video above:
+
 .. literalinclude:: ../examples/vernie_remote.py 
     :language: python
 
