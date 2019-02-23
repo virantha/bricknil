@@ -1,8 +1,8 @@
 from curio import sleep
-from bluebrick import attach, start
-from bluebrick.hub import PoweredUpHub
-from bluebrick.sensor import TrainMotor, VisionSensor
-from bluebrick.process import Process
+from bricknil import attach, start
+from bricknil.hub import PoweredUpHub
+from bricknil.sensor import TrainMotor, VisionSensor
+from bricknil.process import Process
 
 @attach(VisionSensor, name='train_sensor', capabilities=['sense_count', 'sense_distance'])
 @attach(TrainMotor, name='motor')

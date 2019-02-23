@@ -13,7 +13,7 @@ Make sure to install all the dev packages in your local environment::
        cd docs
        make html
    
-  Docs by default are built in `../../githubdocs/bluebrick`, but you can change this in 
+  Docs by default are built in `../../githubdocs/bricknil`, but you can change this in 
   `docs/Makefile`.
 
 * **Deploying documentation**: Documentation is hosted on github pages.  We use fabric (see `tasks.py`) for deploying::
@@ -35,7 +35,7 @@ You can contribute in many ways:
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/virantha/bluebrick/issues.
+Report bugs at https://github.com/virantha/bricknil/issues.
 
 If you are reporting a bug, please include:
 
@@ -58,14 +58,14 @@ is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-BlueBrick  could always use more documentation, whether as part of
-the official BlueBrick  docs, in docstrings, or even on the web in
+BrickNil  could always use more documentation, whether as part of
+the official BrickNil  docs, in docstrings, or even on the web in
 blog posts, articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/virantha/bluebrick/issues.
+The best way to send feedback is to file an issue at https://github.com/virantha/bricknil/issues.
 
 If you are proposing a feature:
 
@@ -77,17 +77,17 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `bluebrick` for local development.
+Ready to contribute? Here's how to set up `bricknil` for local development.
 
-1. Fork the `bluebrick` repo on GitHub.
+1. Fork the `bricknil` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/bluebrick.git
+    $ git clone git@github.com:your_name_here/bricknil.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
-    $ mkvirtualenv bluebrick
-    $ cd bluebrick/
+    $ mkvirtualenv bricknil
+    $ cd bricknil/
     $ python setup.py develop
 
 4. Create a branch for local development::
@@ -120,6 +120,6 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
 3. The pull request should work for Python 3.7+. Check 
-   https://travis-ci.org/virantha/bluebrick/pull_requests
+   https://travis-ci.org/virantha/bricknil/pull_requests
    and make sure that the tests pass for all supported Python versions.
 

@@ -1,9 +1,9 @@
-BlueBrick - Control LEGO Bluetooth Sensors and Motors with Python
+BrickNil - Control LEGO Bluetooth Sensors and Motors with Python
 =================================================================
 
 |image_pypi| |image_downloads| |image_license| |passing| |quality| |Coverage Status|
 
-BlueBrick provides an easy way to connect to and program LEGO\ |reg|
+BrickNil provides an easy way to connect to and program LEGO\ |reg|
 Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
 Linux.  This work was inspired by this EuroBricks_ thread, and the NodeJS Powered-Up_
 library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
@@ -11,12 +11,12 @@ event programming built on top of the Curio_ async library.  As an aside, the ch
 async library is fairly arbitrary; and conceivably enabling another library such as asyncio or Trio 
 should be straightforward.
 
-An example BlueBrick program for controlling the Train motor speed is shown below::
+An example BrickNil program for controlling the Train motor speed is shown below::
 
    from curio import sleep
-   from bluebrick import attach, start
-   from bluebrick.hub import PoweredUpHub
-   from bluebrick.sensor import TrainMotor
+   from bricknil import attach, start
+   from bricknil.hub import PoweredUpHub
+   from bricknil.sensor import TrainMotor
 
    @attach(TrainMotor, name='motor')
    class Train(PoweredUpHub):
@@ -36,9 +36,9 @@ An example BlueBrick program for controlling the Train motor speed is shown belo
 
 
 * Free and open-source software: ASL2 license
-* Blog: http://virantha.com/category/projects/bluebrick
-* Documentation: http://virantha.github.io/bluebrick
-* Source: https://github.com/virantha/bluebrick
+* Blog: http://virantha.com/category/projects/bricknil
+* Documentation: http://virantha.github.io/bricknil
+* Source: https://github.com/virantha/bricknil
 
 Features
 ########
@@ -71,7 +71,7 @@ Building a simple train controller
 Let's build a simple program to control a LEGO\ |reg| PoweredUp train.  The first thing to do
 is create a class that subclasses the Bluetooth hub that we'll be using::
 
-   from bluebrick.hub import PoweredUpHub
+   from bricknil.hub import PoweredUpHub
 
    class Train(PoweredUpHub):
 
@@ -82,8 +82,8 @@ The ``run`` async function (it's actually a coroutine) will contain the code tha
 everything attached to this hub.  Speaking of which, because we'll be wanting to control the train
 motor connected to this hub, we'd better attach it to the code like so::
 
-   from bluebrick.hub import PoweredUpHub
-   from bluebrick.sensor import TrainMotor
+   from bricknil.hub import PoweredUpHub
+   from bricknil.sensor import TrainMotor
 
    @attach(TrainMotor, name='motor')
    class Train(PoweredUpHub):
@@ -96,8 +96,8 @@ let's say that we wanted to set the motor speed to 50 (the allowed range is -100
 numbers are reverse speeds)::
 
    from curio import sleep
-   from bluebrick.hub import PoweredUpHub
-   from bluebrick.sensor import TrainMotor
+   from bricknil.hub import PoweredUpHub
+   from bricknil.sensor import TrainMotor
 
    @attach(TrainMotor, name='motor')
    class Train(PoweredUpHub):
@@ -108,7 +108,7 @@ numbers are reverse speeds)::
 
 Notice that we're using the `await` keyword in front of all the calls, because
 those are also asynchronous coroutines that will get run in the event loop.
-At some point, the :func:`bluebrick.sensor.TrainMotor.set_speed` coroutine
+At some point, the :func:`bricknil.sensor.TrainMotor.set_speed` coroutine
 will finish executing and control will return back to the statement after it.
 The next statement is a call to the `sleep` coroutine from the `curio`
 library. It's important to use this, instead of the regular *function*
@@ -127,7 +127,7 @@ the `run` logic as::
             await self.motor.ramp_speed(0,1000) 
             await sleep(2)
 
-The :func:`bluebrick.sensor.TrainMotor.ramp_speed` function will ramp the speed from 
+The :func:`bricknil.sensor.TrainMotor.ramp_speed` function will ramp the speed from 
 whatever it is currently to the target speed over the millisecond duration given (internally, it will
 change the train speed every 100ms).  Here, you can see how things are running concurrently:  we issue
 the ramp_speed command, that will take 5 seconds to complete in the background,
@@ -137,10 +137,10 @@ comes to a stop, it will stay stopped for 1 second, then repeat this sequence of
 once more before exiting.
 
 It's also useful to print out what's happening as we run our program. In order to facilitate that, 
-there is some rudimentary logging capability built-in to `bluebrick` via the 
-:class:`bluebrick.process.Process` class that all of these concurrent processes are sub-classed from.
+there is some rudimentary logging capability built-in to `bricknil` via the 
+:class:`bricknil.process.Process` class that all of these concurrent processes are sub-classed from.
 Here's the run coroutine with logging statements via
-:func:`bluebrick.process.Process.message_info` enabled::
+:func:`bricknil.process.Process.message_info` enabled::
 
     async def run(self):
         self.message_info("Running")
@@ -162,13 +162,13 @@ our entire system in a separate top-level coroutine like so::
 
 This coroutine instantiates all the hubs we want to control; once we have that,
 we can go ahead and implement the full program that calls
-:func:`bluebrick.start` with this `system` coroutine::
+:func:`bricknil.start` with this `system` coroutine::
 
    from curio import sleep
-   from bluebrick import attach, start
-   from bluebrick.hub import PoweredUpHub
-   from bluebrick.sensor import TrainMotor
-   from bluebrick.process import Process
+   from bricknil import attach, start
+   from bricknil.hub import PoweredUpHub
+   from bricknil.sensor import TrainMotor
+   from bricknil.process import Process
 
    @attach(TrainMotor, name='motor')
    class Train(PoweredUpHub):
@@ -236,7 +236,7 @@ but for this example, we're just going to use the `sense_count` and
 something pass in front of it at a distance of ~2 inches, while the latter
 measures roughly how many inches something is from the sensor (from 1-10
 inches).  For a full list of the supported capabilities, please see the API
-documentation at :class:`bluebrick.sensor.VisionSensor`.
+documentation at :class:`bricknil.sensor.VisionSensor`.
 
 The full program is listed at the end of this section, but let's just go through
 it bit by bit.  The first thing we'll do is attach the sensor to the Train class::
@@ -305,10 +305,10 @@ and end.
 Here's the full code::
 
    from curio import sleep
-   from bluebrick import attach, start
-   from bluebrick.hub import PoweredUpHub
-   from bluebrick.sensor import TrainMotor, VisionSensor
-   from bluebrick.process import Process
+   from bricknil import attach, start
+   from bricknil.hub import PoweredUpHub
+   from bricknil.sensor import TrainMotor, VisionSensor
+   from bricknil.process import Process
 
    @attach(VisionSensor, name='train_sensor', capabilities=['sense_count', 'sense_distance'])
    @attach(TrainMotor, name='motor')
@@ -381,9 +381,9 @@ from the remote telling the robot(Boost hub) what to do. Notice that each Remote
 instance consists of 3 buttons, so there are some helper methods to check if a particular
 button is pressed.
 
-BlueBrick Architecture
+BrickNil Architecture
 ######################
-This section documents the internal architecture of BlueBrick and how all the components communicate with
+This section documents the internal architecture of BrickNil and how all the components communicate with
 each other.
 
 Run loops
@@ -400,7 +400,7 @@ Bluetooth event processing.
 .. figure:: images/run_loops.svg
     :align: center
 
-    BlueBrick running inside Curio's event loop, which in turn is run by the
+    BrickNil running inside Curio's event loop, which in turn is run by the
     Adafruit_BluefruitLE library run loop
 
 I'd much have preferred to have the Bluetooth library be implemented via an
@@ -417,7 +417,7 @@ On Mac OS X, it should just be a simple:
 
 .. code-block:: bash
 
-    $ pip install bluebrick
+    $ pip install bricknil
 
 Installing on other platforms like Linux is not supported at this time until I can break out the
 mac requirements, and test bluez.
@@ -428,15 +428,15 @@ Disclaimer
 The software is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under ASL 2.0
 
-.. |image_pypi| image:: https://img.shields.io/pypi/v/bluebrick.svg
-   :target: https://pypi.python.org/pypi/bluebrick
-.. |image_downloads| image:: https://img.shields.io/pypi/dd/bluebrick.svg
-.. |image_license| image:: https://img.shields.io/pypi/l/bluebrick.svg
+.. |image_pypi| image:: https://img.shields.io/pypi/v/bricknil.svg
+   :target: https://pypi.python.org/pypi/bricknil
+.. |image_downloads| image:: https://img.shields.io/pypi/dd/bricknil.svg
+.. |image_license| image:: https://img.shields.io/pypi/l/bricknil.svg
    :target: https://www.apache.org/licenses/LICENSE-2.0
-.. |passing| image:: https://scrutinizer-ci.com/g/virantha/bluebrick/badges/build.png?b=master
-.. |quality| image:: https://scrutinizer-ci.com/g/virantha/bluebrick/badges/quality-score.png?b=master
-   :target: https://scrutinizer-ci.com/g/virantha/bluebrick
-.. |Coverage Status| image:: https://img.shields.io/coveralls/github/virantha/bluebrick.svg
-   :target: https://coveralls.io/r/virantha/bluebrick
+.. |passing| image:: https://scrutinizer-ci.com/g/virantha/bricknil/badges/build.png?b=master
+.. |quality| image:: https://scrutinizer-ci.com/g/virantha/bricknil/badges/quality-score.png?b=master
+   :target: https://scrutinizer-ci.com/g/virantha/bricknil
+.. |Coverage Status| image:: https://img.shields.io/coveralls/github/virantha/bricknil.svg
+   :target: https://coveralls.io/r/virantha/bricknil
 
 .. |reg|    unicode:: U+000AE .. REGISTERED SIGN

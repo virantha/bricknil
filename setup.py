@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 import io
 import os
 from setuptools import Command
-#from bluebrick.version import __version__
+#from bricknil.version import __version__
 
 __version__ = '0.2'
 
@@ -51,7 +51,7 @@ print(required)
 print(dependency_links)
 
 setup (
-    name = "bluebrick",
+    name = "bricknil",
     version = __version__,
     #version = "0.5",
     description="Control LEGO(tm) BluetoothLE Hubs, Motors, and Sensors using Async Python",
@@ -67,7 +67,7 @@ setup (
     dependency_links = dependency_links,
     entry_points = {
             'console_scripts': [
-                    'bluebrick = bluebrick.bluebrick:main'
+                    'bricknil = bricknil.bricknil:main'
                 ],
         },
     options = {

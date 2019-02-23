@@ -17,11 +17,11 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 import sphinx_readable_theme
-from bluebrick.version import __version__
+from bricknil.version import __version__
 
 # -- Project information -----------------------------------------------------
 
-project = 'BlueBrick'
+project = 'BrickNil'
 copyright = '2019, Virantha N. Ekanayake'
 author = 'Virantha N. Ekanayake'
 
@@ -127,7 +127,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'BlueBrickdoc'
+htmlhelp_basename = 'BrickNildoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -154,7 +154,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'BlueBrick.tex', 'BlueBrick Documentation',
+    (master_doc, 'BrickNil.tex', 'BrickNil Documentation',
      'Virantha N. Ekanayake', 'manual'),
 ]
 
@@ -164,7 +164,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'bluebrick', 'BlueBrick Documentation',
+    (master_doc, 'bricknil', 'BrickNil Documentation',
      [author], 1)
 ]
 
@@ -175,8 +175,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'BlueBrick', 'BlueBrick Documentation',
-     author, 'BlueBrick', 'One line description of project.',
+    (master_doc, 'BrickNil', 'BrickNil Documentation',
+     author, 'BrickNil', 'One line description of project.',
      'Miscellaneous'),
 ]
 

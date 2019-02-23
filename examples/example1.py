@@ -6,8 +6,8 @@ from hub import PoweredUpHub, BoostHub
 from sensor import LED, VisionSensor, InternalTiltSensor, InternalMotor, TrainMotor, Button
 from const import Color
 
-import bluebrick
-from bluebrick import attach
+import bricknil
+from bricknil import attach
 
 
 @attach(LED, name='hub_led')
@@ -89,4 +89,4 @@ async def system():
     #train = Train('my train', ble_q.q)
 
 if __name__=='__main__':
-    bluebrick.start(system)
+    bricknil.start(system)

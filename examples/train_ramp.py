@@ -1,9 +1,9 @@
 
 from curio import sleep
-from bluebrick import attach, start
-from bluebrick.hub import PoweredUpHub
-from bluebrick.sensor import TrainMotor
-from bluebrick.process import Process
+from bricknil import attach, start
+from bricknil.hub import PoweredUpHub
+from bricknil.sensor import TrainMotor
+from bricknil.process import Process
 
 @attach(TrainMotor, name='motor')
 class Train(PoweredUpHub):

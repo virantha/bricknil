@@ -1,10 +1,10 @@
 from itertools import cycle
 from curio import sleep
-from bluebrick import attach, start
-from bluebrick.hub import PoweredUpHub
-from bluebrick.sensor import TrainMotor, VisionSensor, Button, LED
-from bluebrick.process import Process
-from bluebrick.const import Color
+from bricknil import attach, start
+from bricknil.hub import PoweredUpHub
+from bricknil.sensor import TrainMotor, VisionSensor, Button, LED
+from bricknil.process import Process
+from bricknil.const import Color
 
 @attach(Button, name='train_btn', capabilities=['sense_press'])
 @attach(LED, name='train_led')

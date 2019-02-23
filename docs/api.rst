@@ -2,5 +2,5 @@
 API Documentation
 =================
 
-.. automodule:: bluebrick
+.. automodule:: bricknil
 

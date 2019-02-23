@@ -1,11 +1,11 @@
 from invoke import task
-from bluebrick.version import __version__
+from bricknil.version import __version__
 
 @task
 def pypi(c):
     ver = __version__
     c.run('python setup.py bdist_wheel')
-    c.run(f'python -m twine upload dist/bluebrick-{ver}-py3-none-any.whl')
+    c.run(f'python -m twine upload dist/bricknil-{ver}-py3-none-any.whl')
     c.run(f'git commit -am "Committing everything for release {ver}"')
     c.run(f'git tag -a v{ver} -m "Tagging release {ver}"')
     c.run(f'git push')
@@ -15,20 +15,20 @@ def pypi(c):
 def tests(c):
     test_dir = 'test'
     c.run('pytest')
-    c.run('pytest --cov-config .coveragerc --cov=bluebrick --cov-report=term --cov-report=html')
+    c.run('pytest --cov-config .coveragerc --cov=bricknil --cov-report=term --cov-report=html')
     c.run('coveralls')
 
 
 @task
 def docs(c):
-    githubpages = "/Users/virantha/dev/githubdocs/bluebrick"
+    githubpages = "/Users/virantha/dev/githubdocs/bricknil"
     with c.cd(githubpages):
         c.run('git checkout gh-pages')
         c.run('git pull origin gh-pages')
     #c.run("head CHANGES.rst > CHANGES_RECENT.rst")
     #c.run("tail -n 1 CHANGES.rst >> CHANGES_RECENT.rst")
     with c.cd("docs"):
-        print("Running sphinx in docs/ and building to ~/dev/githubpages/bluebrick")
+        print("Running sphinx in docs/ and building to ~/dev/githubpages/bricknil")
         c.run("make clean")
         c.run('rm -rf _auto_summary')
         c.run("make html")

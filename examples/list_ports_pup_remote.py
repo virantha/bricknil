@@ -1,10 +1,10 @@
 from itertools import cycle
 from curio import sleep
-from bluebrick import attach, start
-from bluebrick.hub import PoweredUpRemote
-from bluebrick.sensor import TrainMotor, VisionSensor, Button, LED, InternalTiltSensor, InternalMotor, RemoteButtons
-from bluebrick.process import Process
-from bluebrick.const import Color
+from bricknil import attach, start
+from bricknil.hub import PoweredUpRemote
+from bricknil.sensor import TrainMotor, VisionSensor, Button, LED, InternalTiltSensor, InternalMotor, RemoteButtons
+from bricknil.process import Process
+from bricknil.const import Color
 
 @attach(Button, name='hub_btn', capabilities=['sense_press'])
 @attach(RemoteButtons, name='btn_r', capabilities=['sense_press'])

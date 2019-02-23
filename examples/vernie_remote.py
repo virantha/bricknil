@@ -1,10 +1,10 @@
 
 from curio import sleep, Queue
-from bluebrick import attach, start
-from bluebrick.hub import PoweredUpRemote, BoostHub
-from bluebrick.sensor import InternalMotor, RemoteButtons, LED, Button
-from bluebrick.process import Process
-from bluebrick.const import Color
+from bricknil import attach, start
+from bricknil.hub import PoweredUpRemote, BoostHub
+from bricknil.sensor import InternalMotor, RemoteButtons, LED, Button
+from bricknil.process import Process
+from bricknil.const import Color
 
 
 @attach(LED, name='led') 
