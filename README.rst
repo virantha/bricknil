@@ -3,7 +3,7 @@ BrickNil - Control LEGO Bluetooth Sensors and Motors with Python
 
 |image_pypi| |image_downloads| |image_license| |passing| |quality| |Coverage Status|
 
-BrickNil provides an easy way to connect to and program LEGO\ |reg|
+BrickNil [*]_ provides an easy way to connect to and program LEGO\ |reg|
 Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
 Linux.  This work was inspired by this EuroBricks_ thread, and the NodeJS Powered-Up_
 library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
@@ -39,6 +39,10 @@ An example BrickNil program for controlling the Train motor speed is shown below
 * Blog: http://virantha.com/category/projects/bricknil
 * Documentation: http://virantha.github.io/bricknil
 * Source: https://github.com/virantha/bricknil
+
+.. [*] BrickNil's name comes from the word "Nil" (නිල්) in Sinhala_ which means Blue (as in Bluetooth)
+
+.. _Sinhala: https://en.wikipedia.org/wiki/Sinhalese_language
 
 Features
 ########

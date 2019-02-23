@@ -6,7 +6,7 @@ import os
 from setuptools import Command
 #from bricknil.version import __version__
 
-__version__ = '0.2'
+__version__ = '0.3'
 
 class PyTest(Command):
     user_options = []
