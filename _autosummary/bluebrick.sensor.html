@@ -80,10 +80,13 @@
 <tr class="row-even"><td><a class="reference internal" href="#bluebrick.sensor.LED" title="bluebrick.sensor.LED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LED</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Changes the LED color on the Hubs.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bluebrick.sensor.TrainMotor" title="bluebrick.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bluebrick.sensor.RemoteButtons" title="bluebrick.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Represents one set of ‘+’, ‘-‘, ‘red’ buttons on the PoweredHub Remote</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bluebrick.sensor.TrainMotor" title="bluebrick.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Connects to the train motors.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bluebrick.sensor.VisionSensor" title="bluebrick.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bluebrick.sensor.VisionSensor" title="bluebrick.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the Boost Vision/Distance Sensor</td>
 </tr>
 </tbody>
@@ -523,7 +526,8 @@ your want to attach to by using the port argument with either Port.L or Port.R.<
 <p>There are actually a few different modes that the hardware supports, but we are
 only going to use one of them called ‘KEYSD’ (see the notes in the documentation on the
 raw values reported by the hub).  This mode makes the remote send three values back
-in a list.  To access each button state, see the example below.</p>
+in a list.  To access each button state, there are three helper methods provided
+(see below)</p>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the left buttons</span>
 <span class="nd">@attach</span><span class="p">(</span><span class="n">RemoteButtons</span><span class="p">,</span> <span class="s1">&#39;left_buttons&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
@@ -531,12 +535,12 @@ in a list.  To access each button state, see the example below.</p>
 <span class="c1"># Getting values back in the handler</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">left_buttons_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_buttons</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">is_plus_pressed</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">PLUS</span><span class="p">]</span>  <span class="c1"># 1 if pressed, 0 if released</span>
-    <span class="n">is_minus_pressed</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">MINUS</span><span class="p">]</span>
-    <span class="n">is_red_pressed</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">RED</span><span class="p">]</span>
+    <span class="n">is_plus_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_buttons</span><span class="o">.</span><span class="n">plus_pressed</span><span class="p">()</span>
+    <span class="n">is_minus_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_buttons</span><span class="o">.</span><span class="n">minus_pressed</span><span class="p">()</span>
+    <span class="n">is_red_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_buttons</span><span class="o">.</span><span class="n">red_pressed</span><span class="p">()</span>
 </pre></div>
 </div>
+<p>Maps the port names <cite>L</cite>, <cite>R</cite></p>
 <dl class="class">
 <dt id="bluebrick.sensor.RemoteButtons.Port">
 <em class="property">class </em><code class="descname">Port</code><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Port" title="Permalink to this definition">¶</a></dt>
@@ -557,8 +561,8 @@ in a list.  To access each button state, see the example below.</p>
 <dl class="class">
 <dt id="bluebrick.sensor.RemoteButtons.Button">
 <em class="property">class </em><code class="descname">Button</code><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Button" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>An enumeration.</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></p>
+<p>The button index in the value list returned by the sensor</p>
 <dl class="attribute">
 <dt id="bluebrick.sensor.RemoteButtons.Button.MINUS">
 <code class="descname">MINUS</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.Button.MINUS" title="Permalink to this definition">¶</a></dt>
@@ -597,6 +601,24 @@ in a list.  To access each button state, see the example below.</p>
 <dt id="bluebrick.sensor.RemoteButtons.allowed_combo">
 <code class="descname">allowed_combo</code><em class="property"> = []</em><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.allowed_combo" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.sensor.RemoteButtons.plus_pressed">
+<code class="descname">plus_pressed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/sensor.html#RemoteButtons.plus_pressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.plus_pressed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether <cite>value</cite> reflects that the PLUS button is pressed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.sensor.RemoteButtons.minus_pressed">
+<code class="descname">minus_pressed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/sensor.html#RemoteButtons.minus_pressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.minus_pressed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether <cite>value</cite> reflects that the MINUS button is pressed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bluebrick.sensor.RemoteButtons.red_pressed">
+<code class="descname">red_pressed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/sensor.html#RemoteButtons.red_pressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.sensor.RemoteButtons.red_pressed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether <cite>value</cite> reflects that the RED button is pressed</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -125,7 +125,8 @@
                     <span class="n">port</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">peripheral</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
                 <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">):</span>
-                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_port_info</span><span class="p">(</span><span class="n">peripheral</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                    <span class="k">pass</span>
+                    <span class="c1">#await self._get_port_info(peripheral, msg)</span>
 
         <span class="k">except</span> <span class="n">CancelledError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Terminating peripheral&#39;</span><span class="p">)</span></div>

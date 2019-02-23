@@ -23,6 +23,8 @@ bluebrick.sensor
 	  
 	  LED
 	  
+	  RemoteButtons
+	  
 	  TrainMotor
 	  
 	  VisionSensor

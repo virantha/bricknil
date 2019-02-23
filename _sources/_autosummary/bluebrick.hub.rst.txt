@@ -21,6 +21,8 @@ bluebrick.hub
 	  
 	  PoweredUpHub
 	  
+	  PoweredUpRemote
+	  
 
       
 

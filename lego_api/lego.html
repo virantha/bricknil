@@ -340,28 +340,29 @@
 <li>Port 0 - Left side</li>
 <li>Port 1 - Right side</li>
 </ul>
-<p>Modes and returned values:
-# <em>rckey</em></p>
-<blockquote>
-<div><ul class="simple">
+<dl class="docutils">
+<dt>Modes and returned values:</dt>
+<dd><dl class="first docutils">
+<dt># <em>rckey</em></dt>
+<dd><ul class="first last simple">
 <li>0 = Nothing pressed</li>
 <li>1 = ‘+’ button pushed</li>
 <li>255 = ‘-‘ button pushed</li>
 <li>127 = ‘red’ button pushed</li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 <p># <em>keyr</em> same
-# <em>keya</em> same
-# <em>keyd</em></p>
-<blockquote>
-<div><ul class="simple">
+# <em>keya</em> same</p>
+<dl class="last docutils">
+<dt># <em>keyd</em> -</dt>
+<dd><ul class="first last simple">
 <li>0 = Nothing pressed</li>
 <li>1 = ‘+’</li>
 <li>2 = red</li>
 <li>4 = ‘-‘</li>
 </ul>
-</div></blockquote>
-<dl class="docutils">
+</dd>
 <dt># <em>keysd</em>  bitmask (can tell when multiple buttons are being pressed)</dt>
 <dd><ul class="first last simple">
 <li>[0,0,0] = Nothing pressed</li>
@@ -369,6 +370,8 @@
 <li>[0,1,0] = red</li>
 <li>[0,0,1] = ‘-‘</li>
 </ul>
+</dd>
+</dl>
 </dd>
 </dl>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span>

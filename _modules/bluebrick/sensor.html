@@ -48,7 +48,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">current_task</span><span class="p">,</span> <span class="n">spawn</span>  <span class="c1"># Needed for motor speed ramp</span>
 
-<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
 <span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">Color</span>
 
 <span class="kn">from</span> <span class="nn">.peripheral</span> <span class="k">import</span> <span class="n">Peripheral</span>
@@ -436,7 +436,8 @@
 <span class="sd">       There are actually a few different modes that the hardware supports, but we are</span>
 <span class="sd">       only going to use one of them called &#39;KEYSD&#39; (see the notes in the documentation on the</span>
 <span class="sd">       raw values reported by the hub).  This mode makes the remote send three values back</span>
-<span class="sd">       in a list.  To access each button state, see the example below.</span>
+<span class="sd">       in a list.  To access each button state, there are three helper methods provided </span>
+<span class="sd">       (see below)</span>
 
 <span class="sd">       Examples::</span>
 
@@ -446,21 +447,40 @@
 <span class="sd">            # Getting values back in the handler</span>
 <span class="sd">            async def left_buttons_change(self):</span>
 
-<span class="sd">                value = self.left_buttons.value</span>
-<span class="sd">                is_plus_pressed = value[RemoteButtons.Button.PLUS]  # 1 if pressed, 0 if released</span>
-<span class="sd">                is_minus_pressed = value[RemoteButtons.Button.MINUS]</span>
-<span class="sd">                is_red_pressed = value[RemoteButtons.Button.RED]</span>
+<span class="sd">                is_plus_pressed = self.left_buttons.plus_pressed()</span>
+<span class="sd">                is_minus_pressed = self.left_buttons.minus_pressed()</span>
+<span class="sd">                is_red_pressed = self.left_buttons.red_pressed()</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0037</span>
     <span class="n">Port</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;Port&#39;</span><span class="p">,</span> <span class="s1">&#39;L R&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">Button</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;Button&#39;</span><span class="p">,</span> <span class="s1">&#39;PLUS RED MINUS&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">Button</span> <span class="o">=</span> <span class="n">IntEnum</span><span class="p">(</span><span class="s1">&#39;Button&#39;</span><span class="p">,</span> <span class="s1">&#39;PLUS RED MINUS&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;The button index in the value list returned by the sensor&quot;&quot;&quot;</span>
 
     <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;capability&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sense_press&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">},)</span>
 
     <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
-    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[]</span></div>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Maps the port names `L`, `R`&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">port</span><span class="p">:</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="n">value</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">capabilities</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RemoteButtons.plus_pressed"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.RemoteButtons.plus_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">plus_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether `value` reflects that the PLUS button is pressed&quot;&quot;&quot;</span>
+        <span class="n">button_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">button_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">PLUS</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="RemoteButtons.minus_pressed"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.RemoteButtons.minus_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">minus_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether `value` reflects that the MINUS button is pressed&quot;&quot;&quot;</span>
+        <span class="n">button_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">button_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">MINUS</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="RemoteButtons.red_pressed"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.RemoteButtons.red_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">red_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether `value` reflects that the RED button is pressed&quot;&quot;&quot;</span>
+        <span class="n">button_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">button_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">RED</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span></div></div>
 
 <div class="viewcode-block" id="Button"><a class="viewcode-back" href="../../_autosummary/bluebrick.sensor.html#bluebrick.sensor.Button">[docs]</a><span class="k">class</span> <span class="nc">Button</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Register to be notified of button presses on the Hub (Boost or PoweredUp)</span>

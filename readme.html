@@ -488,9 +488,100 @@ while at the same time changing the LED color orange if it’s responding to a d
 </pre></div>
 </div>
 </div>
-<div class="section" id="multiple-hubs">
-<h3>Multiple hubs<a class="headerlink" href="#multiple-hubs" title="Permalink to this headline">¶</a></h3>
-<p>TODO: Need to show an example here; maybe two trains or a Boost-hub-controlled switch with a train hub.</p>
+<div class="section" id="controlling-vernie-boost-hub-with-the-poweredup-remote">
+<h3>Controlling Vernie (Boost Hub) with the PoweredUp Remote<a class="headerlink" href="#controlling-vernie-boost-hub-with-the-poweredup-remote" title="Permalink to this headline">¶</a></h3>
+<p>Here’s a nice example of controlling two hubs (the remote is also a type of hub) and
+feeding the button presses of the remote to make Vernie move forward, backward, left, and right.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="kn">from</span> <span class="nn">curio</span> <span class="kn">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">Queue</span>
+<span class="kn">from</span> <span class="nn">bluebrick</span> <span class="kn">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
+<span class="kn">from</span> <span class="nn">bluebrick.hub</span> <span class="kn">import</span> <span class="n">PoweredUpRemote</span><span class="p">,</span> <span class="n">BoostHub</span>
+<span class="kn">from</span> <span class="nn">bluebrick.sensor</span> <span class="kn">import</span> <span class="n">InternalMotor</span><span class="p">,</span> <span class="n">RemoteButtons</span><span class="p">,</span> <span class="n">LED</span><span class="p">,</span> <span class="n">Button</span>
+<span class="kn">from</span> <span class="nn">bluebrick.process</span> <span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">from</span> <span class="nn">bluebrick.const</span> <span class="kn">import</span> <span class="n">Color</span>
+
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;led&#39;</span><span class="p">)</span> 
+<span class="nd">@attach</span><span class="p">(</span><span class="n">RemoteButtons</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;btns_right&#39;</span><span class="p">,</span>  <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_press&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">RemoteButtons</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;btns_left&#39;</span><span class="p">,</span>  <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_press&#39;</span><span class="p">])</span>
+<span class="k">class</span> <span class="nc">Remote</span><span class="p">(</span><span class="n">PoweredUpRemote</span><span class="p">):</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">btns_left_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">btns_left</span><span class="o">.</span><span class="n">plus_pressed</span><span class="p">():</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">tell_robot</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;forward&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">btns_left</span><span class="o">.</span><span class="n">minus_pressed</span><span class="p">():</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">tell_robot</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;backward&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">tell_robot</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">)</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">btns_right_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">btns_right</span><span class="o">.</span><span class="n">plus_pressed</span><span class="p">():</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">tell_robot</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">btns_right</span><span class="o">.</span><span class="n">minus_pressed</span><span class="p">():</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">tell_robot</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">tell_robot</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">)</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;Running&#39;</span><span class="p">)</span>
+        <span class="c1"># Set the remote LED to green to show we&#39;re ready</span>
+        <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">led</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>   <span class="c1"># Keep the remote running</span>
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;led&#39;</span><span class="p">)</span> 
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor_right&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">B</span><span class="p">)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor_left&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Robot</span><span class="p">(</span><span class="n">BoostHub</span><span class="p">):</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+        <span class="n">speed</span> <span class="o">=</span> <span class="mi">30</span>
+
+        <span class="c1"># Set the robot LED to green to show we&#39;re ready</span>
+        <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">led</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_remote</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_remote</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">msg</span><span class="o">==</span><span class="s1">&#39;forward&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;going forward&#39;</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_left</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_right</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="o">==</span><span class="s1">&#39;backward&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;going backward&#39;</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_left</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="o">-</span><span class="n">speed</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_right</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="o">-</span><span class="n">speed</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="o">==</span><span class="s1">&#39;stop&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_left</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_right</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="o">==</span><span class="s1">&#39;left&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_left</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="o">-</span><span class="n">speed</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_right</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="o">==</span><span class="s1">&#39;right&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_left</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+                <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_right</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="o">-</span><span class="n">speed</span><span class="p">)</span>
+
+
+<span class="n">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="s1">&#39;Vernie&#39;</span><span class="p">)</span>
+    <span class="n">remote</span> <span class="o">=</span> <span class="n">Remote</span><span class="p">(</span><span class="s1">&#39;remote&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Define a message passing queue from the remote to the robot</span>
+    <span class="n">remote</span><span class="o">.</span><span class="n">tell_robot</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+    <span class="n">robot</span><span class="o">.</span><span class="n">listen_remote</span> <span class="o">=</span> <span class="n">remote</span><span class="o">.</span><span class="n">tell_robot</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">Process</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">Process</span><span class="o">.</span><span class="n">MSG_LEVEL</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, we are using two hubs running in parallel, and we use a <code class="xref py py-class docutils literal notranslate"><span class="pre">curio.Queue</span></code> to send messages
+from the remote telling the robot(Boost hub) what to do. Notice that each RemoteButtons
+instance consists of 3 buttons, so there are some helper methods to check if a particular
+button is pressed.</p>
 </div>
 </div>
 <div class="section" id="bluebrick-architecture">
@@ -547,7 +638,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 <li><a class="reference internal" href="#integrating-a-vision-sensor-into-a-simple-train-controller">Integrating a vision sensor into a simple train controller</a></li>
 <li><a class="reference internal" href="#further-examples">Further examples</a><ul>
 <li><a class="reference internal" href="#hub-buttons-and-led-colors">Hub buttons and LED colors</a></li>
-<li><a class="reference internal" href="#multiple-hubs">Multiple hubs</a></li>
+<li><a class="reference internal" href="#controlling-vernie-boost-hub-with-the-poweredup-remote">Controlling Vernie (Boost Hub) with the PoweredUp Remote</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#bluebrick-architecture">BlueBrick Architecture</a><ul>
