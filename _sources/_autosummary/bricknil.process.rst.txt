@@ -1,12 +1,12 @@
-bluebrick.process
-=================
+bricknil.process
+================
 
 .. contents::
     :local:
 
-.. currentmodule:: bluebrick.process
+.. currentmodule:: bricknil.process
 
-.. automodule:: bluebrick.process
+.. automodule:: bricknil.process
 
       
       Classes

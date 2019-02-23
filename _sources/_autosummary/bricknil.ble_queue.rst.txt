@@ -1,12 +1,12 @@
-bluebrick.ble_queue
-===================
+bricknil.ble_queue
+==================
 
 .. contents::
     :local:
 
-.. currentmodule:: bluebrick.ble_queue
+.. currentmodule:: bricknil.ble_queue
 
-.. automodule:: bluebrick.ble_queue
+.. automodule:: bricknil.ble_queue
 
       
       Classes

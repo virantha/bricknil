@@ -1,12 +1,12 @@
-bluebrick.bluebrick
-===================
+bricknil.bricknil
+=================
 
 .. contents::
     :local:
 
-.. currentmodule:: bluebrick.bluebrick
+.. currentmodule:: bricknil.bricknil
 
-.. automodule:: bluebrick.bluebrick
+.. automodule:: bricknil.bricknil
 
       
       Classes

@@ -1,12 +1,12 @@
-bluebrick.hub
-=============
+bricknil.hub
+============
 
 .. contents::
     :local:
 
-.. currentmodule:: bluebrick.hub
+.. currentmodule:: bricknil.hub
 
-.. automodule:: bluebrick.hub
+.. automodule:: bricknil.hub
 
       
       Classes

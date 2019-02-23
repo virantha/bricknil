@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-BlueBrick Docs (version |release|)
+BrickNil Docs (version |release|)
 ====================================================
 
 Contents
@@ -20,7 +20,7 @@ Contents
 
 Testing
 ================
-    `Coverage <http://virantha.github.io/bluebrick/docs/testing/index.html>`_
+    `Coverage <http://virantha.github.io/bricknil/docs/testing/index.html>`_
 
 Changelog
 =========

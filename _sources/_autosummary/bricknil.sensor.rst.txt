@@ -1,12 +1,12 @@
-bluebrick.sensor
-================
+bricknil.sensor
+===============
 
 .. contents::
     :local:
 
-.. currentmodule:: bluebrick.sensor
+.. currentmodule:: bricknil.sensor
 
-.. automodule:: bluebrick.sensor
+.. automodule:: bricknil.sensor
 
       
       Classes

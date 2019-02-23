@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bluebrick.process &#8212; BlueBrick 0.2 documentation</title>
+    <title>bricknil.process &#8212; BrickNil 0.2 documentation</title>
     <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -17,8 +17,8 @@
     <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="bluebrick.hub" href="bluebrick.hub.html" />
-    <link rel="prev" title="bluebrick.bluebrick" href="bluebrick.bluebrick.html" />
+    <link rel="next" title="bricknil.hub" href="bricknil.hub.html" />
+    <link rel="prev" title="bricknil.bricknil" href="bricknil.bricknil.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -36,12 +36,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="bluebrick.hub.html" title="bluebrick.hub"
+          <a href="bricknil.hub.html" title="bricknil.hub"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="bluebrick.bluebrick.html" title="bluebrick.bluebrick"
+          <a href="bricknil.bricknil.html" title="bricknil.bricknil"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">BlueBrick 0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,15 +51,15 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="bluebrick-process">
-<h1>bluebrick.process<a class="headerlink" href="#bluebrick-process" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="bricknil-process">
+<h1>bricknil.process<a class="headerlink" href="#bricknil-process" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><a class="reference internal" href="#classes" id="id1">Classes</a></li>
 <li><a class="reference internal" href="#members" id="id2">Members</a></li>
 </ul>
 </div>
-<span class="target" id="module-bluebrick.process"></span><p>Super-class of all the Tasks in the event-loop</p>
+<span class="target" id="module-bricknil.process"></span><p>Super-class of all the Tasks in the event-loop</p>
 <div class="section" id="classes">
 <h2><a class="toc-backref" href="#id1">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
@@ -68,7 +68,7 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#bluebrick.process.Process" title="bluebrick.process.Process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Process</span></code></a>(name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.process.Process" title="bricknil.process.Process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Process</span></code></a>(name)</td>
 <td>Subclass this for anything going into the Async Event Loop</td>
 </tr>
 </tbody>
@@ -77,15 +77,15 @@
 <div class="section" id="members">
 <h2><a class="toc-backref" href="#id2">Members</a><a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="bluebrick.process.Process">
-<em class="property">class </em><code class="descclassname">bluebrick.process.</code><code class="descname">Process</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/process.html#Process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.process.Process" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process">
+<em class="property">class </em><code class="descclassname">bricknil.process.</code><code class="descname">Process</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/process.html#Process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.process.Process" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Subclass this for anything going into the Async Event Loop</p>
 <p>This class keeps track of a unique numeric ID for each process, and its name.
 It also provides some utilty functions to log messages at various levels.</p>
 <dl class="attribute">
-<dt id="bluebrick.process.Process.id">
-<code class="descname">id</code><a class="headerlink" href="#bluebrick.process.Process.id" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.id">
+<code class="descname">id</code><a class="headerlink" href="#bricknil.process.Process.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process ID (unique)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -98,8 +98,8 @@ It also provides some utilty functions to log messages at various levels.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="bluebrick.process.Process.name">
-<code class="descname">name</code><a class="headerlink" href="#bluebrick.process.Process.name" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.name">
+<code class="descname">name</code><a class="headerlink" href="#bricknil.process.Process.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Human readable name for process (does not need to be unique)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -112,47 +112,47 @@ It also provides some utilty functions to log messages at various levels.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="bluebrick.process.Process.level">
-<code class="descname">level</code><a class="headerlink" href="#bluebrick.process.Process.level" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.level">
+<code class="descname">level</code><a class="headerlink" href="#bricknil.process.Process.level" title="Permalink to this definition">¶</a></dt>
 <dd><p>Max message level.  Any messages with higher levels will not be logged</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#bluebrick.process.Process.MSG_LEVEL" title="bluebrick.process.Process.MSG_LEVEL"><code class="xref py py-class docutils literal notranslate"><span class="pre">MSG_LEVEL</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#bricknil.process.Process.MSG_LEVEL" title="bricknil.process.Process.MSG_LEVEL"><code class="xref py py-class docutils literal notranslate"><span class="pre">MSG_LEVEL</span></code></a></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="class">
-<dt id="bluebrick.process.Process.MSG_LEVEL">
-<em class="property">class </em><code class="descname">MSG_LEVEL</code><a class="headerlink" href="#bluebrick.process.Process.MSG_LEVEL" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.MSG_LEVEL">
+<em class="property">class </em><code class="descname">MSG_LEVEL</code><a class="headerlink" href="#bricknil.process.Process.MSG_LEVEL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
 <p>An enumeration.</p>
 <dl class="attribute">
-<dt id="bluebrick.process.Process.MSG_LEVEL.DEBUG">
-<code class="descname">DEBUG</code><em class="property"> = 5</em><a class="headerlink" href="#bluebrick.process.Process.MSG_LEVEL.DEBUG" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.MSG_LEVEL.DEBUG">
+<code class="descname">DEBUG</code><em class="property"> = 5</em><a class="headerlink" href="#bricknil.process.Process.MSG_LEVEL.DEBUG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="bluebrick.process.Process.MSG_LEVEL.ERROR">
-<code class="descname">ERROR</code><em class="property"> = 2</em><a class="headerlink" href="#bluebrick.process.Process.MSG_LEVEL.ERROR" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.MSG_LEVEL.ERROR">
+<code class="descname">ERROR</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.process.Process.MSG_LEVEL.ERROR" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="bluebrick.process.Process.MSG_LEVEL.INFO">
-<code class="descname">INFO</code><em class="property"> = 4</em><a class="headerlink" href="#bluebrick.process.Process.MSG_LEVEL.INFO" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.MSG_LEVEL.INFO">
+<code class="descname">INFO</code><em class="property"> = 4</em><a class="headerlink" href="#bricknil.process.Process.MSG_LEVEL.INFO" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="bluebrick.process.Process.MSG_LEVEL.NONE">
-<code class="descname">NONE</code><em class="property"> = 1</em><a class="headerlink" href="#bluebrick.process.Process.MSG_LEVEL.NONE" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.MSG_LEVEL.NONE">
+<code class="descname">NONE</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.process.Process.MSG_LEVEL.NONE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="bluebrick.process.Process.MSG_LEVEL.WARN">
-<code class="descname">WARN</code><em class="property"> = 3</em><a class="headerlink" href="#bluebrick.process.Process.MSG_LEVEL.WARN" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.MSG_LEVEL.WARN">
+<code class="descname">WARN</code><em class="property"> = 3</em><a class="headerlink" href="#bricknil.process.Process.MSG_LEVEL.WARN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -164,26 +164,26 @@ It also provides some utilty functions to log messages at various levels.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bluebrick.process.Process.message">
-<code class="descname">message</code><span class="sig-paren">(</span><em>m: str</em>, <em>level=&lt;MSG_LEVEL.DEBUG: 5&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/process.html#Process.message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.process.Process.message" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.message">
+<code class="descname">message</code><span class="sig-paren">(</span><em>m: str</em>, <em>level=&lt;MSG_LEVEL.DEBUG: 5&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/process.html#Process.message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.process.Process.message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print message <em>m</em> if its level is lower than the instance level</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bluebrick.process.Process.message_info">
-<code class="descname">message_info</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/process.html#Process.message_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.process.Process.message_info" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.message_info">
+<code class="descname">message_info</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/process.html#Process.message_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.process.Process.message_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function for logging messages at INFO level</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bluebrick.process.Process.message_debug">
-<code class="descname">message_debug</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/process.html#Process.message_debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.process.Process.message_debug" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.message_debug">
+<code class="descname">message_debug</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/process.html#Process.message_debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.process.Process.message_debug" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function for logging messages at DEBUG level</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bluebrick.process.Process.message_error">
-<code class="descname">message_error</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bluebrick/process.html#Process.message_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bluebrick.process.Process.message_error" title="Permalink to this definition">¶</a></dt>
+<dt id="bricknil.process.Process.message_error">
+<code class="descname">message_error</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/process.html#Process.message_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.process.Process.message_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function for logging messages at ERROR level</p>
 </dd></dl>
 
@@ -200,7 +200,7 @@ It also provides some utilty functions to log messages at various levels.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">bluebrick.process</a><ul>
+<li><a class="reference internal" href="#">bricknil.process</a><ul>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#members">Members</a></li>
 </ul>
@@ -210,15 +210,15 @@ It also provides some utilty functions to log messages at various levels.</p>
 <ul>
   <li><a href="../index.html">Documentation index</a><ul>
   <li><a href="../api.html">API Documentation</a><ul>
-      <li>Previous: <a href="bluebrick.bluebrick.html" title="previous chapter">bluebrick.bluebrick</a></li>
-      <li>Next: <a href="bluebrick.hub.html" title="next chapter">bluebrick.hub</a></li>
+      <li>Previous: <a href="bricknil.bricknil.html" title="previous chapter">bricknil.bricknil</a></li>
+      <li>Next: <a href="bricknil.hub.html" title="next chapter">bricknil.hub</a></li>
   </ul></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/bluebrick.process.rst.txt"
+      <li><a href="../_sources/_autosummary/bricknil.process.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>

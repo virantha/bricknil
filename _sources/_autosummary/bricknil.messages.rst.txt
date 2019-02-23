@@ -1,12 +1,12 @@
-bluebrick.peripheral
-====================
+bricknil.messages
+=================
 
 .. contents::
     :local:
 
-.. currentmodule:: bluebrick.peripheral
+.. currentmodule:: bricknil.messages
 
-.. automodule:: bluebrick.peripheral
+.. automodule:: bricknil.messages
 
       
       Classes
@@ -15,7 +15,7 @@ bluebrick.peripheral
       .. autosummary::
 
 	  
-	  Peripheral
+	  Message
 	  
 
       
