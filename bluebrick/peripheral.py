@@ -163,6 +163,7 @@ class Peripheral(Process):
                 dataset_i += 1
 
 
+
     async def send_message(self, msg, msg_bytes):
         """ Send outgoing message to BLEventQ """
         while not self.message_handler:

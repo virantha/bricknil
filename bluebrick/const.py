@@ -27,6 +27,8 @@ DEVICES = {     0x0001:   'Motor',
                 0x0025:   'Vision Sensor',
                 0x0026:   'External Motor with Tacho',
                 0x0027:   'Internal Motor with Tacho',
-                0x0028:   'Internal Tilt'
+                0x0028:   'Internal Tilt',
+                0x0037:   'Remote Button',
+                0x0038:   'Remote Signal Level',
             }
 

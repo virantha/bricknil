@@ -49,6 +49,7 @@ class BLEventQ(Process):
         msg_parser.parse(bytearray([15, 0x00, 0x04,255, 1, Button._sensor_id, 0x00, 0,0,0,0, 0,0,0,0]))
 
         def received(data):
+            self.message(f'Raw data received: {data}')
             msg = msg_parser.parse(data)
             self.message('{0} Received: {1}'.format(hub.name, msg))
         hub.tx.start_notify(received)
@@ -79,6 +80,7 @@ class BLEventQ(Process):
                 devices = self.ble.find_devices(service_uuids=[uart_uuid])
                 
                 for device in devices:
+                    self.message(f'checking device named {device.name}')
                     if device.name == hub.ble_name:
                         if not hub.ble_id or hub.ble_id == device.id:
                             found = True

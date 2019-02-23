@@ -2,13 +2,12 @@
 
 """
 import uuid
-from collections import OrderedDict
 from curio import sleep, UniversalQueue, CancelledError
-from enum import Enum
 from .process import Process
-from .sensor import Button # Hack to get sensor_id of Button
-from .peripheral import Peripheral # for type check
+from .peripheral import Peripheral  # for type check
 
+
+# noinspection SpellCheckingInspection
 class Hub(Process):
     """Base class for all Lego hubs
 
@@ -25,15 +24,15 @@ class Hub(Process):
     """
     hubs = []
 
+    # noinspection SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection
     def __init__(self, name):
         super().__init__(name)
         self.message_queue = None
-        self.uart_uuid = uuid.UUID('00001623-1212-efde-1623-785feabcd123') 
+        self.uart_uuid = uuid.UUID('00001623-1212-efde-1623-785feabcd123')
         self.char_uuid = uuid.UUID('00001624-1212-efde-1623-785feabcd123')
         self.tx = None
         self.peripherals = {}  # attach_sensor method will add sensors to this
         self.peripheral_queue = UniversalQueue()  # Incoming messages from peripherals
-
 
         # Keep track of port info as we get messages from the hub ('update_port' messages)
         self.port_info = {}
@@ -42,12 +41,14 @@ class Hub(Process):
         Hub.hubs.append(self)
 
     async def send_message(self, msg_name, msg_bytes):
-        """Insert a message to the hub into the queue(:func:`bluebrick.hub.Hub.message_queue`) connected to our BLE interface 
+        """Insert a message to the hub into the queue(:func:`bluebrick.hub.Hub.message_queue`) connected to our BLE
+           interface
 
         """
+
         while not self.tx:  # Need to make sure we have a handle to the uart
             await sleep(1)
-        await self.message_queue.put( (msg_name, self, msg_bytes))
+        await self.message_queue.put((msg_name, self, msg_bytes))
 
     async def peripheral_message_loop(self):
         """The main loop that receives messages from the :class:`bluebrick.messages.Message` parser.
@@ -78,8 +79,9 @@ class Hub(Process):
                     port, info = peripheral
                     self.port_info[port] = info
                 elif msg.startswith('port'):
-                    await self._get_port_info(peripheral, msg)
-                    
+                    pass
+                    #await self._get_port_info(peripheral, msg)
+
         except CancelledError:
             self.message(f'Terminating peripheral')
 
@@ -89,7 +91,7 @@ class Hub(Process):
            Called by the class decorator :class:`bluebrick.bluebrick.attach` when decorating the sensor
         """
         # Check that we don't already have a sensor with the same name attached
-        assert not sensor.name in self.peripherals, f'Duplicate {sensor.name} found!'
+        assert sensor.name not in self.peripherals, f'Duplicate {sensor.name} found!'
         self.peripherals[sensor.name] = sensor
         # Put this sensor as an attribute
         setattr(self, sensor.name, sensor)
@@ -102,7 +104,7 @@ class Hub(Process):
             # Request mode info
             b = [0x00, 0x21, port, 0x01]
             await self.send_message(f'req mode info on {port}', b)
-        elif msg =='port_info_received':
+        elif msg == 'port_info_received':
             # At this point we know all the available modes for this port
             # let's get the name and value format
             modes = self.port_info[port]['modes']
@@ -111,22 +113,12 @@ class Hub(Process):
                 b = [0x00, 0x21, port, 0x02]
                 await self.send_message(f'req mode combination info on {port}', b)
             for mode in modes.keys():
-                b = [0x00, 0x22, port, mode, 0] 
+                b = [0x00, 0x22, port, mode, 0]
                 await self.send_message(f'req info(NAME) on mode {mode} {port}', b)
-                b = [0x00, 0x22, port, mode, 0x80] 
+                b = [0x00, 0x22, port, mode, 0x80]
                 await self.send_message(f'req info(VALUE FORMAT) on mode {mode} {port}', b)
         return
 
-        # Now get information on each mode and the name
-        for mode in range(16):
-            b = [0x00, 0x22, port, mode, 0] 
-            await self.send_message(f'req info(NAME) on mode {mode} {port}', b)
-            b = [0x00, 0x22, port, mode, 0x80] 
-            await self.send_message(f'req info(VALUE FORMAT) on mode {mode} {port}', b)
-        # Now get information on each mode data values
-        for mode in range(16):
-            b = [0x00, 0x22, port, mode, 128] 
-            await self.send_message(f'req info on mode {mode} {port}', b)
 
 class PoweredUpHub(Hub):
     """PoweredUp Hub class 
@@ -140,6 +132,17 @@ class PoweredUpHub(Hub):
         self.ble_name = 'HUB NO.4'
         self.ble_id = None  # Override and set this if you want to connect ta known hub
 
+class PoweredUpRemote(Hub):
+    """PoweredUp Remote class 
+
+       Override `ble_id` instance variable if you want to connect to a specific physical Hub. This
+       is useful if you have multiple hubs running at the same time performing different functions.
+    """
+
+    def __init__(self, name):
+        super().__init__(name)
+        self.ble_name = 'Handset'
+        self.ble_id = None  # Override and set this if you want to connect ta known hub
 
 class BoostHub(Hub):
     """Boost Move Hub
@@ -152,5 +155,3 @@ class BoostHub(Hub):
         super().__init__(name)
         self.ble_name = 'LEGO Move Hub'
         self.ble_id = None  # Override and set this if you want to connect ta known hub
-
-

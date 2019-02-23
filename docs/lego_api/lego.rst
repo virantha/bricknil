@@ -29,3 +29,6 @@ Hub LED information
 =========================
 .. include:: led.rst
 
+Remote buttons
+==============
+.. include:: remote_button.rst

@@ -360,10 +360,19 @@ while at the same time changing the LED color orange if it's responding to a dis
 .. literalinclude:: ../examples/train_all.py
     :language: python
 
-Multiple hubs
--------------
-TODO: Need to show an example here; maybe two trains or a Boost-hub-controlled switch with a train hub.
-   
+Controlling Vernie (Boost Hub) with the PoweredUp Remote
+--------------------------------------------------------
+Here's a nice example of controlling two hubs (the remote is also a type of hub) and 
+feeding the button presses of the remote to make Vernie move forward, backward, left, and right.
+
+.. literalinclude:: ../examples/vernie_remote.py 
+    :language: python
+
+Here, we are using two hubs running in parallel, and we use a :class:`curio.Queue` to send messages
+from the remote telling the robot(Boost hub) what to do. Notice that each RemoteButtons 
+instance consists of 3 buttons, so there are some helper methods to check if a particular
+button is pressed.
+
 BlueBrick Architecture
 ######################
 This section documents the internal architecture of BlueBrick and how all the components communicate with

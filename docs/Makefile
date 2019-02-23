@@ -47,6 +47,7 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
 clean:
+	rm -rf _autosummary/*
 	rm -rf $(BUILDDIR)/*
 
 html:

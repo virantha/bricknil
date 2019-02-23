@@ -6,7 +6,7 @@ import os
 from setuptools import Command
 #from bluebrick.version import __version__
 
-__version__ = '0.1'
+__version__ = '0.2'
 
 class PyTest(Command):
     user_options = []

@@ -17,7 +17,8 @@ from .ble_queue import BLEventQ
 from .hub import PoweredUpHub, BoostHub, Hub
 
 # Actual decorator that sets up the peripheral classes
-class attach():
+# noinspection PyPep8Naming
+class attach:
     """ Class-decorator to attach peripherals onto a Hub
 
         Injects sub-classes of `Peripheral` as instance variables on a Hub 

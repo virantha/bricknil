@@ -2,7 +2,7 @@
 """
 from curio import sleep, current_task, spawn  # Needed for motor speed ramp
 
-from enum import Enum
+from enum import Enum, IntEnum
 from .const import Color
 
 from .peripheral import Peripheral
@@ -381,7 +381,60 @@ class TrainMotor(Peripheral):
         self.ramp_in_progress_task = await spawn(_ramp_speed, daemon = True)
 
 
+class RemoteButtons(Peripheral):
+    """Represents one set of '+', '-', 'red' buttons on the PoweredHub Remote
 
+       Each remote has two sets of buttons, on the left and right side.  Pick the one
+       your want to attach to by using the port argument with either Port.L or Port.R.
+
+       There are actually a few different modes that the hardware supports, but we are
+       only going to use one of them called 'KEYSD' (see the notes in the documentation on the
+       raw values reported by the hub).  This mode makes the remote send three values back
+       in a list.  To access each button state, there are three helper methods provided 
+       (see below)
+
+       Examples::
+
+            # Basic connection to the left buttons
+            @attach(RemoteButtons, 'left_buttons', port=RemoteButtons.Port.L)
+
+            # Getting values back in the handler
+            async def left_buttons_change(self):
+
+                is_plus_pressed = self.left_buttons.plus_pressed()
+                is_minus_pressed = self.left_buttons.minus_pressed()
+                is_red_pressed = self.left_buttons.red_pressed()
+
+    """
+
+    _sensor_id = 0x0037
+    Port = Enum('Port', 'L R', start=0)
+    Button = IntEnum('Button', 'PLUS RED MINUS', start=0)
+    """The button index in the value list returned by the sensor"""
+
+    capability = Enum('capability', {'sense_press':4},)
+
+    datasets = { capability.sense_press: (3,1) }
+    allowed_combo = []
+
+    def __init__(self, name, port=None, capabilities=[]):
+        """Maps the port names `L`, `R`"""
+        if port:
+            port = port.value
+        super().__init__(name, port, capabilities)
+
+    def plus_pressed(self):
+        """Return whether `value` reflects that the PLUS button is pressed"""
+        button_list = self.value[self.capability.sense_press]
+        return button_list[self.Button.PLUS] == 1
+    def minus_pressed(self):
+        """Return whether `value` reflects that the MINUS button is pressed"""
+        button_list = self.value[self.capability.sense_press]
+        return button_list[self.Button.MINUS] == 1
+    def red_pressed(self):
+        """Return whether `value` reflects that the RED button is pressed"""
+        button_list = self.value[self.capability.sense_press]
+        return button_list[self.Button.RED] == 1
 
 class Button(Peripheral):
     """ Register to be notified of button presses on the Hub (Boost or PoweredUp)

@@ -12,6 +12,14 @@ def pypi(c):
     c.run(f'git push --tags')
 
 @task
+def tests(c):
+    test_dir = 'test'
+    c.run('pytest')
+    c.run('pytest --cov-config .coveragerc --cov=bluebrick --cov-report=term --cov-report=html')
+    c.run('coveralls')
+
+
+@task
 def docs(c):
     githubpages = "/Users/virantha/dev/githubdocs/bluebrick"
     with c.cd(githubpages):

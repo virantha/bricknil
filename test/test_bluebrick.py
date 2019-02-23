@@ -22,3 +22,13 @@ class Testbluebrick:
         for i in range(10):
             p2 = Process('test2')
             assert self.p.id == p2.id-(i+1)
+        assert p2.__str__() == 'test2.11'
+        assert p2.__repr__() == 'Process("test2")'
+
+    def test_messages(self):
+        self.p.level = Process.MSG_LEVEL.DEBUG
+        self.p.message('hello')
+        self.p.message_info('hello')
+        self.p.message_debug('hello')
+        self.p.message_error('hello')
+
