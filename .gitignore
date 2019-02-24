@@ -1,6 +1,7 @@
 *.py[cod]
 *.swp
 *.bak
+.DS_STORE
 
 htmlcov/
 

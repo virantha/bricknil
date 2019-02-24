@@ -8,9 +8,9 @@ from mock import patch, call
 from mock import MagicMock
 from mock import PropertyMock
 
-from  bluebrick.process import Process
+from  bricknil.process import Process
 
-class Testbluebrick:
+class Testbricknil:
 
     def setup(self):
         self.p = Process('test')

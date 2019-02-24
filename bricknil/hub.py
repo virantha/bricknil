@@ -80,7 +80,7 @@ class Hub(Process):
                     self.port_info[port] = info
                 elif msg.startswith('port'):
                     pass
-                    #await self._get_port_info(peripheral, msg)
+                    await self._get_port_info(peripheral, msg)
 
         except CancelledError:
             self.message(f'Terminating peripheral')
@@ -113,11 +113,14 @@ class Hub(Process):
                 b = [0x00, 0x21, port, 0x02]
                 await self.send_message(f'req mode combination info on {port}', b)
             for mode in modes.keys():
-                b = [0x00, 0x22, port, mode, 0]
-                await self.send_message(f'req info(NAME) on mode {mode} {port}', b)
-                b = [0x00, 0x22, port, mode, 0x80]
-                await self.send_message(f'req info(VALUE FORMAT) on mode {mode} {port}', b)
-        return
+                info_types = { 'NAME': 0, 'VALUE FORMAT':0x80, 'RAW Range':0x01,
+                        'PCT Range': 0x02, 'SI Range':0x03, 'Symbol':0x04,
+                        'MAPPING': 0x05,
+                        }
+                # Send a message to requeust each type of info 
+                for k,v in info_types.items():
+                    b = [0x00, 0x22, port, mode, v]
+                    await self.send_message(f'req info({k}) on mode {mode} {port}', b)
 
 
 class PoweredUpHub(Hub):

@@ -12,6 +12,7 @@
 
 """
 from .const import DEVICES
+import struct
 
 class UnknownMessageError(Exception):
     pass
@@ -168,12 +169,62 @@ class Message:
         mode_info = modes_info.setdefault(mode, {})
 
         l.append(f'MODE INFO Port:{port} Mode:{mode}')
+        def _unpack_float(b):
+            return struct.unpack('<f', bytearray(b[0:4]))
+
         if mode_type == 0: # Name of mode
             l.append('Name:')
             name = ''.join( [chr(b) for b in msg_bytes if b!=0])
             l.append(name)
             mode_info['name'] = name
-        elif mode_type ==0x80:  # Value format of modej
+        elif mode_type == 0x01: # Raw range
+            l.append('Raw range:')
+            b_array = bytearray(msg_bytes)
+            raw_min = struct.unpack('<f', b_array[0:4])[0]
+            raw_max = struct.unpack('<f', b_array[4:])[0]
+            l.append(f'{raw_min} to {raw_max}')
+            mode_info['raw_range'] = (raw_min, raw_max)
+        elif mode_type == 0x02: # Raw range
+            l.append('Pct range:')
+            b_array = bytearray(msg_bytes)
+            pct_min = struct.unpack('<f', b_array[0:4])[0]
+            pct_max = struct.unpack('<f', b_array[4:])[0]
+            l.append(f'{pct_min} to {pct_max}')
+            mode_info['pct_range'] = (pct_min, pct_max)
+        elif mode_type == 0x03: # Raw range
+            l.append('SI range:')
+            mn = _unpack_float(msg_bytes[0:4])[0]
+            mx = _unpack_float(msg_bytes[4:])[0]
+            l.append(f'{mn} to {mx}')
+            mode_info['si_range'] = (mn, mx)
+        elif mode_type == 0x04: # Symbol
+            l.append('Symbol:')
+            symbol = ''.join( [chr(b) for b in msg_bytes if b!=0])
+            l.append(symbol)
+            mode_info['symbol'] =symbol
+        elif mode_type == 0x05: # Mappig
+            l.append('Input Mapping:')
+            bits = ['NA', 'NA', 'Discrete', 'Relative', 'Absolute', 'NA', 'Supports Functional Mapping 2.0}', 'Supports NULL']
+            # First byte is bit-mask of input details
+            mask = msg_bytes[0]
+            maps = [ bits[i]  for i in range(8) if (mask>>i) & 1]
+            l.append(','.join(maps))
+            mode_info['input_mapping'] = maps
+
+            l.append('Output Mapping:')
+            mask = msg_bytes[1]
+            maps = [ bits[i]  for i in range(8) if (mask>>i)&1]
+            l.append(','.join(maps))
+            mode_info['output_mapping'] = maps
+
+
+                
+
+
+
+
+
+        elif mode_type ==0x80:  # Value format of mode
             # 4 bytes
             # [0] = Number of datasets (e.g. RBG has 3 for each color)
             # [1] = Dataset type.  00-byte, 01=16b, 10=32b, 11=float
