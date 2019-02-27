@@ -15,6 +15,8 @@ import uuid
 from .process import Process
 from .ble_queue import BLEventQ
 from .hub import PoweredUpHub, BoostHub, Hub
+from .const import USE_BLEAK
+from .bleak import Bleak
 
 # Actual decorator that sets up the peripheral classes
 # noinspection PyPep8Naming
@@ -159,11 +161,19 @@ def start(user_system_setup_func):
         - Starting up the user async co-routines inside the Curio event loop
     """
 
-    ble = Adafruit_BluefruitLE.get_provider()
-    ble.initialize()
-    # run_mainloop_with call does not accept function args.  So let's curry
-    # the my_run with the ble arg as curry_my_run
-    curry_curio_event_run = partial(_curio_event_run, ble=ble, system=user_system_setup_func)
-    
-    ble.run_mainloop_with(curry_curio_event_run)
+    if USE_BLEAK:
+        ble = Bleak()
+        # Run curio in a thread
+        curry_curio_event_run = partial(_curio_event_run, ble=ble, system=user_system_setup_func)
+        t = threading.Thread(target=curry_curio_event_run)
+        t.start()
+
+    else:
+        ble = Adafruit_BluefruitLE.get_provider()
+        ble.initialize()
+        # run_mainloop_with call does not accept function args.  So let's curry
+        # the my_run with the ble arg as curry_my_run
+        curry_curio_event_run = partial(_curio_event_run, ble=ble, system=user_system_setup_func)
+        
+        ble.run_mainloop_with(curry_curio_event_run)
 

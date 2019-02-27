@@ -1,10 +1,12 @@
 """Singleton interface to the Adafruit Bluetooth library"""
 import Adafruit_BluefruitLE
 from curio import Queue, sleep, CancelledError
+import sys
 
 from .sensor import Button # Hack! only to get the button sensor_id for the fake attach message
 from .process import Process
 from .messages import Message
+from .const import USE_BLEAK
 
 # Need a class to represent the bluetooth adapter provided
 # by adafruit that receives messages
@@ -15,12 +17,15 @@ class BLEventQ(Process):
         super().__init__('BLE Event Q')
         self.ble = ble
         self.q = Queue()
-        self.message('Clearing BLE cache data')
-        self.ble.clear_cached_data()
-        self.adapter = self.ble.get_default_adapter()
-        self.message(f'Found adapter {self.adapter.name}')
-        self.message(f'Powering up adapter {self.adapter.name}')
-        self.adapter.power_on()
+        if USE_BLEAK:
+            self.message('using bleak')
+        else:
+            self.message('Clearing BLE cache data')
+            self.ble.clear_cached_data()
+            self.adapter = self.ble.get_default_adapter()
+            self.message(f'Found adapter {self.adapter.name}')
+            self.message(f'Powering up adapter {self.adapter.name}')
+            self.adapter.power_on()
         self.hubs = {}
 
     async def run(self):
@@ -54,12 +59,24 @@ class BLEventQ(Process):
             self.message('{0} Received: {1}'.format(hub.name, msg))
         hub.tx.start_notify(received)
 
+    async def bleak_connect(self, hub):
+
+        # Get devices; send a message 
+        devices = await self.ble.curio_connect()
+        print(devices)
+
+
     async def connect(self, hub):
         # Connect the messaging queue for communication between self and the hub
         hub.message_queue = self.q
 
         uart_uuid = hub.uart_uuid
         char_uuid = hub.char_uuid
+        if USE_BLEAK: 
+            await self.bleak_connect(hub)
+            sys.exit(0)
+
+
         #self.message('Disconnecting any connected UART devices')
         #self.ble.disconnect_devices([uart_uuid])
         self.message(f'Starting scan for UART {uart_uuid}')
