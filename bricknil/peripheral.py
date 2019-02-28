@@ -200,7 +200,7 @@ class Peripheral(Process):
             * mode
             * value(s)
         """
-        b = [0x00, 0x81, self.port, 0x11, 0x51, mode, value ]
+        b = [0x00, 0x81, self.port, 0x10, 0x51, mode, value ]
         await self.send_message('set output', b)
 
 
