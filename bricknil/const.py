@@ -1,7 +1,13 @@
 """Useful constants for BlueBrick
 """
 from enum import Enum
-USE_BLEAK=True
+import platform
+
+if platform.system() == "Darwin":
+    USE_BLEAK = False
+else:
+    USE_BLEAK = True
+
 class Color(Enum):
     """11 colors"""
     black = 0 

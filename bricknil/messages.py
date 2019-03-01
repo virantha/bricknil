@@ -216,14 +216,6 @@ class Message:
             maps = [ bits[i]  for i in range(8) if (mask>>i)&1]
             l.append(','.join(maps))
             mode_info['output_mapping'] = maps
-
-
-                
-
-
-
-
-
         elif mode_type ==0x80:  # Value format of mode
             # 4 bytes
             # [0] = Number of datasets (e.g. RBG has 3 for each color)

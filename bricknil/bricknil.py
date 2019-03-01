@@ -17,7 +17,8 @@ from .process import Process
 from .ble_queue import BLEventQ
 from .hub import PoweredUpHub, BoostHub, Hub
 from .const import USE_BLEAK
-from .bleak import Bleak
+if USE_BLEAK:
+    from .bleak import Bleak
 
 import threading
 
@@ -168,7 +169,6 @@ def start(user_system_setup_func):
     """
 
     if USE_BLEAK:
-        #logging.basicConfig(level=logging.INFO)
         ble = Bleak()
         # Run curio in a thread
         curry_curio_event_run = partial(_curio_event_run, ble=ble, system=user_system_setup_func)

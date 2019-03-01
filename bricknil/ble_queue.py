@@ -1,7 +1,7 @@
 """Singleton interface to the Adafruit Bluetooth library"""
 import Adafruit_BluefruitLE
 from curio import Queue, sleep, CancelledError
-import sys
+import sys, functools
 
 from .sensor import Button # Hack! only to get the button sensor_id for the fake attach message
 from .process import Process
@@ -11,7 +11,16 @@ from .const import USE_BLEAK
 # Need a class to represent the bluetooth adapter provided
 # by adafruit that receives messages
 class BLEventQ(Process):
+    """All bluetooth comms go through this object
 
+       Provides interfaces to connect to a device/hub, send_messages to,
+       and receive_messages from.  Also abstracts away the underlying bluetooth library
+       that depends on the OS (Adafruit_Bluefruit for Mac, and Bleak for Linux/Win10)
+
+       All requests to send messages to the BLE device must be inserted into
+       the :class:`bricknil.BLEventQ.q` Queue object.
+
+    """
 
     def __init__(self, ble):
         super().__init__('BLE Event Q')
@@ -19,6 +28,9 @@ class BLEventQ(Process):
         self.q = Queue()
         if USE_BLEAK:
             self.message('using bleak')
+            self.adapter = None
+            # User needs to make sure adapter is powered up and on
+            #    sudo hciconfig hci0 up
         else:
             self.message('Clearing BLE cache data')
             self.ble.clear_cached_data()
@@ -33,8 +45,8 @@ class BLEventQ(Process):
             while True:
                 msg = await self.q.get()
                 msg_type, hub, msg_val = msg
-                self.message(f'Got msg: {msg_type} = {msg_val}')
                 await self.q.task_done()
+                self.message(f'Got msg: {msg_type} = {msg_val}')
                 await self.send_message(hub.tx, msg_val)
         except CancelledError:
             self.message(f'Terminating and disconnecxting')
@@ -44,6 +56,14 @@ class BLEventQ(Process):
                 self.device.disconnect()
 
     async def send_message(self, characteristic, msg):
+        """Prepends a byte with the length of the msg and writes it to
+           the characteristic
+
+           Arguments:
+              characteristic : An object from bluefruit, or if using Bleak,
+                  a tuple (device, uuid : str)
+              msg (bytearray) : Message with header
+        """
         # Message needs to have length prepended
         length = len(msg)+1
         values = bytearray([length]+msg)
@@ -54,19 +74,22 @@ class BLEventQ(Process):
             characteristic.write_value(values)
 
     async def get_messages(self, hub):
-        # Register  Message instance to parse and handle messages from this hub
+        """Instance a Message object to parse incoming messages and setup
+           the callback from the characteristic to call Message.parse on the
+           incoming data bytes
+        """
+        # Message instance to parse and handle messages from this hub
         msg_parser = Message(hub)
 
         # Create a fake attach message on port 255, so that we can attach any instantiated Button listeners if present
         msg_parser.parse(bytearray([15, 0x00, 0x04,255, 1, Button._sensor_id, 0x00, 0,0,0,0, 0,0,0,0]))
 
         def bleak_received(sender, data):
-            #self.message_debug(f'Bleak Raw data received: {data}')
+            self.message_debug(f'Bleak Raw data received: {data}')
             msg = msg_parser.parse(data)
-            #self.message_debug('{0} Received: {1}'.format(hub.name, msg))
-
+            self.message_debug('{0} Received: {1}'.format(hub.name, msg))
         def received(data):
-            self.message_debug(f'Raw data received: {data}')
+            self.message_debug(f'Adafruit_Bluefruit Raw data received: {data}')
             msg = msg_parser.parse(data)
             self.message_debug('{0} Received: {1}'.format(hub.name, msg))
 
@@ -74,116 +97,108 @@ class BLEventQ(Process):
             device, char_uuid = hub.tx
             await self.ble.in_queue.put( ('notify', (device, char_uuid, bleak_received) ))
         else:
+            # Adafruit library does not callback with the sender, only the data
             hub.tx.start_notify(received)
 
-    async def bleak_connect(self, hub):
 
-        found = False
-        while not found: 
-            await self.ble.in_queue.put('discover')  # Tell bleak to start discovery
-            devices = await self.ble.out_queue.get() # Wait for discovered devices
-            await self.ble.out_queue.task_done()
+    def _check_devices_for(self, devices, name, address):
+        """Check if any of the devices match what we're looking for
+           
+           First, check to make sure device.name is the name we're looking for.
+           Then, if address is supplied, only return a device with a matching name
+           if it's BLE MAC address also agrees
 
-            print(devices)
-            # Scan through devices for Uart UUID, or a specific BLE address
-            for device in devices:
-                self.message(f'checking device named {device.name}')
-                if device.name == hub.ble_name:
-                    if not hub.ble_id or hub.ble_id == device.id:
-                        found = True
-                        self.device = device
-                        break
+           Returns:
+              device : Matching device (None if no matches)
+        """
+        for device in devices:
+            self.message(f'checking device named {device.name} for {name}')
+            if device.name == name:
+                if not address:
+                    return device
+                else:
+                    if USE_BLEAK: 
+                        ble_address = device.address
                     else:
-                        self.message(f'found device named {device.name} but id{device.address} is not the one we want')
-            if not found:
-                self.message(f'Rescanning for {hub.uart_uuid}')
-
-        assert self.device.name == hub.ble_name
-        self.message('found device')
-        # Now, connect to it
-        await self.ble.in_queue.put( ('connect', self.device.address) )
-        device = await self.ble.out_queue.get()
-        await self.ble.out_queue.task_done()
-        self.message('connnected to device!')
-        print(f'{device.characteristics}')
-
-        hub.ble_id = self.device.address
-        self.hubs[self.device.address] = hub
-        hub.tx = (device, hub.char_uuid)
-        await self.get_messages(hub)
+                        ble_address = device.id
+                    if address == ble_address:
+                        return device
+                    else:
+                        self.message(f'Address {ble_address} is not a match')
         return None
 
-
-
-    async def connect(self, hub):
-        # Connect the messaging queue for communication between self and the hub
-        hub.message_queue = self.q
-
-        uart_uuid = hub.uart_uuid
-        char_uuid = hub.char_uuid
-        if USE_BLEAK: 
-            print('now using bleak connect')
-            await self.bleak_connect(hub)
-            return
-
-        #self.message('Disconnecting any connected UART devices')
-        #self.ble.disconnect_devices([uart_uuid])
-        self.message(f'Starting scan for UART {uart_uuid}')
-
+    async def _ble_connect(self, uart_uuid, ble_name, ble_id=None, timeout=60):
+        """Connect to the underlying BLE device with the needed UART UUID
+        """
         # Set hub.ble_id to a specific hub id if you want it to connect to a
         # particular hardware hub instance
-        if hub.ble_id:
-            self.message_info(f'Looking for specific hub id {hub.ble_id}')
+        if ble_id:
+            self.message_info(f'Looking for specific hub id {ble_id}')
         else:
             self.message_info(f'Looking for first matching hub')
 
-        self.adapter.start_scan()
+        # Start discovery
+        if not USE_BLEAK:
+            self.adapter.start_scan()
+
         try:
-            timeout = 60
             found = False
-            while not found and timeout > 0 :
-                #self.device = self.ble.find_device(service_uuids=[uart_uuid])
-                devices = self.ble.find_devices(service_uuids=[uart_uuid])
-                
-                for device in devices:
-                    self.message(f'checking device named {device.name}')
-                    if device.name == hub.ble_name:
-                        if not hub.ble_id or hub.ble_id == device.id:
-                            found = True
-                            self.device = device
-                            break
-                        else:
-                            self.message(f'found device id{device.id}')
-                            self.message(f'found device id {type(device.id)}')
-                if not found:
-                    self.message(f'Rescanning for {uart_uuid} ({timeout}sec left)')
+            while not found and timeout > 0:
+                if USE_BLEAK:
+                    await self.ble.in_queue.put('discover')  # Tell bleak to start discovery
+                    devices = await self.ble.out_queue.get() # Wait for discovered devices
+                    await self.ble.out_queue.task_done()
+                else:
+                    devices = self.ble.find_devices(service_uuids=[uart_uuid])
+
+                device = self._check_devices_for(devices, ble_name, ble_id)
+                if device:
+                    self.device = device
+                    found = True
+                else:
+                    self.message(f'Rescanning for {uart_uuid} ({timeout} tries left)')
                     timeout -= 1
                     self.device = None
                     await sleep(1)
             if self.device is None:
                 raise RuntimeError('Failed to find UART device!')
-            assert self.device.name == hub.ble_name
+            assert self.device.name == ble_name
         except:
             raise
         finally:
-            self.adapter.stop_scan()
-        self.message("found device!")
-        self.device.connect()
-        self.message_info("Connected to device")
+            if not USE_BLEAK:
+                self.adapter.stop_scan()
 
-        # Discover services
-        self.device.discover([uart_uuid], [char_uuid])
-        uart = self.device.find_service(uart_uuid)
-        rx = uart.find_characteristic(char_uuid)
-        self.message_info(f'Device name {self.device.name}')
-        self.message_info(f'Device id {self.device.id}')
-        self.message_info(f'Device advertised {self.device.advertised}')
-        hub.ble_id = self.device.id
-        hub.tx = rx
-        self.hubs[self.device.id] = hub
+
+    async def connect(self, hub):
+        # Connect the messaging queue for communication between self and the hub
+        hub.message_queue = self.q
+        self.message(f'Starting scan for UART {hub.uart_uuid}')
+        await self._ble_connect(hub.uart_uuid, hub.ble_name, hub.ble_id)
+
+        self.message("found device {self.device.name}")
+
+        if USE_BLEAK:
+            await self.ble.in_queue.put( ('connect', self.device.address) )
+            device = await self.ble.out_queue.get()
+            await self.ble.out_queue.task_done()
+            hub.ble_id = self.device.address
+            self.message(f'Device advertised: {device.characteristics}')
+            hub.tx = (device, char_uuid)   # Need to store device because the char is not an object in Bleak, unlike Bluefruit library
+        else:
+            self.device.connect()
+            hub.ble_id = self.device.id
+            # discover services
+            self.device.discover([hub.uart_uuid], [hub.char_uuid])
+            uart = self.device.find_service(hub.uart_uuid)
+            hub.tx = uart.find_characteristic(hub.char_uuid) # same for rx
+            self.message_info(f'Device advertised {self.device.advertised}')
+
+
+        self.message_info("Connected to device {device.name}:{hub.ble_id}")
+        self.hubs[hub.ble_id] = hub
 
         await self.get_messages(hub)
-        return self.adapter
 
 
 

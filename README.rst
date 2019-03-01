@@ -62,12 +62,13 @@ Features
    * The current implmentation uses the async library Curio_ by David Beazley 
 * Leverages the Adafruit Bluefruit BluetoothLE library
    * Supports Mac OS X (possibly the only BLE library in Python to support native CoreBluetooth access). 
-   * Should also support Linux with BlueZ but currently not tested.
+   * Supports Linux via Bleak_ libraries; Windows 10 support should also be there but has not been tested.
 
 
 .. _Curio: http://curio.readthedocs.io
 .. _EuroBricks: https://www.eurobricks.com/forum/index.php?/forums/topic/162288-powered-up-a-tear-down/
 .. _Powered-Up: https://github.com/nathankellenicki/node-poweredup
+.. _Bleak: https://github.com/hbldh/bleak
 
 Building a simple train controller
 ##################################
