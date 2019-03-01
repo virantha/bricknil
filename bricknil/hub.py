@@ -5,6 +5,7 @@ import uuid
 from curio import sleep, UniversalQueue, CancelledError
 from .process import Process
 from .peripheral import Peripheral  # for type check
+from .const import USE_BLEAK
 
 
 # noinspection SpellCheckingInspection
@@ -79,8 +80,8 @@ class Hub(Process):
                     port, info = peripheral
                     self.port_info[port] = info
                 elif msg.startswith('port'):
-                    pass
-                    await self._get_port_info(peripheral, msg)
+                    if not USE_BLEAK:
+                        await self._get_port_info(peripheral, msg)
 
         except CancelledError:
             self.message(f'Terminating peripheral')

@@ -38,13 +38,20 @@ class BLEventQ(Process):
                 await self.send_message(hub.tx, msg_val)
         except CancelledError:
             self.message(f'Terminating and disconnecxting')
-            self.device.disconnect()
+            if USE_BLEAK:
+                await self.ble.in_queue.put( 'quit' )
+            else:
+                self.device.disconnect()
 
     async def send_message(self, characteristic, msg):
         # Message needs to have length prepended
         length = len(msg)+1
         values = bytearray([length]+msg)
-        characteristic.write_value(values)
+        if USE_BLEAK:
+            device, char_uuid = characteristic
+            await self.ble.in_queue.put( ('tx', (device, char_uuid, values)) )
+        else:
+            characteristic.write_value(values)
 
     async def get_messages(self, hub):
         # Register  Message instance to parse and handle messages from this hub
@@ -53,17 +60,59 @@ class BLEventQ(Process):
         # Create a fake attach message on port 255, so that we can attach any instantiated Button listeners if present
         msg_parser.parse(bytearray([15, 0x00, 0x04,255, 1, Button._sensor_id, 0x00, 0,0,0,0, 0,0,0,0]))
 
-        def received(data):
-            self.message(f'Raw data received: {data}')
+        def bleak_received(sender, data):
+            #self.message_debug(f'Bleak Raw data received: {data}')
             msg = msg_parser.parse(data)
-            self.message('{0} Received: {1}'.format(hub.name, msg))
-        hub.tx.start_notify(received)
+            #self.message_debug('{0} Received: {1}'.format(hub.name, msg))
+
+        def received(data):
+            self.message_debug(f'Raw data received: {data}')
+            msg = msg_parser.parse(data)
+            self.message_debug('{0} Received: {1}'.format(hub.name, msg))
+
+        if USE_BLEAK:
+            device, char_uuid = hub.tx
+            await self.ble.in_queue.put( ('notify', (device, char_uuid, bleak_received) ))
+        else:
+            hub.tx.start_notify(received)
 
     async def bleak_connect(self, hub):
 
-        # Get devices; send a message 
-        devices = await self.ble.curio_connect()
-        print(devices)
+        found = False
+        while not found: 
+            await self.ble.in_queue.put('discover')  # Tell bleak to start discovery
+            devices = await self.ble.out_queue.get() # Wait for discovered devices
+            await self.ble.out_queue.task_done()
+
+            print(devices)
+            # Scan through devices for Uart UUID, or a specific BLE address
+            for device in devices:
+                self.message(f'checking device named {device.name}')
+                if device.name == hub.ble_name:
+                    if not hub.ble_id or hub.ble_id == device.id:
+                        found = True
+                        self.device = device
+                        break
+                    else:
+                        self.message(f'found device named {device.name} but id{device.address} is not the one we want')
+            if not found:
+                self.message(f'Rescanning for {hub.uart_uuid}')
+
+        assert self.device.name == hub.ble_name
+        self.message('found device')
+        # Now, connect to it
+        await self.ble.in_queue.put( ('connect', self.device.address) )
+        device = await self.ble.out_queue.get()
+        await self.ble.out_queue.task_done()
+        self.message('connnected to device!')
+        print(f'{device.characteristics}')
+
+        hub.ble_id = self.device.address
+        self.hubs[self.device.address] = hub
+        hub.tx = (device, hub.char_uuid)
+        await self.get_messages(hub)
+        return None
+
 
 
     async def connect(self, hub):
@@ -73,9 +122,9 @@ class BLEventQ(Process):
         uart_uuid = hub.uart_uuid
         char_uuid = hub.char_uuid
         if USE_BLEAK: 
+            print('now using bleak connect')
             await self.bleak_connect(hub)
-            sys.exit(0)
-
+            return
 
         #self.message('Disconnecting any connected UART devices')
         #self.ble.disconnect_devices([uart_uuid])

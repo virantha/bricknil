@@ -5,6 +5,7 @@
     #. The function :func:`start` that starts running the BLE communication queue, and all the hubs, in the event-loop system
 
 """
+import logging
 import pprint
 from curio import run, spawn,  sleep
 import Adafruit_BluefruitLE
@@ -17,6 +18,8 @@ from .ble_queue import BLEventQ
 from .hub import PoweredUpHub, BoostHub, Hub
 from .const import USE_BLEAK
 from .bleak import Bleak
+
+import threading
 
 # Actual decorator that sets up the peripheral classes
 # noinspection PyPep8Naming
@@ -90,6 +93,7 @@ class attach:
 async def _run_all(ble, system):
     """Curio run loop 
     """
+    print('inside curio run loop')
     # Instantiate the Bluetooth LE handler/queue
     ble_q = BLEventQ(ble)
 
@@ -124,8 +128,10 @@ async def _run_all(ble, system):
 
 
     # Now wait for the tasks to finish
+    hub.message_info(f'Waiting for hubs to end')
     for task in hub_tasks:
         await task.join()
+    hub.message_info(f'Hubs end')
     for task in hub_peripheral_listen_tasks:
         await task.cancel()
     await task_ble_q.cancel()
@@ -162,12 +168,14 @@ def start(user_system_setup_func):
     """
 
     if USE_BLEAK:
+        #logging.basicConfig(level=logging.INFO)
         ble = Bleak()
         # Run curio in a thread
         curry_curio_event_run = partial(_curio_event_run, ble=ble, system=user_system_setup_func)
         t = threading.Thread(target=curry_curio_event_run)
         t.start()
-
+        print('started thread for curio')
+        ble.run()
     else:
         ble = Adafruit_BluefruitLE.get_provider()
         ble.initialize()

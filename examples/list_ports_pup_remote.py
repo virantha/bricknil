@@ -26,5 +26,5 @@ async def system():
     remote = Remote('remote')
 
 if __name__ == '__main__':
-    Process.level = Process.MSG_LEVEL.INFO
+    Process.level = Process.MSG_LEVEL.DEBUG
     start(system)
