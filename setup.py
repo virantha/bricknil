@@ -6,7 +6,12 @@ import os
 from setuptools import Command
 #from bricknil.version import __version__
 
-__version__ = '0.3'
+
+# Load the package's __version__.py module as a dictionary.
+here = os.path.abspath(os.path.dirname(__file__))
+about = {}
+with open(os.path.join(here, 'bricknil', 'version.py')) as f:
+    exec(f.read(), about)
 
 class PyTest(Command):
     user_options = []
@@ -52,7 +57,7 @@ print(dependency_links)
 
 setup (
     name = "bricknil",
-    version = __version__,
+    version = about['__version__'],
     #version = "0.5",
     description="Control LEGO(tm) BluetoothLE Hubs, Motors, and Sensors using Async Python",
     license = "ASL 2.0",
