@@ -148,6 +148,8 @@ class BLEventQ(Process):
                     await self.ble.in_queue.put('discover')  # Tell bleak to start discovery
                     devices = await self.ble.out_queue.get() # Wait for discovered devices
                     await self.ble.out_queue.task_done()
+                    # Filter out no-matching uuid
+                    devices = [d for d in devices if str(uart_uuid) in d.uuids]
                 else:
                     devices = self.ble.find_devices(service_uuids=[uart_uuid])
 
@@ -176,7 +178,7 @@ class BLEventQ(Process):
         self.message(f'Starting scan for UART {hub.uart_uuid}')
         await self._ble_connect(hub.uart_uuid, hub.ble_name, hub.ble_id)
 
-        self.message("found device {self.device.name}")
+        self.message(f"found device {self.device.name}")
 
         if USE_BLEAK:
             await self.ble.in_queue.put( ('connect', self.device.address) )
@@ -184,7 +186,7 @@ class BLEventQ(Process):
             await self.ble.out_queue.task_done()
             hub.ble_id = self.device.address
             self.message(f'Device advertised: {device.characteristics}')
-            hub.tx = (device, char_uuid)   # Need to store device because the char is not an object in Bleak, unlike Bluefruit library
+            hub.tx = (device, hub.char_uuid)   # Need to store device because the char is not an object in Bleak, unlike Bluefruit library
         else:
             self.device.connect()
             hub.ble_id = self.device.id
@@ -195,7 +197,7 @@ class BLEventQ(Process):
             self.message_info(f'Device advertised {self.device.advertised}')
 
 
-        self.message_info("Connected to device {device.name}:{hub.ble_id}")
+        self.message_info(f"Connected to device {self.device.name}:{hub.ble_id}")
         self.hubs[hub.ble_id] = hub
 
         await self.get_messages(hub)

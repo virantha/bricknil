@@ -35,7 +35,7 @@ class Bleak:
             await self.in_queue.task_done()
             if msg == 'discover':
                 print('Awaiting on bleak discover')
-                devices = await bleak.discover(loop=self.loop)
+                devices = await bleak.discover(timeout=1, loop=self.loop)
                 print('Done Awaiting on bleak discover')
                 await self.out_queue.put(devices)
             elif msg == 'connect':
