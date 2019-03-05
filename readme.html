@@ -130,15 +130,21 @@ should be straightforward.</p>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>Leverages the Adafruit Bluefruit BluetoothLE library</dt>
+<dt>Cross-platform</dt>
 <dd><ul class="first last">
-<li>Supports Mac OS X (possibly the only BLE library in Python to support native CoreBluetooth access).</li>
-<li>Supports Linux via <a class="reference external" href="https://github.com/hbldh/bleak">Bleak</a> libraries; Windows 10 support should also be there but has not been tested.</li>
+<li>Uses the Adafruit Bluefruit BluetoothLE library for Mac OS X</li>
+<li>Uses the Bleak Bluetooth library for Linux and Win10<a class="footnote-reference" href="#id4" id="id3">[†]</a>, tested on Raspberry Pi</li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[†]</a></td><td>Untested</td></tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="building-a-simple-train-controller">
 <h2>Building a simple train controller<a class="headerlink" href="#building-a-simple-train-controller" title="Permalink to this headline">¶</a></h2>
@@ -607,7 +613,7 @@ execution loop is running the Curio event library, which provides the async
 event loop that executes our user code. Thus, we need to be careful about
 maintaining thread safety between the Curio async event loop and the background
 Bluetooth event processing.</p>
-<div class="figure align-center" id="id3">
+<div class="figure align-center" id="id5">
 <img alt="_images/run_loops.svg" src="_images/run_loops.svg" /><p class="caption"><span class="caption-text">BrickNil running inside Curio’s event loop, which in turn is run by the
 Adafruit_BluefruitLE library run loop</span></p>
 </div>
