@@ -60,32 +60,37 @@ library.  It requires modern Python (designed and tested for 3.7) and uses async
 event programming built on top of the <a class="reference external" href="http://curio.readthedocs.io">Curio</a> async library.  As an aside, the choice of
 async library is fairly arbitrary; and conceivably enabling another library such as asyncio or Trio
 should be straightforward.</p>
-<p>An example BrickNil program for controlling the Train motor speed is shown below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">bricknil</span> <span class="k">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
-<span class="kn">from</span> <span class="nn">bricknil.hub</span> <span class="k">import</span> <span class="n">PoweredUpHub</span>
-<span class="kn">from</span> <span class="nn">bricknil.sensor</span> <span class="k">import</span> <span class="n">TrainMotor</span>
-
-<span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>  <span class="c1"># Repeat this control two times</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="mi">5000</span><span class="p">)</span> <span class="c1"># Ramp speed to 80 over 5 seconds</span>
-            <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>  <span class="c1"># Brake to 0 over 1 second</span>
-            <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="k">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
-    <span class="n">train</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;My train&#39;</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
-</pre></div>
-</div>
+<p>An example BrickNil program for controlling the Train motor speed is shown below:
+.. code-block:: python</p>
+<blockquote>
+<div><p>from curio import sleep
+from bricknil import attach, start
+from bricknil.hub import PoweredUpHub
+from bricknil.sensor import TrainMotor</p>
+<p>&#64;attach(TrainMotor, name=’motor’)
+class Train(PoweredUpHub):</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>async def run(self):</dt>
+<dd><dl class="first last docutils">
+<dt>for i in range(2):  # Repeat this control two times</dt>
+<dd>await self.motor.ramp_speed(80,5000) # Ramp speed to 80 over 5 seconds
+await sleep(6)
+await self.motor.ramp_speed(0,1000)  # Brake to 0 over 1 second
+await sleep(2)</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>async def system():</dt>
+<dd>train = Train(‘My train’)</dd>
+<dt>if __name__ == ‘__main__’:</dt>
+<dd>start(system)</dd>
+</dl>
+</div></blockquote>
 <ul class="simple">
 <li>Free and open-source software: ASL2 license</li>
-<li>Blog: <a class="reference external" href="http://virantha.com/category/projects/bricknil">http://virantha.com/category/projects/bricknil</a></li>
 <li>Documentation: <a class="reference external" href="http://virantha.github.io/bricknil">http://virantha.github.io/bricknil</a></li>
 <li>Source: <a class="reference external" href="https://github.com/virantha/bricknil">https://github.com/virantha/bricknil</a></li>
 </ul>
@@ -188,7 +193,7 @@ numbers are reverse speeds):</p>
 </div>
 <p>Notice that we’re using the <cite>await</cite> keyword in front of all the calls, because
 those are also asynchronous coroutines that will get run in the event loop.
-At some point, the <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.TrainMotor.set_speed" title="bricknil.sensor.TrainMotor.set_speed"><code class="xref py py-func docutils literal notranslate"><span class="pre">bricknil.sensor.TrainMotor.set_speed()</span></code></a> coroutine
+At some point, the <cite>bricknil.sensor.TrainMotor.set_speed</cite> coroutine
 will finish executing and control will return back to the statement after it.
 The next statement is a call to the <cite>sleep</cite> coroutine from the <cite>curio</cite>
 library. It’s important to use this, instead of the regular <em>function</em>
@@ -206,7 +211,7 @@ the <cite>run</cite> logic as:</p>
         <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.TrainMotor.ramp_speed" title="bricknil.sensor.TrainMotor.ramp_speed"><code class="xref py py-func docutils literal notranslate"><span class="pre">bricknil.sensor.TrainMotor.ramp_speed()</span></code></a> function will ramp the speed from
+<p>The <cite>bricknil.sensor.TrainMotor.ramp_speed</cite> function will ramp the speed from
 whatever it is currently to the target speed over the millisecond duration given (internally, it will
 change the train speed every 100ms).  Here, you can see how things are running concurrently:  we issue
 the ramp_speed command, that will take 5 seconds to complete in the background,
@@ -216,9 +221,9 @@ comes to a stop, it will stay stopped for 1 second, then repeat this sequence of
 once more before exiting.</p>
 <p>It’s also useful to print out what’s happening as we run our program. In order to facilitate that,
 there is some rudimentary logging capability built-in to <cite>bricknil</cite> via the
-<a class="reference internal" href="_autosummary/bricknil.process.html#bricknil.process.Process" title="bricknil.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.process.Process</span></code></a> class that all of these concurrent processes are sub-classed from.
+<cite>bricknil.process.Process</cite> class that all of these concurrent processes are sub-classed from.
 Here’s the run coroutine with logging statements via
-<a class="reference internal" href="_autosummary/bricknil.process.html#bricknil.process.Process.message_info" title="bricknil.process.Process.message_info"><code class="xref py py-func docutils literal notranslate"><span class="pre">bricknil.process.Process.message_info()</span></code></a> enabled:</p>
+<cite>bricknil.process.Process.message_info</cite> enabled:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
@@ -239,7 +244,7 @@ our entire system in a separate top-level coroutine like so:</p>
 </div>
 <p>This coroutine instantiates all the hubs we want to control; once we have that,
 we can go ahead and implement the full program that calls
-<code class="xref py py-func docutils literal notranslate"><span class="pre">bricknil.start()</span></code> with this <cite>system</cite> coroutine:</p>
+<cite>bricknil.start</cite> with this <cite>system</cite> coroutine:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">bricknil</span> <span class="k">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
 <span class="kn">from</span> <span class="nn">bricknil.hub</span> <span class="k">import</span> <span class="n">PoweredUpHub</span>
@@ -312,7 +317,7 @@ but for this example, we’re just going to use the <cite>sense_count</cite> and
 something pass in front of it at a distance of ~2 inches, while the latter
 measures roughly how many inches something is from the sensor (from 1-10
 inches).  For a full list of the supported capabilities, please see the API
-documentation at <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.VisionSensor</span></code></a>.</p>
+documentation at <cite>bricknil.sensor.VisionSensor</cite>.</p>
 <p>The full program is listed at the end of this section, but let’s just go through
 it bit by bit.  The first thing we’ll do is attach the sensor to the Train class:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
@@ -593,7 +598,7 @@ feeding the button presses of the remote to make Vernie move forward, backward, 
     <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Here, we are using two hubs running in parallel, and we use a <code class="xref py py-class docutils literal notranslate"><span class="pre">curio.Queue</span></code> to send messages
+<p>Here, we are using two hubs running in parallel, and we use a <cite>curio.Queue</cite> to send messages
 from the remote telling the robot(Boost hub) what to do. Notice that each RemoteButtons
 instance consists of 3 buttons, so there are some helper methods to check if a particular
 button is pressed.</p>
