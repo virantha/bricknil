@@ -3,6 +3,19 @@ BrickNil - Control LEGO Bluetooth Sensors and Motors with Python
 
 |image_pypi| |image_downloads| |image_license| |passing| |quality| |Coverage Status|
 
+.. |image_pypi| image:: https://img.shields.io/pypi/v/bricknil.svg
+   :target: https://pypi.python.org/pypi/bricknil
+.. |image_downloads| image:: https://img.shields.io/pypi/dd/bricknil.svg
+.. |image_license| image:: https://img.shields.io/pypi/l/bricknil.svg
+   :target: https://www.apache.org/licenses/LICENSE-2.0
+.. |passing| image:: https://scrutinizer-ci.com/g/virantha/bricknil/badges/build.png?b=master
+.. |quality| image:: https://scrutinizer-ci.com/g/virantha/bricknil/badges/quality-score.png?b=master
+   :target: https://scrutinizer-ci.com/g/virantha/bricknil
+.. |Coverage Status| image:: https://img.shields.io/coveralls/github/virantha/bricknil.svg
+   :target: https://coveralls.io/r/virantha/bricknil
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
 BrickNil [*]_ provides an easy way to connect to and program LEGO\ |reg|
 Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
 Linux.  This work was inspired by this EuroBricks_ thread, and the NodeJS Powered-Up_
@@ -11,7 +24,8 @@ event programming built on top of the Curio_ async library.  As an aside, the ch
 async library is fairly arbitrary; and conceivably enabling another library such as asyncio or Trio 
 should be straightforward.
 
-An example BrickNil program for controlling the Train motor speed is shown below::
+An example BrickNil program for controlling the Train motor speed is shown below:
+.. code-block:: python
 
    from curio import sleep
    from bricknil import attach, start
@@ -36,7 +50,6 @@ An example BrickNil program for controlling the Train motor speed is shown below
 
 
 * Free and open-source software: ASL2 license
-* Blog: http://virantha.com/category/projects/bricknil
 * Documentation: http://virantha.github.io/bricknil
 * Source: https://github.com/virantha/bricknil
 
@@ -60,15 +73,16 @@ Features
 * Fully supports Python asynchronous keywords and coroutines
 * Allows expressive concurrent programming using async/await syntax
    * The current implmentation uses the async library Curio_ by David Beazley 
-* Leverages the Adafruit Bluefruit BluetoothLE library
-   * Supports Mac OS X (possibly the only BLE library in Python to support native CoreBluetooth access). 
-   * Supports Linux via Bleak_ libraries; Windows 10 support should also be there but has not been tested.
+* Cross-platform
+   * Uses the Adafruit Bluefruit BluetoothLE library for Mac OS X
+   * Uses the Bleak Bluetooth library for Linux and Win10\ [*]_, tested on Raspberry Pi
 
 
 .. _Curio: http://curio.readthedocs.io
 .. _EuroBricks: https://www.eurobricks.com/forum/index.php?/forums/topic/162288-powered-up-a-tear-down/
 .. _Powered-Up: https://github.com/nathankellenicki/node-poweredup
 .. _Bleak: https://github.com/hbldh/bleak
+.. [*] Untested 
 
 Building a simple train controller
 ##################################
@@ -113,7 +127,7 @@ numbers are reverse speeds)::
 
 Notice that we're using the `await` keyword in front of all the calls, because
 those are also asynchronous coroutines that will get run in the event loop.
-At some point, the :func:`bricknil.sensor.TrainMotor.set_speed` coroutine
+At some point, the `bricknil.sensor.TrainMotor.set_speed` coroutine
 will finish executing and control will return back to the statement after it.
 The next statement is a call to the `sleep` coroutine from the `curio`
 library. It's important to use this, instead of the regular *function*
@@ -132,7 +146,7 @@ the `run` logic as::
             await self.motor.ramp_speed(0,1000) 
             await sleep(2)
 
-The :func:`bricknil.sensor.TrainMotor.ramp_speed` function will ramp the speed from 
+The `bricknil.sensor.TrainMotor.ramp_speed` function will ramp the speed from 
 whatever it is currently to the target speed over the millisecond duration given (internally, it will
 change the train speed every 100ms).  Here, you can see how things are running concurrently:  we issue
 the ramp_speed command, that will take 5 seconds to complete in the background,
@@ -143,9 +157,9 @@ once more before exiting.
 
 It's also useful to print out what's happening as we run our program. In order to facilitate that, 
 there is some rudimentary logging capability built-in to `bricknil` via the 
-:class:`bricknil.process.Process` class that all of these concurrent processes are sub-classed from.
+`bricknil.process.Process` class that all of these concurrent processes are sub-classed from.
 Here's the run coroutine with logging statements via
-:func:`bricknil.process.Process.message_info` enabled::
+`bricknil.process.Process.message_info` enabled::
 
     async def run(self):
         self.message_info("Running")
@@ -167,7 +181,7 @@ our entire system in a separate top-level coroutine like so::
 
 This coroutine instantiates all the hubs we want to control; once we have that,
 we can go ahead and implement the full program that calls
-:func:`bricknil.start` with this `system` coroutine::
+`bricknil.start` with this `system` coroutine::
 
    from curio import sleep
    from bricknil import attach, start
@@ -241,7 +255,7 @@ but for this example, we're just going to use the `sense_count` and
 something pass in front of it at a distance of ~2 inches, while the latter
 measures roughly how many inches something is from the sensor (from 1-10
 inches).  For a full list of the supported capabilities, please see the API
-documentation at :class:`bricknil.sensor.VisionSensor`.
+documentation at `bricknil.sensor.VisionSensor`.
 
 The full program is listed at the end of this section, but let's just go through
 it bit by bit.  The first thing we'll do is attach the sensor to the Train class::
@@ -381,7 +395,7 @@ And here's the code that's being used in the video above:
 .. literalinclude:: ../examples/vernie_remote.py 
     :language: python
 
-Here, we are using two hubs running in parallel, and we use a :class:`curio.Queue` to send messages
+Here, we are using two hubs running in parallel, and we use a `curio.Queue` to send messages
 from the remote telling the robot(Boost hub) what to do. Notice that each RemoteButtons 
 instance consists of 3 buttons, so there are some helper methods to check if a particular
 button is pressed.
@@ -433,15 +447,3 @@ Disclaimer
 The software is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under ASL 2.0
 
-.. |image_pypi| image:: https://img.shields.io/pypi/v/bricknil.svg
-   :target: https://pypi.python.org/pypi/bricknil
-.. |image_downloads| image:: https://img.shields.io/pypi/dd/bricknil.svg
-.. |image_license| image:: https://img.shields.io/pypi/l/bricknil.svg
-   :target: https://www.apache.org/licenses/LICENSE-2.0
-.. |passing| image:: https://scrutinizer-ci.com/g/virantha/bricknil/badges/build.png?b=master
-.. |quality| image:: https://scrutinizer-ci.com/g/virantha/bricknil/badges/quality-score.png?b=master
-   :target: https://scrutinizer-ci.com/g/virantha/bricknil
-.. |Coverage Status| image:: https://img.shields.io/coveralls/github/virantha/bricknil.svg
-   :target: https://coveralls.io/r/virantha/bricknil
-
-.. |reg|    unicode:: U+000AE .. REGISTERED SIGN

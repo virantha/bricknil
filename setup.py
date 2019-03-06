@@ -33,12 +33,25 @@ def read(*filenames, **kwargs):
     buf = []
     for filename in filenames:
         with io.open(filename, encoding=encoding) as f:
-            buf.append(f.read())
+            headline_count = 0
+            found_features = False
+            for line in f.readlines():
+                # Keep reading until we find the first headline
+                # after Features
+                if line.startswith('Features'):
+                    found_features = True
+                if line.startswith('####'):
+                    headline_count += 1
+                if found_features and headline_count == 2:
+                    break
+                else:
+                    buf.append(line.rstrip())
     return sep.join(buf)
 
 packages = find_packages(exclude="tests")
 
 long_description = read('README.rst')
+print(long_description)
 
 required = []
 dependency_links = []
@@ -52,13 +65,10 @@ with open("requirements.txt") as f:
         else:
             required.append(line)
 
-print(required)
-print(dependency_links)
 
 setup (
     name = "bricknil",
     version = about['__version__'],
-    #version = "0.5",
     description="Control LEGO(tm) BluetoothLE Hubs, Motors, and Sensors using Async Python",
     license = "ASL 2.0",
     long_description = long_description,
