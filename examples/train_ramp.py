@@ -1,3 +1,4 @@
+import logging
 
 from curio import sleep
 from bricknil import attach, start
@@ -22,5 +23,5 @@ async def system():
     train = Train('My train')
 
 if __name__ == '__main__':
-    Process.level = Process.MSG_LEVEL.INFO
+    logging.basicConfig(level=logging.INFO)
     start(system)

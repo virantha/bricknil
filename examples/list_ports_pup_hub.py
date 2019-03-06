@@ -35,6 +35,5 @@ async def system():
     hub = Robot('robot', True)
 
 if __name__ == '__main__':
-    Process.level = Process.MSG_LEVEL.DEBUG
     logging.basicConfig(level=logging.INFO)
     start(system)

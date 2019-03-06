@@ -65,7 +65,7 @@ class attach:
     """
     def __init__(self, peripheral_type, **kwargs):
         # TODO: check here to make sure parameters were entered
-        if Process.level == Process.MSG_LEVEL.DEBUG:
+        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
             print(f'decorating with {peripheral_type}')
         self.peripheral_type = peripheral_type
         self.kwargs = kwargs

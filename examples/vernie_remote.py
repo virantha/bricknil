@@ -1,3 +1,4 @@
+import logging
 
 from curio import sleep, Queue
 from bricknil import attach, start
@@ -29,7 +30,7 @@ class Remote(PoweredUpRemote):
             await self.tell_robot.put('stop')
 
     async def run(self):
-        self.message_info('Running')
+        self.message('Running')
         # Set the remote LED to green to show we're ready
         await self.led.set_color(Color.green)
         while True:
@@ -41,7 +42,7 @@ class Remote(PoweredUpRemote):
 class Robot(BoostHub):
 
     async def run(self):
-        self.message_info("Running")
+        self.message("Running")
         speed = 30
 
         # Set the robot LED to green to show we're ready
@@ -50,23 +51,23 @@ class Robot(BoostHub):
             msg = await self.listen_remote.get()
             await self.listen_remote.task_done()
             if msg=='forward':
-                self.message_info('going forward')
+                self.message('going forward')
                 await self.motor_left.set_speed(speed)
                 await self.motor_right.set_speed(speed)
             elif msg=='backward':
-                self.message_info('going backward')
+                self.message('going backward')
                 await self.motor_left.set_speed(-speed)
                 await self.motor_right.set_speed(-speed)
             elif msg=='stop':
-                self.message_info('stop')
+                self.message('stop')
                 await self.motor_left.set_speed(0)
                 await self.motor_right.set_speed(0)
             elif msg=='left':
-                self.message_info('left')
+                self.message('left')
                 await self.motor_left.set_speed(-speed)
                 await self.motor_right.set_speed(speed)
             elif msg=='right':
-                self.message_info('right')
+                self.message('right')
                 await self.motor_left.set_speed(speed)
                 await self.motor_right.set_speed(-speed)
 
@@ -80,5 +81,5 @@ async def system():
     robot.listen_remote = remote.tell_robot
 
 if __name__ == '__main__':
-    Process.level = Process.MSG_LEVEL.INFO
+    logging.basicConfig(level=logging.INFO)
     start(system)

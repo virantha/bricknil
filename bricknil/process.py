@@ -27,15 +27,10 @@ class Process:
        Attributes:
           id (int) : Process ID (unique)
           name (str):  Human readable name for process (does not need to be unique)
-          level (:class:`MSG_LEVEL`): Max message level.  Any messages with higher levels will not be logged
 
     """
 
     _next_id = 0  
-    MSG_LEVEL = Enum('MSG_LEVEL', 'NONE ERROR WARN INFO DEBUG')
-    level = MSG_LEVEL.NONE  
-    """No messages by default"""
-
 
     def __init__(self, name):
         self.name = name
@@ -52,28 +47,24 @@ class Process:
     def __repr__(self):
         return f'{type(self).__name__}("{self.name}")'
 
-    def message(self, m : str , level = MSG_LEVEL.INFO):
+    def message(self, m : str , level = logging.INFO):
         """Print message *m* if its level is lower than the instance level"""
 
-        msg_level = level.value
-        if level == self.MSG_LEVEL.DEBUG:
+        if level == logging.DEBUG:
             self.logger.debug(m)
-        elif level == self.MSG_LEVEL.INFO:
+        elif level == logging.INFO:
             self.logger.info(m)
-        elif level == self.MSG_LEVEL.ERROR:
+        elif level == logging.ERROR:
             self.logger.error(m)
-
-        #if self.level.value >= msg_level:
-            #print(f'{str(self)}: {m}')
 
     def message_info(self, m):
         """Helper function for logging messages at INFO level"""
-        self.message(m, self.MSG_LEVEL.INFO)
+        self.message(m, logging.INFO)
 
     def message_debug(self, m):
         """Helper function for logging messages at DEBUG level"""
-        self.message(m, self.MSG_LEVEL.DEBUG)
+        self.message(m, logging.DEBUG)
 
     def message_error(self, m):
         """Helper function for logging messages at ERROR level"""
-        self.message(m, self.MSG_LEVEL.ERROR)
+        self.message(m, logging.ERROR)

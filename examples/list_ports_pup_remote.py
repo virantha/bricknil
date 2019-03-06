@@ -1,3 +1,4 @@
+import logging
 from itertools import cycle
 from curio import sleep
 from bricknil import attach, start
@@ -23,8 +24,8 @@ class Remote(PoweredUpRemote):
         await sleep(20) # Give it enough time to gather data
 
 async def system():
-    remote = Remote('remote')
+    remote = Remote('remote', True)
 
 if __name__ == '__main__':
-    Process.level = Process.MSG_LEVEL.DEBUG
+    logging.basicConfig(level=logging.INFO)
     start(system)
