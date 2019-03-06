@@ -5,6 +5,7 @@ from bricknil.hub import BoostHub
 from bricknil.sensor import TrainMotor, VisionSensor, Button, LED, InternalTiltSensor, InternalMotor
 from bricknil.process import Process
 from bricknil.const import Color
+import logging
 
 @attach(Button, name='hub_btn', capabilities=['sense_press'])
 @attach(LED, name='hub_led')
@@ -34,4 +35,5 @@ async def system():
 
 if __name__ == '__main__':
     Process.level = Process.MSG_LEVEL.DEBUG
+    logging.basicConfig(level=logging.DEBUG)
     start(system)

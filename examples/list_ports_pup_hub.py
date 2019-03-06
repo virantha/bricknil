@@ -5,6 +5,7 @@ from bricknil.hub import PoweredUpHub
 from bricknil.sensor import TrainMotor, VisionSensor, Button, LED, InternalTiltSensor, InternalMotor
 from bricknil.process import Process
 from bricknil.const import Color
+import logging
 
 @attach(Button, name='hub_btn', capabilities=['sense_press'])
 @attach(LED, name='hub_led')
@@ -28,9 +29,12 @@ class Robot(PoweredUpHub):
         await sleep(20) # Give it enough time to gather data
         self.message_info("Done")
 
+        self.message_info(self.port_info)
+
 async def system():
-    hub = Robot('robot')
+    hub = Robot('robot', True)
 
 if __name__ == '__main__':
     Process.level = Process.MSG_LEVEL.DEBUG
+    logging.basicConfig(level=logging.INFO)
     start(system)

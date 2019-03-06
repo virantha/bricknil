@@ -1,3 +1,17 @@
+# Copyright 2019 Virantha N. Ekanayake 
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Singleton interface to the Adafruit Bluetooth library"""
 import Adafruit_BluefruitLE
 from curio import Queue, sleep, CancelledError
@@ -46,7 +60,7 @@ class BLEventQ(Process):
                 msg = await self.q.get()
                 msg_type, hub, msg_val = msg
                 await self.q.task_done()
-                self.message(f'Got msg: {msg_type} = {msg_val}')
+                self.message_debug(f'Got msg: {msg_type} = {msg_val}')
                 await self.send_message(hub.tx, msg_val)
         except CancelledError:
             self.message(f'Terminating and disconnecxting')
@@ -185,7 +199,7 @@ class BLEventQ(Process):
             device = await self.ble.out_queue.get()
             await self.ble.out_queue.task_done()
             hub.ble_id = self.device.address
-            self.message(f'Device advertised: {device.characteristics}')
+            self.message_info(f'Device advertised: {device.characteristics}')
             hub.tx = (device, hub.char_uuid)   # Need to store device because the char is not an object in Bleak, unlike Bluefruit library
         else:
             self.device.connect()

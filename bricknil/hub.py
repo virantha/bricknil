@@ -1,3 +1,17 @@
+# Copyright 2019 Virantha N. Ekanayake 
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Hub processes for the Boost Move and PoweredUp hubs
 
 """
@@ -26,8 +40,9 @@ class Hub(Process):
     hubs = []
 
     # noinspection SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection
-    def __init__(self, name):
+    def __init__(self, name, query_port_info=False):
         super().__init__(name)
+        self.query_port_info = query_port_info
         self.message_queue = None
         self.uart_uuid = uuid.UUID('00001623-1212-efde-1623-785feabcd123')
         self.char_uuid = uuid.UUID('00001624-1212-efde-1623-785feabcd123')
@@ -57,7 +72,7 @@ class Hub(Process):
            Waits for messages on a UniversalQueue and dispatches to the appropriate peripheral handler.
         """
         try:
-            self.message(f'starting peripheral message loop')
+            self.message_debug(f'starting peripheral message loop')
 
             # Check if we have any hub button peripherals attached
             # - If so, we need to manually call peripheral.activate_updates()
@@ -67,12 +82,12 @@ class Hub(Process):
                 peripheral, msg = msg
                 await self.peripheral_queue.task_done()
                 if msg == 'value_change':
-                    self.message(f'peripheral msg: {peripheral} {msg}')
+                    self.message_debug(f'peripheral msg: {peripheral} {msg}')
                     handler_name = f'{peripheral.name}_change'
                     handler = getattr(self, handler_name)
                     await handler()
                 elif msg == 'attach':
-                    self.message(f'peripheral msg: {peripheral} {msg}')
+                    self.message_debug(f'peripheral msg: {peripheral} {msg}')
                     peripheral.message_handler = self.send_message
                     peripheral.enabled = True
                     await peripheral.activate_updates()
@@ -80,7 +95,7 @@ class Hub(Process):
                     port, info = peripheral
                     self.port_info[port] = info
                 elif msg.startswith('port'):
-                    if not USE_BLEAK:
+                    if self.query_port_info:
                         await self._get_port_info(peripheral, msg)
 
         except CancelledError:
@@ -131,8 +146,8 @@ class PoweredUpHub(Hub):
        is useful if you have multiple hubs running at the same time performing different functions.
     """
 
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, query_port_info=False):
+        super().__init__(name, query_port_info)
         self.ble_name = 'HUB NO.4'
         self.ble_id = None  # Override and set this if you want to connect ta known hub
 
@@ -143,8 +158,8 @@ class PoweredUpRemote(Hub):
        is useful if you have multiple hubs running at the same time performing different functions.
     """
 
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, query_port_info=False):
+        super().__init__(name, query_port_info)
         self.ble_name = 'Handset'
         self.ble_id = None  # Override and set this if you want to connect ta known hub
 
@@ -155,7 +170,7 @@ class BoostHub(Hub):
        is useful if you have multiple hubs running at the same time performing different functions.
     """
 
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, query_port_info=False):
+        super().__init__(name, query_port_info)
         self.ble_name = 'LEGO Move Hub'
         self.ble_id = None  # Override and set this if you want to connect ta known hub
