@@ -68,16 +68,16 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.hub.BoostHub" title="bricknil.hub.BoostHub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoostHub</span></code></a>(name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.hub.BoostHub" title="bricknil.hub.BoostHub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoostHub</span></code></a>(name[,&nbsp;query_port_info])</td>
 <td>Boost Move Hub</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.hub.Hub" title="bricknil.hub.Hub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hub</span></code></a>(name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.hub.Hub" title="bricknil.hub.Hub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hub</span></code></a>(name[,&nbsp;query_port_info])</td>
 <td>Base class for all Lego hubs</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.hub.PoweredUpHub" title="bricknil.hub.PoweredUpHub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoweredUpHub</span></code></a>(name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.hub.PoweredUpHub" title="bricknil.hub.PoweredUpHub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoweredUpHub</span></code></a>(name[,&nbsp;query_port_info])</td>
 <td>PoweredUp Hub class</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.hub.PoweredUpRemote" title="bricknil.hub.PoweredUpRemote"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoweredUpRemote</span></code></a>(name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.hub.PoweredUpRemote" title="bricknil.hub.PoweredUpRemote"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoweredUpRemote</span></code></a>(name[,&nbsp;query_port_info])</td>
 <td>PoweredUp Remote class</td>
 </tr>
 </tbody>
@@ -87,7 +87,7 @@
 <h2><a class="toc-backref" href="#id2">Members</a><a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="bricknil.hub.Hub">
-<em class="property">class </em><code class="descclassname">bricknil.hub.</code><code class="descname">Hub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#Hub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.Hub" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bricknil.hub.</code><code class="descname">Hub</code><span class="sig-paren">(</span><em>name</em>, <em>query_port_info=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#Hub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.Hub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bricknil.process.html#bricknil.process.Process" title="bricknil.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.process.Process</span></code></a></p>
 <p>Base class for all Lego hubs</p>
 <dl class="attribute">
@@ -210,7 +210,7 @@ interface</p>
 
 <dl class="class">
 <dt id="bricknil.hub.PoweredUpHub">
-<em class="property">class </em><code class="descclassname">bricknil.hub.</code><code class="descname">PoweredUpHub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#PoweredUpHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.PoweredUpHub" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bricknil.hub.</code><code class="descname">PoweredUpHub</code><span class="sig-paren">(</span><em>name</em>, <em>query_port_info=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#PoweredUpHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.PoweredUpHub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bricknil.hub.Hub" title="bricknil.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.hub.Hub</span></code></a></p>
 <p>PoweredUp Hub class</p>
 <p>Override <cite>ble_id</cite> instance variable if you want to connect to a specific physical Hub. This
@@ -219,7 +219,7 @@ is useful if you have multiple hubs running at the same time performing differen
 
 <dl class="class">
 <dt id="bricknil.hub.PoweredUpRemote">
-<em class="property">class </em><code class="descclassname">bricknil.hub.</code><code class="descname">PoweredUpRemote</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#PoweredUpRemote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.PoweredUpRemote" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bricknil.hub.</code><code class="descname">PoweredUpRemote</code><span class="sig-paren">(</span><em>name</em>, <em>query_port_info=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#PoweredUpRemote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.PoweredUpRemote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bricknil.hub.Hub" title="bricknil.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.hub.Hub</span></code></a></p>
 <p>PoweredUp Remote class</p>
 <p>Override <cite>ble_id</cite> instance variable if you want to connect to a specific physical Hub. This
@@ -228,7 +228,7 @@ is useful if you have multiple hubs running at the same time performing differen
 
 <dl class="class">
 <dt id="bricknil.hub.BoostHub">
-<em class="property">class </em><code class="descclassname">bricknil.hub.</code><code class="descname">BoostHub</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#BoostHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.BoostHub" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bricknil.hub.</code><code class="descname">BoostHub</code><span class="sig-paren">(</span><em>name</em>, <em>query_port_info=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#BoostHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.BoostHub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bricknil.hub.Hub" title="bricknil.hub.Hub"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.hub.Hub</span></code></a></p>
 <p>Boost Move Hub</p>
 <p>Override <cite>ble_id</cite> instance variable if you want to connect to a specific physical Hub. This

@@ -185,7 +185,8 @@
 
     <span class="c1"># Print out the port information in debug mode</span>
     <span class="k">for</span> <span class="n">hub</span> <span class="ow">in</span> <span class="n">Hub</span><span class="o">.</span><span class="n">hubs</span><span class="p">:</span>
-        <span class="n">hub</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">hub</span><span class="o">.</span><span class="n">port_info</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">hub</span><span class="o">.</span><span class="n">query_port_info</span><span class="p">:</span>
+            <span class="n">hub</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">hub</span><span class="o">.</span><span class="n">port_info</span><span class="p">))</span>
         
 
 

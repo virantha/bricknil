@@ -32,3 +32,9 @@ Hub LED information
 Remote buttons
 ==============
 .. include:: remote_button.rst
+
+Train Motor
+===========
+.. include:: train_motor.rst
+
+

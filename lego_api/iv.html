@@ -42,37 +42,61 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <p>Ports 59 and 60 on the Boost hub</p>
+  <p>Ports 59 and 60 on the Boost hub and Pup hub</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">59</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
-   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-   <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-                 <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CUR L&#39;</span><span class="p">},</span>
-             <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-                 <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CUR S&#39;</span><span class="p">}},</span>
-   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Current&#39;</span><span class="p">},</span>
+     <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;input_mapping&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Absolute&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CUR L&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output_mapping&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                   <span class="s1">&#39;pct_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>
+                   <span class="s1">&#39;raw_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4095.0</span><span class="p">),</span>
+                   <span class="s1">&#39;si_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2444.0</span><span class="p">),</span>
+                   <span class="s1">&#39;symbol&#39;</span><span class="p">:</span> <span class="s1">&#39;mA&#39;</span><span class="p">},</span>
+               <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;input_mapping&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Absolute&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CUR S&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output_mapping&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                   <span class="s1">&#39;pct_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>
+                   <span class="s1">&#39;raw_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4095.0</span><span class="p">),</span>
+                   <span class="s1">&#39;si_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2444.0</span><span class="p">),</span>
+                   <span class="s1">&#39;symbol&#39;</span><span class="p">:</span> <span class="s1">&#39;mA&#39;</span><span class="p">}},</span>
+     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Current&#39;</span><span class="p">},</span>
 <span class="mi">60</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-   <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-                 <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;VLT L&#39;</span><span class="p">},</span>
-             <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-                 <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;VLT S&#39;</span><span class="p">}},</span>
-   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Voltage&#39;</span><span class="p">},</span>
+     <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;modes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;input_mapping&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Absolute&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;VLT L&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output_mapping&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                   <span class="s1">&#39;pct_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>
+                   <span class="s1">&#39;raw_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">3893.0</span><span class="p">),</span>
+                   <span class="s1">&#39;si_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">9600.0</span><span class="p">),</span>
+                   <span class="s1">&#39;symbol&#39;</span><span class="p">:</span> <span class="s1">&#39;mV&#39;</span><span class="p">},</span>
+               <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="s1">&#39;dataset_type&#39;</span><span class="p">:</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datasets&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s1">&#39;input_mapping&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Absolute&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;VLT S&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;output_mapping&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                   <span class="s1">&#39;pct_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>
+                   <span class="s1">&#39;raw_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">3893.0</span><span class="p">),</span>
+                   <span class="s1">&#39;si_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">9600.0</span><span class="p">),</span>
+                   <span class="s1">&#39;symbol&#39;</span><span class="p">:</span> <span class="s1">&#39;mV&#39;</span><span class="p">}},</span>
+     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Voltage&#39;</span><span class="p">},</span>
 </pre></div>
 </div>
 
