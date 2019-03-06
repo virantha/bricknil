@@ -144,10 +144,12 @@ async def _run_all(ble, system):
 
 
     # Now wait for the tasks to finish
-    hub.message_info(f'Waiting for hubs to end')
+    ble_q.message_info(f'Waiting for hubs to end')
+
     for task in hub_tasks:
         await task.join()
-    hub.message_info(f'Hubs end')
+    ble_q.message_info(f'Hubs end')
+
     for task in hub_peripheral_listen_tasks:
         await task.cancel()
     await task_ble_q.cancel()

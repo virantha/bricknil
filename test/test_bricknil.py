@@ -26,7 +26,6 @@ class Testbricknil:
         assert p2.__repr__() == 'Process("test2")'
 
     def test_messages(self):
-        self.p.level = Process.MSG_LEVEL.DEBUG
         self.p.message('hello')
         self.p.message_info('hello')
         self.p.message_debug('hello')
