@@ -73,7 +73,7 @@ Features
    * Hub buttons
 * Fully supports Python asynchronous keywords and coroutines
    * Allows expressive concurrent programming using async/await syntax
-   * The current implmentation uses the async library Curio_ by David Beazley 
+   * The current implementation uses the async library Curio_ by David Beazley 
 * Cross-platform
    * Uses the Adafruit Bluefruit BluetoothLE library for Mac OS X
    * Uses the Bleak Bluetooth library for Linux and Win10\ [*]_, tested on Raspberry Pi
