@@ -26,6 +26,11 @@ from .const import USE_BLEAK
 class Hub(Process):
     """Base class for all Lego hubs
 
+       Arguments:
+            name (str) : Human-readable name for this hub (for logging)
+            query_port_info (bool) : Set to True if you want to query all the port information on a Hub (very communication intensive)
+            ble_id (str) : BluetoothLE network(MAC) adddress to connect to (None if you want to connect to the first matching hub)
+
        Attributes:
       
             hubs (list [`Hub`]) : Class attr to keep track of all Hub (and subclasses) instances
@@ -40,8 +45,9 @@ class Hub(Process):
     hubs = []
 
     # noinspection SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection
-    def __init__(self, name, query_port_info=False):
+    def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name)
+        self.ble_id = ble_id
         self.query_port_info = query_port_info
         self.message_queue = None
         self.uart_uuid = uuid.UUID('00001623-1212-efde-1623-785feabcd123')
@@ -142,35 +148,26 @@ class Hub(Process):
 class PoweredUpHub(Hub):
     """PoweredUp Hub class 
 
-       Override `ble_id` instance variable if you want to connect to a specific physical Hub. This
-       is useful if you have multiple hubs running at the same time performing different functions.
     """
 
-    def __init__(self, name, query_port_info=False):
-        super().__init__(name, query_port_info)
+    def __init__(self, name, query_port_info=False, ble_id=None):
+        super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'HUB NO.4'
-        self.ble_id = None  # Override and set this if you want to connect ta known hub
 
 class PoweredUpRemote(Hub):
     """PoweredUp Remote class 
 
-       Override `ble_id` instance variable if you want to connect to a specific physical Hub. This
-       is useful if you have multiple hubs running at the same time performing different functions.
     """
 
-    def __init__(self, name, query_port_info=False):
-        super().__init__(name, query_port_info)
+    def __init__(self, name, query_port_info=False, ble_id=None):
+        super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'Handset'
-        self.ble_id = None  # Override and set this if you want to connect ta known hub
 
 class BoostHub(Hub):
     """Boost Move Hub
 
-       Override `ble_id` instance variable if you want to connect to a specific physical Hub. This
-       is useful if you have multiple hubs running at the same time performing different functions.
     """
 
-    def __init__(self, name, query_port_info=False):
-        super().__init__(name, query_port_info)
+    def __init__(self, name, query_port_info=False, ble_id=None):
+        super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'LEGO Move Hub'
-        self.ble_id = None  # Override and set this if you want to connect ta known hub

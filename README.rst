@@ -72,7 +72,7 @@ Features
    * Internal tilt/orientation/accelerometer 
    * Hub buttons
 * Fully supports Python asynchronous keywords and coroutines
-* Allows expressive concurrent programming using async/await syntax
+   * Allows expressive concurrent programming using async/await syntax
    * The current implmentation uses the async library Curio_ by David Beazley 
 * Cross-platform
    * Uses the Adafruit Bluefruit BluetoothLE library for Mac OS X
@@ -89,7 +89,9 @@ Building a simple train controller
 ##################################
 
 Let's build a simple program to control a LEGO\ |reg| PoweredUp train.  The first thing to do
-is create a class that subclasses the Bluetooth hub that we'll be using::
+is create a class that subclasses the Bluetooth hub that we'll be using:
+
+.. code-block:: python
 
    from bricknil.hub import PoweredUpHub
 
@@ -100,7 +102,9 @@ is create a class that subclasses the Bluetooth hub that we'll be using::
 
 The ``run`` async function (it's actually a coroutine) will contain the code that will control
 everything attached to this hub.  Speaking of which, because we'll be wanting to control the train
-motor connected to this hub, we'd better attach it to the code like so::
+motor connected to this hub, we'd better attach it to the code like so:
+
+.. code-block:: python
 
    from bricknil.hub import PoweredUpHub
    from bricknil.sensor import TrainMotor
@@ -113,7 +117,9 @@ motor connected to this hub, we'd better attach it to the code like so::
 
 Now, we can access the motor functions by calling the object `self.motor` inside `run`.  For example,
 let's say that we wanted to set the motor speed to 50 (the allowed range is -100 to 100 where negative
-numbers are reverse speeds)::
+numbers are reverse speeds):
+
+.. code-block:: python
 
    from curio import sleep
    from bricknil.hub import PoweredUpHub
@@ -138,7 +144,9 @@ other tasks from running.
 Note that we can use arbitrary Python to build our controller; suppose that we
 wanted to ramp the motor speed gradually to 80 over 5 seconds, and then reduce
 speed back to a stop in 1 second, and then repeat it over again.  We could implement
-the `run` logic as::
+the `run` logic as:
+
+.. code-block:: python
 
     async def run(self):
         for i in range(2):
@@ -160,7 +168,9 @@ It's also useful to print out what's happening as we run our program. In order t
 there is some rudimentary logging capability built-in to `bricknil` via the 
 `bricknil.process.Process` class that all of these concurrent processes are sub-classed from.
 Here's the run coroutine with logging statements via
-`bricknil.process.Process.message_info` enabled::
+`bricknil.process.Process.message_info` enabled:
+
+.. code-block:: python
 
     async def run(self):
         self.message_info("Running")
@@ -175,14 +185,18 @@ Here's the run coroutine with logging statements via
 
 Of course, just running the above code isn't quite enough to execute the
 controller.  Once we have the controller logic implemented, we need to define
-our entire system in a separate top-level coroutine like so::
+our entire system in a separate top-level coroutine like so:
+
+.. code-block:: python
 
    async def system():
        train = Train('My train')
 
 This coroutine instantiates all the hubs we want to control; once we have that,
 we can go ahead and implement the full program that calls
-`bricknil.start` with this `system` coroutine::
+`bricknil.start` with this `system` coroutine:
+
+.. code-block:: python
 
    from curio import sleep
    from bricknil import attach, start
@@ -209,6 +223,7 @@ we can go ahead and implement the full program that calls
    if __name__ == '__main__':
        Process.level = Process.MSG_LEVEL.INFO
        start(system)
+
 
 Running this program will output the following::
 
@@ -259,7 +274,9 @@ inches).  For a full list of the supported capabilities, please see the API
 documentation at `bricknil.sensor.VisionSensor`.
 
 The full program is listed at the end of this section, but let's just go through
-it bit by bit.  The first thing we'll do is attach the sensor to the Train class::
+it bit by bit.  The first thing we'll do is attach the sensor to the Train class:
+
+.. code-block:: python
 
    @attach(VisionSensor, name='train_sensor', capabilities=['sense_count', 'sense_distance'])
    @attach(TrainMotor, name='motor')
@@ -269,7 +286,9 @@ it bit by bit.  The first thing we'll do is attach the sensor to the Train class
 Anytime you attach a sensor to the system (motion, tilt, color, etc), you need to define
 what capabilities you want to enable; each sensor can physically provide different capabilities
 depending on which sensor you're using.  As soon as you attach a sensor, you need to provide
-a call-back coroutine that will be called whenever the sensor detects a change like so::
+a call-back coroutine that will be called whenever the sensor detects a change like so:
+
+.. code-block:: python
 
    @attach(VisionSensor, name='train_sensor', capabilities=['sense_count', 'sense_distance'])
    @attach(TrainMotor, name='motor')
@@ -279,7 +298,9 @@ a call-back coroutine that will be called whenever the sensor detects a change l
 	   ...
 
 The values will be provided in dictionary called `self.value` that is indexed by the capability.
-Let's look at a practical example, and implement the logic we were discussing above::
+Let's look at a practical example, and implement the logic we were discussing above:
+
+.. code-block:: python
 
    @attach(VisionSensor, name='train_sensor', capabilities=['sense_count', 'sense_distance'])
    @attach(TrainMotor, name='motor')
@@ -303,7 +324,9 @@ Here, we get the `distance` and `count` from the `value` dict.  If the `count` i
 3 (more than 3 hand waves), we set a flag that keeps the system running to `False`.  Next, based
 on the inverse of the distance, we set a motor_speed instance variable, and then use `self.sensor_change`
 to signal to the main `run` routine that a sensor update has happened.  Our `run` logic can now
-use these values to implement the controller::
+use these values to implement the controller:
+
+.. code-block:: python
 
     async def run(self):
         self.motor_speed = 0
@@ -322,7 +345,9 @@ for the next sensor update, whenever that may be, at intervals of 1 second.  As 
 your hand more than three times in front of the sensor, the program will exit this `while` loop
 and end.
 
-Here's the full code::
+Here's the full code:
+
+.. code-block:: python
 
    from curio import sleep
    from bricknil import attach, start
@@ -368,6 +393,21 @@ Here's the full code::
 
 Further examples
 ################
+
+Connecting to a specific hub
+----------------------------
+If you know the BluetoothLE network address of the hub you want to connect to, then you can force a Hub object
+to only connect to that hub.  This can be useful, for example, for connecting to two trains that need to have different
+code and can be accomplished by passing in the ``ble_id`` argument like so during instantiation of the Hub:
+
+.. code-block:: python
+
+   async def system():
+       hub = Train('train1', ble_id='05c5e50e-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+       hub = Train('train2', ble_id='05c5e50e-YYYY-YYYY-YYYY-YYYYYYYYYYYY')
+       hub = CargoTrain('train3', ble_id='05c5e50e-ZZZZ-ZZZZ-ZZZZ-ZZZZZZZZZZZZ')
+
+
 
 Hub buttons and LED colors
 --------------------------

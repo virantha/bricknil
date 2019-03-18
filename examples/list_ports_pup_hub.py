@@ -32,7 +32,7 @@ class Robot(PoweredUpHub):
         self.message_info(self.port_info)
 
 async def system():
-    hub = Robot('robot', True)
+    hub = Robot('robot', ble_id='05c5e50e-71e9-4dcf-871a-7e5b93b36d6a')
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

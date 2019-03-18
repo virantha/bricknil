@@ -15,7 +15,7 @@
 """Singleton interface to the Adafruit Bluetooth library"""
 import Adafruit_BluefruitLE
 from curio import Queue, sleep, CancelledError
-import sys, functools
+import sys, functools, uuid
 
 from .sensor import Button # Hack! only to get the button sensor_id for the fake attach message
 from .process import Process
@@ -190,7 +190,8 @@ class BLEventQ(Process):
         # Connect the messaging queue for communication between self and the hub
         hub.message_queue = self.q
         self.message(f'Starting scan for UART {hub.uart_uuid}')
-        await self._ble_connect(hub.uart_uuid, hub.ble_name, hub.ble_id)
+        ble_id = uuid.UUID(hub.ble_id)
+        await self._ble_connect(hub.uart_uuid, hub.ble_name, ble_id)
 
         self.message(f"found device {self.device.name}")
 

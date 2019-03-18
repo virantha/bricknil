@@ -86,10 +86,9 @@ class attach:
               `Hub.attach_sensor` method
 
         """
-        #print(f"Decorating class {cls.__name__} with {self.peripheral_type.__name__}")
         # Define a wrapper function to capture the actual instantiation and __init__ params
         @wraps(cls)
-        def wrapper_f(*args):
+        def wrapper_f(*args, **kwargs):
             #print(f'type of cls is {type(cls)}')
             peripheral = self.peripheral_type(**self.kwargs)
 
@@ -98,7 +97,7 @@ class attach:
                 handler_name = f'{peripheral.name}_change'
                 assert hasattr(cls, handler_name), f'{cls.__name__} needs a handler {handler_name}'
             # Create the hub process and attach this peripheral
-            o = cls(*args)
+            o = cls(*args, **kwargs)
             o.message_debug(f"Decorating class {cls.__name__} with {self.peripheral_type.__name__}")
             o.attach_sensor(peripheral)
             return o
