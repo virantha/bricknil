@@ -74,7 +74,7 @@ setup (
     long_description = long_description,
     author="Virantha N. Ekanayake",
     author_email="virantha@gmail.com", # Removed.
-    url='virantha.github.io/bricknil',
+    url='https://virantha.github.io/bricknil',
     package_data = {'': ['*.xml']},
     zip_safe = True,
     include_package_data = True,
