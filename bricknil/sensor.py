@@ -493,3 +493,14 @@ class Button(Peripheral):
 
         b = [0x00, 0x01, 0x02, 0x02]  # Button reports from "Hub Properties Message Type"
         await self.send_message(f'Activate button reports: port {self.port}', b) 
+
+class DuploTrainMotor(Peripheral):
+    _sensor_id = 0x0029
+
+    def __init__(self, name, port=None, capabilities=[]):
+        """Initialize current speed to 0"""
+        self.speed = 0
+        self.ramp_in_progress_task = None
+        super().__init__(name, port, capabilities)
+
+
