@@ -71,22 +71,25 @@
 <tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.Button" title="bricknil.sensor.Button"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Button</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Register to be notified of button presses on the Hub (Boost or PoweredUp)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.InternalMotor" title="bricknil.sensor.InternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.DuploTrainMotor" title="bricknil.sensor.DuploTrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploTrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Initialize current speed to 0</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.InternalMotor" title="bricknil.sensor.InternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the internal motor(s) in the Boost Move Hub.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.InternalTiltSensor" title="bricknil.sensor.InternalTiltSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.InternalTiltSensor" title="bricknil.sensor.InternalTiltSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the internal tilt sensor in the Boost Move Hub.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LED</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LED</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Changes the LED color on the Hubs.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Represents one set of ‘+’, ‘-‘, ‘red’ buttons on the PoweredHub Remote</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Connects to the train motors.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the Boost Vision/Distance Sensor</td>
 </tr>
 </tbody>
@@ -642,12 +645,6 @@ button appear to be like any other peripheral sensor.</p>
 <cite>BLEventQ.get_messages</cite> method that is used to register for updates
 from a given sensor.</p>
 <p>Call super-class with port set to 255</p>
-<dl class="method">
-<dt id="bricknil.sensor.Button.activate_updates">
-<code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#Button.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.Button.activate_updates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use a special Hub Properties button message updates activation message</p>
-</dd></dl>
-
 <dl class="class">
 <dt id="bricknil.sensor.Button.capability">
 <em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.Button.capability" title="Permalink to this definition">¶</a></dt>
@@ -660,6 +657,12 @@ from a given sensor.</p>
 
 </dd></dl>
 
+<dl class="method">
+<dt id="bricknil.sensor.Button.activate_updates">
+<code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#Button.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.Button.activate_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use a special Hub Properties button message updates activation message</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="bricknil.sensor.Button.datasets">
 <code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_press: 0&gt;: (1, 1)}</em><a class="headerlink" href="#bricknil.sensor.Button.datasets" title="Permalink to this definition">¶</a></dt>
@@ -670,6 +673,13 @@ from a given sensor.</p>
 <code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_press: 0&gt;]</em><a class="headerlink" href="#bricknil.sensor.Button.allowed_combo" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.DuploTrainMotor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">DuploTrainMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploTrainMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploTrainMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
+<p>Initialize current speed to 0</p>
 </dd></dl>
 
 </div>

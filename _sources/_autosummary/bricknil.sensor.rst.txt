@@ -17,6 +17,8 @@ bricknil.sensor
 	  
 	  Button
 	  
+	  DuploTrainMotor
+	  
 	  InternalMotor
 	  
 	  InternalTiltSensor

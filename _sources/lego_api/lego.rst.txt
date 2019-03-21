@@ -38,3 +38,29 @@ Train Motor
 .. include:: train_motor.rst
 
 
+Duplo
+=====
+
+Duplo Train Motor
+-----------------
+.. include:: duplo_train_motor.rst
+
+Duplo Train Speaker
+-------------------
+.. include:: duplo_train_speaker.rst
+
+Duplo Train Color
+-----------------
+.. include:: duplo_train_color.rst
+
+Duplo Train Speedometer
+-----------------------
+.. include:: duplo_train_speedometer.rst
+
+Duplo Train RGB Light
+---------------------
+.. include:: duplo_train_rgb_light.rst
+
+Duplo Train Voltage
+-------------------
+.. include:: duplo_train_voltage.rst
