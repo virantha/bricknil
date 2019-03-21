@@ -147,27 +147,30 @@ class Hub(Process):
 
 class PoweredUpHub(Hub):
     """PoweredUp Hub class 
-
     """
-
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'HUB NO.4'
 
 class PoweredUpRemote(Hub):
     """PoweredUp Remote class 
-
     """
-
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'Handset'
 
 class BoostHub(Hub):
     """Boost Move Hub
-
     """
-
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'LEGO Move Hub'
+
+class DuploTrainHub(Hub):
+    """Duplo Steam train and Cargo Train
+
+       This is hub is found in Lego sets 10874 and 10875
+    """
+    def __init__(self, name, query_port_info=False, ble_id=None):
+        super().__init__(name, query_port_info, ble_id)
+        self.ble_name = 'Train Base'

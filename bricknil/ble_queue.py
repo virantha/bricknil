@@ -190,7 +190,8 @@ class BLEventQ(Process):
         # Connect the messaging queue for communication between self and the hub
         hub.message_queue = self.q
         self.message(f'Starting scan for UART {hub.uart_uuid}')
-        ble_id = uuid.UUID(hub.ble_id)
+        ble_id = uuid.UUID(hub.ble_id) if hub.ble_id else None
+
         await self._ble_connect(hub.uart_uuid, hub.ble_name, ble_id)
 
         self.message(f"found device {self.device.name}")
