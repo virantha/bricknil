@@ -309,8 +309,7 @@ class Motor(Peripheral):
 
     """
     def __init__(self, name, port=None, capabilities=[]):
-        """Initialize current speed to 0"""
-        self.speed = 0
+        self.speed = 0  # Initialize current speed to 0
         self.ramp_in_progress_task = None
         super().__init__(name, port, capabilities)
 

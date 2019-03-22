@@ -29,26 +29,19 @@ class InternalMotor(Peripheral):
         the motor's current speed and position.  You don't need to use the sensors, and
         can treat this as strictly an output.
 
-        .. graphviz::
-
-            digraph {
-               "from" -> "to"
-            }
-
-
         Examples::
 
             # Basic connection to the motor on Port A
-            @attach(InternalMotor, 'left_motor', port=InternalMotor.Port.A)
+            @attach(InternalMotor, name='left_motor', port=InternalMotor.Port.A)
 
             # Basic connection to both motors at the same time (virtual I/O port).
             # Any speed command will cause both motors to rotate at the same speed
-            @attach(InternalMotor, 'motors', port=InternalMotor.Port.AB)
+            @attach(InternalMotor, name='motors', port=InternalMotor.Port.AB)
 
             # Report back when motor speed changes. You must have a motors_change method defined 
-            @attach(InternalMotor, 'motors', port=InternalMotor.Port.A, capabilities=['sense_speed'])
+            @attach(InternalMotor, name='motors', port=InternalMotor.Port.A, capabilities=['sense_speed'])
             # Only report back when speed change exceeds 5 units
-            @attach(InternalMotor, 'motors', port=InternalMotor.Port.A, capabilities=[('sense_speed', 5)])
+            @attach(InternalMotor, name='motors', port=InternalMotor.Port.A, capabilities=[('sense_speed', 5)])
 
         See Also:
             :class:`TrainMotor` for connecting to a train motor
@@ -128,15 +121,15 @@ class VisionSensor(Peripheral):
         Examples::
 
             # Basic distance sensor
-            @attach(VisionSensor, 'vision', capabilities=['sense_color'])
+            @attach(VisionSensor, name='vision', capabilities=['sense_color'])
             # Or use the capability Enum
-            @attach(VisionSensor, 'vision', capabilities=[VisionSensor.capability.sense_color])
+            @attach(VisionSensor, name='vision', capabilities=[VisionSensor.capability.sense_color])
 
             # Distance and color sensor
-            @attach(VisionSensor, 'vision', capabilities=['sense_color', 'sense_distance'])
+            @attach(VisionSensor, name='vision', capabilities=['sense_color', 'sense_distance'])
 
             # Distance and rgb sensor with different thresholds to trigger updates
-            @attach(VisionSensor, 'vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
+            @attach(VisionSensor, name='vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
 
         The values returned by the sensor will always be available in the instance variable
         `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are 
@@ -212,12 +205,12 @@ class InternalTiltSensor(Peripheral):
         Examples::
 
             # Basic tilt sensor
-            @attach(InternalTiltSensor, 'tilt', capabilities=['sense_tilt'])
+            @attach(InternalTiltSensor, name='tilt', capabilities=['sense_tilt'])
             # Or use the capability Enum
-            @attach(InternalTiltSensor, 'tilt', capabilities=[InternalTiltSensor.sense_tilt])
+            @attach(InternalTiltSensor, name='tilt', capabilities=[InternalTiltSensor.sense_tilt])
 
             # Tilt and orientation sensor
-            @attach(InternalTiltSensor, 'tilt', capabilities=['sense_tilt, sense_orientation'])
+            @attach(InternalTiltSensor, name='tilt', capabilities=['sense_tilt, sense_orientation'])
 
         The values returned by the sensor will always be available in the
         instance variable `self.value`.  For example, when the `sense_angle`
@@ -276,7 +269,7 @@ class InternalTiltSensor(Peripheral):
 class LED(Peripheral):
     """ Changes the LED color on the Hubs::
 
-            @attach(LED, 'hub_led')
+            @attach(LED, name='hub_led')
 
             self.hub_led.set_output(Color.red)
 
@@ -307,17 +300,17 @@ class TrainMotor(Motor):
 
         Examples::
 
-            @attach(TrainMotor, 'train')
+             @attach(TrainMotor, name='train')
 
         And then within the run body, use::
 
-            self.train.set_speed(speed)
+            await self.train.set_speed(speed)
 
         Attributes:
             speed (int) : Keep track of the current speed in order to ramp it
 
         See Also:
-            `InternalMotor`
+            :class:`InternalMotor`
     """
     _sensor_id = 0x0002
 
@@ -338,7 +331,7 @@ class RemoteButtons(Peripheral):
        Examples::
 
             # Basic connection to the left buttons
-            @attach(RemoteButtons, 'left_buttons', port=RemoteButtons.Port.L)
+            @attach(RemoteButtons, name='left_buttons', port=RemoteButtons.Port.L)
 
             # Getting values back in the handler
             async def left_buttons_change(self):
@@ -388,7 +381,7 @@ class Button(Peripheral):
 
         Examples::
 
-            @attach(Button, 'hub_btn')
+            @attach(Button, name='hub_btn')
 
         Notes:
             Since there is no attach I/O message from the hub to trigger the
@@ -430,16 +423,16 @@ class DuploTrainMotor(Motor):
 
        Examples::
 
-            @attach(DuploTrainMotor, 'motor')
+            @attach(DuploTrainMotor, name='motor')
 
-        And then within the run body, use::
+       And then within the run body, use::
 
-            self.train.set_speed(speed)
+            await self.train.set_speed(speed)
 
-        Attributes:
+       Attributes:
             speed (int): Keep track of the current speed in order to ramp it
 
-        See Also:
+       See Also:
             :class:`TrainMotor` for connecting to a PoweredUp train motor
     """
     _sensor_id = 0x0029
@@ -469,7 +462,7 @@ class DuploSpeedSensor(Peripheral):
         
        For the second example, the two values will be in a dict::
 
-            speed = self.speed_sensor.value[DuploeSpeedSensor.sense_speed]
+            speed = self.speed_sensor.value[DuploSpeedSensor.sense_speed]
             revs  = self.speed_sensor.value[DuploSpeedSensor.sense_count]
 
     """
@@ -551,16 +544,42 @@ class DuploVisionSensor(Peripheral):
                     ]
 
 class DuploSpeaker(Peripheral):
+    """Plays one of five preset sounds through the Duplo built-in speaker
 
+       See :class:`sounds` for the list.
+
+
+       Examples::
+
+            @attach(DuploSpeaker, name='speaker')
+            ...
+            await self.speaker.play_sound(DuploSpeaker.sounds.brake)
+           
+       Notes:
+            Uses Mode 1 to play the presets
+
+    """
     _sensor_id = 0x002A
+    sounds = Enum('sounds', { 'brake': 3,
+                              'station': 5,
+                              'water': 7,
+                              'horn': 9,
+                              'steam': 10,
+                              })
+
+    async def activate_updates(self):
+        """For some reason, even though the speaker is an output device
+           we need to send a Port Input Format Setup command (0x41) to enable
+           notifications.  Otherwise, none of the sound output commands will play.
+        """
+        mode = 1
+        b = [0x00, 0x41, self.port, mode, 0x01, 0x00, 0x00, 0x00, 0x01]
+        await self.send_message('Activate DUPLO Speaker: port {self.port}', b)
 
     async def play_sound(self, sound):
-
-        sounds = [3, 5, 7, 9, 10]
-        for mode in range(1,3):
-            for i in sounds:
-                self.message_info(f'Playing sound {mode}:{i}')
-                await self.set_output(mode, i)
-                await sleep(2)
+        assert isinstance(sound, self.sounds), 'Can only play sounds that are enums (DuploSpeaker.sounds.brake, etc)'
+        mode = 1
+        self.message_info(f'Playing sound {sound.name}:{sound.value}')
+        await self.set_output(mode, sound.value)
 
 
