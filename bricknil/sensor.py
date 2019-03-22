@@ -483,8 +483,6 @@ class DuploSpeedSensor(Peripheral):
 class DuploVisionSensor(Peripheral):
     """ Access the Duplo Vision/Distance Sensor
 
-        Only the sensing capabilities of this sensor is supported right now.
-
         - *sense_color*: Returns one of the 10 predefined colors
         - *sense_ctag*: Returns one of the 10 predefined tags
         - *sense_reflectivity*: Under distances of one inch, the inverse of the distance
@@ -496,15 +494,15 @@ class DuploVisionSensor(Peripheral):
         Examples::
 
             # Basic color sensor
-            @attach(DuploVisionSensor, 'vision', capabilities=['sense_color'])
+            @attach(DuploVisionSensor, name='vision', capabilities=['sense_color'])
             # Or use the capability Enum
-            @attach(DuploVisionSensor, 'vision', capabilities=[DuploVisionSensor.capability.sense_color])
+            @attach(DuploVisionSensor, name='vision', capabilities=[DuploVisionSensor.capability.sense_color])
 
             # Ctag and reflectivity sensor
-            @attach(DuploVisionSensor, 'vision', capabilities=['sense_ctag', 'sense_reflectivity'])
+            @attach(DuploVisionSensor, name='vision', capabilities=['sense_ctag', 'sense_reflectivity'])
 
             # Distance and rgb sensor with different thresholds to trigger updates
-            @attach(DuploVisionSensor, 'vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
+            @attach(DuploVisionSensor, name='vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
 
         The values returned by the sensor will always be available in the instance variable
         `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are 
@@ -548,7 +546,6 @@ class DuploSpeaker(Peripheral):
 
        See :class:`sounds` for the list.
 
-
        Examples::
 
             @attach(DuploSpeaker, name='speaker')
@@ -570,7 +567,8 @@ class DuploSpeaker(Peripheral):
     async def activate_updates(self):
         """For some reason, even though the speaker is an output device
            we need to send a Port Input Format Setup command (0x41) to enable
-           notifications.  Otherwise, none of the sound output commands will play.
+           notifications.  Otherwise, none of the sound output commands will play.  This function
+           is called automatically after this sensor is attached.
         """
         mode = 1
         b = [0x00, 0x41, self.port, mode, 0x01, 0x00, 0x00, 0x00, 0x01]

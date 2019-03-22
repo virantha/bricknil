@@ -17,11 +17,12 @@ BrickNil - Control LEGO Bluetooth Sensors and Motors with Python
 .. |reg|    unicode:: U+000AE .. REGISTERED SIGN
 
 BrickNil [*]_ provides an easy way to connect to and program LEGO\ |reg|
-Bluetooth hubs (including the newer 60197 and 60198 train sets) using Python on OS X and
+Bluetooth hubs (including the PoweredUp Passenger Train 60197_ and Cargo Train 60198_ sets, and the Lego
+Duplo Steam Train 10874_ and Cargo Train 10875_ ) using Python on OS X and
 Linux.  This work was inspired by this EuroBricks_ thread, and the NodeJS Powered-Up_
 library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
 event programming built on top of the Curio_ async library.  As an aside, the choice of
-async library is fairly arbitrary; and conceivably enabling another library such as asyncio or Trio 
+async library is fairly arbitrary; and enabling another library such as asyncio or Trio 
 should be straightforward.
 
 An example BrickNil program for controlling the Train motor speed is shown below:
@@ -57,12 +58,16 @@ An example BrickNil program for controlling the Train motor speed is shown below
 .. [*] BrickNil's name comes from the word "Nil" (නිල්) in Sinhala_ which means Blue (as in Bluetooth)
 
 .. _Sinhala: https://en.wikipedia.org/wiki/Sinhalese_language
+.. _60197: https://www.amazon.com/gp/product/B07CC37F63/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07CC37F63
+.. _60198: https://www.amazon.com/gp/product/B07C39LCZ9/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07C39LCZ9
+.. _10874: https://www.amazon.com/gp/product/B07BK6M2WC/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK6M2WC
+.. _10875: https://www.amazon.com/gp/product/B07BK6KQR6/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK6KQR6
 
 Features
 ########
 
 * Supports the following LEGO\ |reg| Bluetooth systems:
-   * PoweredUp hubs for trains
+   * PoweredUp hubs for trains 60197_, 60198_, and 10874_
    * Boost Move hub
 * Supports the following actuators/sensors:
    * Internal motors
@@ -134,7 +139,7 @@ numbers are reverse speeds):
 
 Notice that we're using the `await` keyword in front of all the calls, because
 those are also asynchronous coroutines that will get run in the event loop.
-At some point, the `bricknil.sensor.TrainMotor.set_speed` coroutine
+At some point, the :meth:`bricknil.peripheral.Motor.set_speed` coroutine
 will finish executing and control will return back to the statement after it.
 The next statement is a call to the `sleep` coroutine from the `curio`
 library. It's important to use this, instead of the regular *function*
@@ -155,7 +160,7 @@ the `run` logic as:
             await self.motor.ramp_speed(0,1000) 
             await sleep(2)
 
-The `bricknil.sensor.TrainMotor.ramp_speed` function will ramp the speed from 
+The :meth:`bricknil.peripheral.Motor.ramp_speed` function will ramp the speed from 
 whatever it is currently to the target speed over the millisecond duration given (internally, it will
 change the train speed every 100ms).  Here, you can see how things are running concurrently:  we issue
 the ramp_speed command, that will take 5 seconds to complete in the background,
@@ -166,9 +171,9 @@ once more before exiting.
 
 It's also useful to print out what's happening as we run our program. In order to facilitate that, 
 there is some rudimentary logging capability built-in to `bricknil` via the 
-`bricknil.process.Process` class that all of these concurrent processes are sub-classed from.
+:class:`bricknil.process.Process` class that all of these concurrent processes are sub-classed from.
 Here's the run coroutine with logging statements via
-`bricknil.process.Process.message_info` enabled:
+:meth:`bricknil.process.Process.message_info` enabled:
 
 .. code-block:: python
 
@@ -194,7 +199,7 @@ our entire system in a separate top-level coroutine like so:
 
 This coroutine instantiates all the hubs we want to control; once we have that,
 we can go ahead and implement the full program that calls
-`bricknil.start` with this `system` coroutine:
+:func:`bricknil.start` with this `system` coroutine:
 
 .. code-block:: python
 
@@ -271,7 +276,7 @@ but for this example, we're just going to use the `sense_count` and
 something pass in front of it at a distance of ~2 inches, while the latter
 measures roughly how many inches something is from the sensor (from 1-10
 inches).  For a full list of the supported capabilities, please see the API
-documentation at `bricknil.sensor.VisionSensor`.
+documentation at :class:`bricknil.sensor.VisionSensor`.
 
 The full program is listed at the end of this section, but let's just go through
 it bit by bit.  The first thing we'll do is attach the sensor to the Train class:

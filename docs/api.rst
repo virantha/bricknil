@@ -3,4 +3,3 @@ API Documentation
 =================
 
 .. automodule:: bricknil
-
