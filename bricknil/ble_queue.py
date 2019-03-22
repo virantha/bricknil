@@ -115,19 +115,25 @@ class BLEventQ(Process):
             hub.tx.start_notify(received)
 
 
-    def _check_devices_for(self, devices, name, address):
+    def _check_devices_for(self, devices, name, manufacturer_id, address):
         """Check if any of the devices match what we're looking for
            
-           First, check to make sure device.name is the name we're looking for.
-           Then, if address is supplied, only return a device with a matching name
+           First, check to make sure the manufacturer_id matches.  If the
+           manufacturer_id is not present in the BLE advertised data from the 
+           device, then fall back to the name (although this is unreliable because
+           the name on the device can be changed by the user through the LEGO apps).
+
+           Then, if address is supplied, only return a device with a matching id/name
            if it's BLE MAC address also agrees
 
            Returns:
               device : Matching device (None if no matches)
         """
         for device in devices:
-            self.message(f'checking device named {device.name} for {name}')
-            if device.name == name:
+            self.message(f'checking manufacturer ID for device named {device.name} for {name}')
+            # Get the device manufacturer id from the advertised data if present
+            if len(device.advertised) > 4 and device.advertised[4]==manufacturer_id \
+                or device.name == name:
                 if not address:
                     return device
                 else:
@@ -139,9 +145,12 @@ class BLEventQ(Process):
                         return device
                     else:
                         self.message(f'Address {ble_address} is not a match')
+            else:
+                self.message(f'No match for device with advertised data {device.advertised}')
+
         return None
 
-    async def _ble_connect(self, uart_uuid, ble_name, ble_id=None, timeout=60):
+    async def _ble_connect(self, uart_uuid, ble_name, ble_manufacturer_id, ble_id=None, timeout=60):
         """Connect to the underlying BLE device with the needed UART UUID
         """
         # Set hub.ble_id to a specific hub id if you want it to connect to a
@@ -167,7 +176,7 @@ class BLEventQ(Process):
                 else:
                     devices = self.ble.find_devices(service_uuids=[uart_uuid])
 
-                device = self._check_devices_for(devices, ble_name, ble_id)
+                device = self._check_devices_for(devices, ble_name, ble_manufacturer_id,  ble_id)
                 if device:
                     self.device = device
                     found = True
@@ -192,7 +201,7 @@ class BLEventQ(Process):
         self.message(f'Starting scan for UART {hub.uart_uuid}')
         ble_id = uuid.UUID(hub.ble_id) if hub.ble_id else None
 
-        await self._ble_connect(hub.uart_uuid, hub.ble_name, ble_id)
+        await self._ble_connect(hub.uart_uuid, hub.ble_name, hub.manufacturer_id, ble_id)
 
         self.message(f"found device {self.device.name}")
 

@@ -151,6 +151,7 @@ class PoweredUpHub(Hub):
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'HUB NO.4'
+        self.manufacturer_id = 65
 
 class PoweredUpRemote(Hub):
     """PoweredUp Remote class 
@@ -158,6 +159,7 @@ class PoweredUpRemote(Hub):
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'Handset'
+        self.manufacturer_id = 66
 
 class BoostHub(Hub):
     """Boost Move Hub
@@ -165,6 +167,8 @@ class BoostHub(Hub):
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'LEGO Move Hub'
+        self.manufacturer_id = 64
+
 
 class DuploTrainHub(Hub):
     """Duplo Steam train and Cargo Train
@@ -174,3 +178,4 @@ class DuploTrainHub(Hub):
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'Train Base'
+        self.manufacturer_id = 32
