@@ -1,5 +1,5 @@
 import pytest
-import os
+import os, sys
 import logging
 
 import smtplib
@@ -8,6 +8,7 @@ from mock import patch, call
 from mock import MagicMock
 from mock import PropertyMock
 
+sys.modules['bleak'] = MagicMock()
 from  bricknil.process import Process
 
 class Testbricknil:
