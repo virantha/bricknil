@@ -1,3 +1,8 @@
+0.7 - 3/22/19
+-------------
+- Changed hub matching to be more robust
+   - Since the name can change, we now use the manufacturer data instead to match hubs
+   - Tested using both Mac (adafruit) and Linux (bleak) libraries
 
 0.6 - 3/21/19
 -------------
