@@ -43,6 +43,7 @@ def read(*filenames, **kwargs):
                 if line.startswith('####'):
                     headline_count += 1
                 if found_features and headline_count == 2:
+                    buf = buf[:-1]
                     break
                 else:
                     buf.append(line.rstrip())
@@ -51,7 +52,6 @@ def read(*filenames, **kwargs):
 packages = find_packages(exclude="tests")
 
 long_description = read('README.rst')
-print(long_description)
 
 required = []
 dependency_links = []
