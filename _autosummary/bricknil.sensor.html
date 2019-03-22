@@ -755,7 +755,6 @@ current speed by:</p>
 <em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">DuploVisionSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploVisionSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
 <p>Access the Duplo Vision/Distance Sensor</p>
-<p>Only the sensing capabilities of this sensor is supported right now.</p>
 <ul class="simple">
 <li><em>sense_color</em>: Returns one of the 10 predefined colors</li>
 <li><em>sense_ctag</em>: Returns one of the 10 predefined tags</li>
@@ -766,15 +765,15 @@ current speed by:</p>
 and sense_rgb is supported.</p>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic color sensor</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">])</span>
 <span class="c1"># Or use the capability Enum</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">])</span>
 
 <span class="c1"># Ctag and reflectivity sensor</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_ctag&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_ctag&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">])</span>
 
 <span class="c1"># Distance and rgb sensor with different thresholds to trigger updates</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
 </pre></div>
 </div>
 <p>The values returned by the sensor will always be available in the instance variable
@@ -852,7 +851,8 @@ enabled, the following values will be stored and updated:</p>
 <code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploSpeaker.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.activate_updates" title="Permalink to this definition">¶</a></dt>
 <dd><p>For some reason, even though the speaker is an output device
 we need to send a Port Input Format Setup command (0x41) to enable
-notifications.  Otherwise, none of the sound output commands will play.</p>
+notifications.  Otherwise, none of the sound output commands will play.  This function
+is called automatically after this sensor is attached.</p>
 </dd></dl>
 
 <dl class="method">

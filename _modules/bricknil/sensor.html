@@ -529,8 +529,6 @@
 <div class="viewcode-block" id="DuploVisionSensor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.DuploVisionSensor">[docs]</a><span class="k">class</span> <span class="nc">DuploVisionSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Access the Duplo Vision/Distance Sensor</span>
 
-<span class="sd">        Only the sensing capabilities of this sensor is supported right now.</span>
-
 <span class="sd">        - *sense_color*: Returns one of the 10 predefined colors</span>
 <span class="sd">        - *sense_ctag*: Returns one of the 10 predefined tags</span>
 <span class="sd">        - *sense_reflectivity*: Under distances of one inch, the inverse of the distance</span>
@@ -542,15 +540,15 @@
 <span class="sd">        Examples::</span>
 
 <span class="sd">            # Basic color sensor</span>
-<span class="sd">            @attach(DuploVisionSensor, &#39;vision&#39;, capabilities=[&#39;sense_color&#39;])</span>
+<span class="sd">            @attach(DuploVisionSensor, name=&#39;vision&#39;, capabilities=[&#39;sense_color&#39;])</span>
 <span class="sd">            # Or use the capability Enum</span>
-<span class="sd">            @attach(DuploVisionSensor, &#39;vision&#39;, capabilities=[DuploVisionSensor.capability.sense_color])</span>
+<span class="sd">            @attach(DuploVisionSensor, name=&#39;vision&#39;, capabilities=[DuploVisionSensor.capability.sense_color])</span>
 
 <span class="sd">            # Ctag and reflectivity sensor</span>
-<span class="sd">            @attach(DuploVisionSensor, &#39;vision&#39;, capabilities=[&#39;sense_ctag&#39;, &#39;sense_reflectivity&#39;])</span>
+<span class="sd">            @attach(DuploVisionSensor, name=&#39;vision&#39;, capabilities=[&#39;sense_ctag&#39;, &#39;sense_reflectivity&#39;])</span>
 
 <span class="sd">            # Distance and rgb sensor with different thresholds to trigger updates</span>
-<span class="sd">            @attach(DuploVisionSensor, &#39;vision&#39;, capabilities=[(&#39;sense_color&#39;, 1), (&#39;sense_rgb&#39;, 5)])</span>
+<span class="sd">            @attach(DuploVisionSensor, name=&#39;vision&#39;, capabilities=[(&#39;sense_color&#39;, 1), (&#39;sense_rgb&#39;, 5)])</span>
 
 <span class="sd">        The values returned by the sensor will always be available in the instance variable</span>
 <span class="sd">        `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are </span>
@@ -594,7 +592,6 @@
 
 <span class="sd">       See :class:`sounds` for the list.</span>
 
-
 <span class="sd">       Examples::</span>
 
 <span class="sd">            @attach(DuploSpeaker, name=&#39;speaker&#39;)</span>
@@ -616,7 +613,8 @@
 <div class="viewcode-block" id="DuploSpeaker.activate_updates"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.DuploSpeaker.activate_updates">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">activate_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;For some reason, even though the speaker is an output device</span>
 <span class="sd">           we need to send a Port Input Format Setup command (0x41) to enable</span>
-<span class="sd">           notifications.  Otherwise, none of the sound output commands will play.</span>
+<span class="sd">           notifications.  Otherwise, none of the sound output commands will play.  This function</span>
+<span class="sd">           is called automatically after this sensor is attached.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x41</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">]</span>
