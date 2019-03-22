@@ -102,7 +102,7 @@ should be straightforward.</p>
 <dt>Supports the following LEGO® Bluetooth systems:</dt>
 <dd><ul class="first last">
 <li>PoweredUp hubs for trains <a class="reference external" href="https://www.amazon.com/gp/product/B07CC37F63/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07CC37F63">60197</a>, <a class="reference external" href="https://www.amazon.com/gp/product/B07C39LCZ9/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07C39LCZ9">60198</a>, and <a class="reference external" href="https://www.amazon.com/gp/product/B07BK6M2WC/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07BK6M2WC">10874</a></li>
-<li>Boost Move hub</li>
+<li><a class="reference external" href="https://www.amazon.com/gp/product/B06Y6JCTKH/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B06Y6JCTKH">Boost</a> Move hub</li>
 </ul>
 </dd>
 </dl>
@@ -612,6 +612,72 @@ from the remote telling the robot(Boost hub) what to do. Notice that each Remote
 instance consists of 3 buttons, so there are some helper methods to check if a particular
 button is pressed.</p>
 </div>
+<div class="section" id="using-the-duplo-train-and-playing-sounds">
+<h3>Using the Duplo Train and Playing Sounds<a class="headerlink" href="#using-the-duplo-train-and-playing-sounds" title="Permalink to this headline">¶</a></h3>
+<p>The Duplo trains <a class="reference external" href="https://www.amazon.com/gp/product/B07BK6M2WC/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07BK6M2WC">10874</a> and <a class="reference external" href="https://www.amazon.com/gp/product/B07BK6KQR6/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07BK6KQR6">10875</a> have the ability to play a set of 5
+predetermined sounds through their built-in speakers
+(<a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploSpeaker" title="bricknil.sensor.DuploSpeaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploSpeaker</span></code></a>).  In addition, there is a
+speedometer(<a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploSpeedSensor" title="bricknil.sensor.DuploSpeedSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploSpeedSensor</span></code></a>) built-in to the front
+wheels, and a vision sensor(<a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploVisionSensor" title="bricknil.sensor.DuploVisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploVisionSensor</span></code></a>) in the
+undercarriage pointing straight down.  This vision sensor is slightly less
+capable than the stand-alone Boost Vision Sensor discussed above, but it can
+still recognize colors, distance, and the special blocks that Lego provides in
+those sets.  Here’s an example that puts everything together:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
+<span class="kn">from</span> <span class="nn">curio</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">bricknil</span> <span class="kn">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
+<span class="kn">from</span> <span class="nn">bricknil.hub</span> <span class="kn">import</span> <span class="n">DuploTrainHub</span>
+<span class="kn">from</span> <span class="nn">bricknil.sensor</span> <span class="kn">import</span> <span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">LED</span><span class="p">,</span> <span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">DuploSpeaker</span>
+<span class="kn">from</span> <span class="nn">bricknil.const</span> <span class="kn">import</span> <span class="n">Color</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeaker</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speaker&#39;</span><span class="p">)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_ctag&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;led&#39;</span><span class="p">)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speed_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_count&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">DuploTrainHub</span><span class="p">):</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">speed_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Speed sensor changed speed: {speed} count: {count}&#39;</span><span class="p">)</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">vision_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_color</span><span class="p">]</span>
+        <span class="n">ctag</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_ctag</span><span class="p">]</span>
+        <span class="n">reflt</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_reflectivity</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}&#39;</span><span class="p">)</span>
+
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="n">Color</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">Color</span><span class="o">.</span><span class="n">purple</span><span class="p">,</span> <span class="n">Color</span><span class="o">.</span><span class="n">yellow</span><span class="p">,</span> <span class="n">Color</span><span class="o">.</span><span class="n">blue</span><span class="p">,</span> <span class="n">Color</span><span class="o">.</span><span class="n">white</span><span class="p">])</span>
+
+        <span class="n">snd</span> <span class="o">=</span> <span class="n">DuploSpeaker</span><span class="o">.</span><span class="n">sounds</span>
+        <span class="n">sounds</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="n">snd</span><span class="o">.</span><span class="n">brake</span><span class="p">,</span> <span class="n">snd</span><span class="o">.</span><span class="n">station</span><span class="p">,</span> <span class="n">snd</span><span class="o">.</span><span class="n">water</span><span class="p">,</span> <span class="n">snd</span><span class="o">.</span><span class="n">horn</span><span class="p">,</span> <span class="n">snd</span><span class="o">.</span><span class="n">steam</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">led</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>       <span class="c1"># Cycle through the colors</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">speaker</span><span class="o">.</span><span class="n">play_sound</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sounds</span><span class="p">))</span>  <span class="c1"># cycle through the sounds</span>
+            <span class="n">tgt_speed</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">+</span> <span class="n">i</span><span class="o">*</span><span class="mi">15</span>                        <span class="c1"># Keep increasing the speed</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="n">tgt_speed</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Set speed to {i}&quot;</span><span class="p">)</span>
+            <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
+
+<span class="n">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">hub</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;train&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="bricknil-architecture">
 <h2>BrickNil Architecture<a class="headerlink" href="#bricknil-architecture" title="Permalink to this headline">¶</a></h2>
@@ -669,6 +735,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 <li><a class="reference internal" href="#connecting-to-a-specific-hub">Connecting to a specific hub</a></li>
 <li><a class="reference internal" href="#hub-buttons-and-led-colors">Hub buttons and LED colors</a></li>
 <li><a class="reference internal" href="#controlling-vernie-boost-hub-with-the-poweredup-remote">Controlling Vernie (Boost Hub) with the PoweredUp Remote</a></li>
+<li><a class="reference internal" href="#using-the-duplo-train-and-playing-sounds">Using the Duplo Train and Playing Sounds</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#bricknil-architecture">BrickNil Architecture</a><ul>
