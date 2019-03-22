@@ -62,13 +62,14 @@ An example BrickNil program for controlling the Train motor speed is shown below
 .. _60198: https://www.amazon.com/gp/product/B07C39LCZ9/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07C39LCZ9
 .. _10874: https://www.amazon.com/gp/product/B07BK6M2WC/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK6M2WC
 .. _10875: https://www.amazon.com/gp/product/B07BK6KQR6/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK6KQR6
+.. _Boost: https://www.amazon.com/gp/product/B06Y6JCTKH/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B06Y6JCTKH
 
 Features
 ########
 
 * Supports the following LEGO\ |reg| Bluetooth systems:
    * PoweredUp hubs for trains 60197_, 60198_, and 10874_
-   * Boost Move hub
+   * Boost_ Move hub
 * Supports the following actuators/sensors:
    * Internal motors
    * Train motors
@@ -445,6 +446,22 @@ Here, we are using two hubs running in parallel, and we use a `curio.Queue` to s
 from the remote telling the robot(Boost hub) what to do. Notice that each RemoteButtons 
 instance consists of 3 buttons, so there are some helper methods to check if a particular
 button is pressed.
+
+Using the Duplo Train and Playing Sounds
+----------------------------------------
+The Duplo trains 10874_ and 10875_ have the ability to play a set of 5
+predetermined sounds through their built-in speakers
+(:class:`bricknil.sensor.DuploSpeaker`).  In addition, there is a
+speedometer(:class:`bricknil.sensor.DuploSpeedSensor`) built-in to the front
+wheels, and a vision sensor(:class:`bricknil.sensor.DuploVisionSensor`) in the
+undercarriage pointing straight down.  This vision sensor is slightly less
+capable than the stand-alone Boost Vision Sensor discussed above, but it can
+still recognize colors, distance, and the special blocks that Lego provides in
+those sets.  Here's an example that puts everything together:
+
+.. literalinclude:: ../examples/duplo_train.py
+    :language: python
+
 
 BrickNil Architecture
 ######################
