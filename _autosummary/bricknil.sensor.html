@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bricknil.sensor &#8212; BrickNil 0.5 documentation</title>
+    <title>bricknil.sensor &#8212; BrickNil 0.6 documentation</title>
     <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="bricknil.peripheral.html" title="bricknil.peripheral"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -71,25 +71,34 @@
 <tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.Button" title="bricknil.sensor.Button"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Button</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Register to be notified of button presses on the Hub (Boost or PoweredUp)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.DuploTrainMotor" title="bricknil.sensor.DuploTrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploTrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
-<td>Initialize current speed to 0</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.DuploSpeaker" title="bricknil.sensor.DuploSpeaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploSpeaker</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Plays one of five preset sounds through the Duplo built-in speaker</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.InternalMotor" title="bricknil.sensor.InternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.DuploSpeedSensor" title="bricknil.sensor.DuploSpeedSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploSpeedSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Speedometer on Duplo train base that measures front wheel speed.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.DuploTrainMotor" title="bricknil.sensor.DuploTrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploTrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Train Motor on Duplo Trains</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.DuploVisionSensor" title="bricknil.sensor.DuploVisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploVisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Access the Duplo Vision/Distance Sensor</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.InternalMotor" title="bricknil.sensor.InternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the internal motor(s) in the Boost Move Hub.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.InternalTiltSensor" title="bricknil.sensor.InternalTiltSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.InternalTiltSensor" title="bricknil.sensor.InternalTiltSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the internal tilt sensor in the Boost Move Hub.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LED</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LED</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Changes the LED color on the Hubs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Represents one set of ‘+’, ‘-‘, ‘red’ buttons on the PoweredHub Remote</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Connects to the train motors.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the Boost Vision/Distance Sensor</td>
 </tr>
 </tbody>
@@ -105,21 +114,18 @@
 <p>Unlike the train motors, these motors have a built-in sensor for sending back
 the motor’s current speed and position.  You don’t need to use the sensors, and
 can treat this as strictly an output.</p>
-<div class="graphviz"><img src="../_images/graphviz-b9d0c63b938aaf556b962cade66de20ee4f6de48.png" alt="digraph {
-   &quot;from&quot; -&gt; &quot;to&quot;
-}" class="graphviz" /></div>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the motor on Port A</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;left_motor&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;left_motor&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
 
 <span class="c1"># Basic connection to both motors at the same time (virtual I/O port).</span>
 <span class="c1"># Any speed command will cause both motors to rotate at the same speed</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">AB</span><span class="p">)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">AB</span><span class="p">)</span>
 
 <span class="c1"># Report back when motor speed changes. You must have a motors_change method defined</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">])</span>
 <span class="c1"># Only report back when speed change exceeds 5 units</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -218,15 +224,15 @@ to do some sanity checking and bounding.</p>
 and sense_rgb is supported.</p>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic distance sensor</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">])</span>
 <span class="c1"># Or use the capability Enum</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">])</span>
 
 <span class="c1"># Distance and color sensor</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
 
 <span class="c1"># Distance and rgb sensor with different thresholds to trigger updates</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
 </pre></div>
 </div>
 <p>The values returned by the sensor will always be available in the instance variable
@@ -330,12 +336,12 @@ There is no update for just a translation along an axis</li>
 <p>Any combination of the above modes are allowed.</p>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic tilt sensor</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_tilt&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_tilt&#39;</span><span class="p">])</span>
 <span class="c1"># Or use the capability Enum</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">sense_tilt</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">sense_tilt</span><span class="p">])</span>
 
 <span class="c1"># Tilt and orientation sensor</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_tilt, sense_orientation&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_tilt, sense_orientation&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>The values returned by the sensor will always be available in the
@@ -442,7 +448,7 @@ special to the self.value dict.</p>
 <em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">LED</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#LED"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.LED" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
 <p>Changes the LED color on the Hubs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="s1">&#39;hub_led&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;hub_led&#39;</span><span class="p">)</span>
 
 <span class="bp">self</span><span class="o">.</span><span class="n">hub_led</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
 </pre></div>
@@ -462,16 +468,16 @@ special to the self.value dict.</p>
 <dl class="class">
 <dt id="bricknil.sensor.TrainMotor">
 <em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">TrainMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#TrainMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.TrainMotor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Motor" title="bricknil.peripheral.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Motor</span></code></a></p>
 <p>Connects to the train motors.</p>
 <p>TrainMotor has no sensing capabilities and only supports a single output mode that
 sets the speed.</p>
 <p>Examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>And then within the run body, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="attribute">
@@ -490,33 +496,8 @@ sets the speed.</p>
 
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><cite>InternalMotor</cite></p>
+<p class="last"><a class="reference internal" href="#bricknil.sensor.InternalMotor" title="bricknil.sensor.InternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalMotor</span></code></a></p>
 </div>
-<p>Initialize current speed to 0</p>
-<dl class="method">
-<dt id="bricknil.sensor.TrainMotor.ramp_speed">
-<code class="descname">ramp_speed</code><span class="sig-paren">(</span><em>target_speed</em>, <em>ramp_time_ms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#TrainMotor.ramp_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.TrainMotor.ramp_speed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ramp the speed by 10 units in the time given</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bricknil.sensor.TrainMotor.set_speed">
-<code class="descname">set_speed</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#TrainMotor.set_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.TrainMotor.set_speed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate and set the train speed</p>
-<p>If there is an in-progress ramp, and this command is not part of that ramp,
-then cancel that in-progress ramp first, before issuing this set_speed command.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speed</strong> (<em>int</em>) – Range -100 to 100 where negative numbers are reverse.
-Use 0 to put the motor into neutral.
-255 will do a hard brake</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -533,7 +514,7 @@ in a list.  To access each button state, there are three helper methods provided
 (see below)</p>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the left buttons</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">RemoteButtons</span><span class="p">,</span> <span class="s1">&#39;left_buttons&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">RemoteButtons</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;left_buttons&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
 
 <span class="c1"># Getting values back in the handler</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">left_buttons_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -635,7 +616,7 @@ attached like other sensors in the Lego protocol.  Instead, the buttons are acce
 through Hub property messages.  We abstract away these special messages to make the
 button appear to be like any other peripheral sensor.</p>
 <p>Examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">Button</span><span class="p">,</span> <span class="s1">&#39;hub_btn&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">Button</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;hub_btn&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="rubric">Notes</p>
@@ -657,12 +638,6 @@ from a given sensor.</p>
 
 </dd></dl>
 
-<dl class="method">
-<dt id="bricknil.sensor.Button.activate_updates">
-<code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#Button.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.Button.activate_updates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use a special Hub Properties button message updates activation message</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="bricknil.sensor.Button.datasets">
 <code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_press: 0&gt;: (1, 1)}</em><a class="headerlink" href="#bricknil.sensor.Button.datasets" title="Permalink to this definition">¶</a></dt>
@@ -673,13 +648,250 @@ from a given sensor.</p>
 <code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_press: 0&gt;]</em><a class="headerlink" href="#bricknil.sensor.Button.allowed_combo" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="bricknil.sensor.Button.activate_updates">
+<code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#Button.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.Button.activate_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use a special Hub Properties button message updates activation message</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="bricknil.sensor.DuploTrainMotor">
 <em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">DuploTrainMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploTrainMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploTrainMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Motor" title="bricknil.peripheral.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Motor</span></code></a></p>
+<p>Train Motor on Duplo Trains</p>
+<p>Make sure that the train is sitting on the ground (the front wheels need to keep rotating) in
+order to keep the train motor powered.  If you pick up the train, the motor will stop operating
+withina few seconds.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And then within the run body, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploTrainMotor.speed">
+<code class="descname">speed</code><a class="headerlink" href="#bricknil.sensor.DuploTrainMotor.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep track of the current speed in order to ramp it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainMotor</span></code></a> for connecting to a PoweredUp train motor</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.DuploSpeedSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">DuploSpeedSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploSpeedSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploSpeedSensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
-<p>Initialize current speed to 0</p>
+<p>Speedometer on Duplo train base that measures front wheel speed.</p>
+<p>This can measure the following values:</p>
+<ul class="simple">
+<li><em>sense_speed</em>: Returns the speed of the front wheels</li>
+<li><em>sense_count</em>: Keeps count of the number of revolutions the front wheels have spun</li>
+</ul>
+<p>Either or both can be enabled for measurement.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Report speed changes</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speed_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">])</span>
+
+<span class="c1"># Report all</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speed_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_count&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The values returned by the sensor will be in <cite>self.value</cite>.  For the first example, get the
+current speed by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+<p>For the second example, the two values will be in a dict:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">]</span>
+<span class="n">revs</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="bricknil.sensor.DuploSpeedSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.DuploSpeedSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeedSensor.capability.sense_count">
+<code class="descname">sense_count</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.DuploSpeedSensor.capability.sense_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeedSensor.capability.sense_speed">
+<code class="descname">sense_speed</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.DuploSpeedSensor.capability.sense_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeedSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_speed: 0&gt;: (1, 2), &lt;capability.sense_count: 1&gt;: (1, 4)}</em><a class="headerlink" href="#bricknil.sensor.DuploSpeedSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeedSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_speed: 0&gt;, &lt;capability.sense_count: 1&gt;]</em><a class="headerlink" href="#bricknil.sensor.DuploSpeedSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.DuploVisionSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">DuploVisionSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploVisionSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
+<p>Access the Duplo Vision/Distance Sensor</p>
+<p>Only the sensing capabilities of this sensor is supported right now.</p>
+<ul class="simple">
+<li><em>sense_color</em>: Returns one of the 10 predefined colors</li>
+<li><em>sense_ctag</em>: Returns one of the 10 predefined tags</li>
+<li><em>sense_reflectivity</em>: Under distances of one inch, the inverse of the distance</li>
+<li><em>sense_rgb</em>: R, G, B values (3 sets of uint16)</li>
+</ul>
+<p>Any combination of sense_color, sense_ctag, sense_reflectivity,
+and sense_rgb is supported.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic color sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">])</span>
+<span class="c1"># Or use the capability Enum</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">])</span>
+
+<span class="c1"># Ctag and reflectivity sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_ctag&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">])</span>
+
+<span class="c1"># Distance and rgb sensor with different thresholds to trigger updates</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>The values returned by the sensor will always be available in the instance variable
+<cite>self.value</cite>.  For example, when the <cite>sense_color</cite> and <cite>sense_rgb</cite> capabilities are
+enabled, the following values will be stored and updated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{</span> <span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">:</span>  <span class="n">uint8</span><span class="p">,</span>
+               <span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_rgb</span><span class="p">:</span>
+                                <span class="p">[</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint16</span> <span class="p">]</span>
+             <span class="p">}</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>The actual modes supported by the sensor are as follows:</p>
+<ul class="simple">
+<li>0 = color (0-10)</li>
+<li>1 = ctag (32-bit int)</li>
+<li>2 = Reflt   (inverse of distance when closer than 1”)</li>
+<li>3 = RGB I</li>
+</ul>
+<dl class="class">
+<dt id="bricknil.sensor.DuploVisionSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploVisionSensor.capability.sense_color">
+<code class="descname">sense_color</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor.capability.sense_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploVisionSensor.capability.sense_ctag">
+<code class="descname">sense_ctag</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor.capability.sense_ctag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploVisionSensor.capability.sense_reflectivity">
+<code class="descname">sense_reflectivity</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor.capability.sense_reflectivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploVisionSensor.capability.sense_rgb">
+<code class="descname">sense_rgb</code><em class="property"> = 3</em><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor.capability.sense_rgb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploVisionSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_color: 0&gt;: (1, 1), &lt;capability.sense_ctag: 1&gt;: (1, 1), &lt;capability.sense_reflectivity: 2&gt;: (1, 1), &lt;capability.sense_rgb: 3&gt;: (3, 2)}</em><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploVisionSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_color: 0&gt;, &lt;capability.sense_ctag: 1&gt;, &lt;capability.sense_reflectivity: 2&gt;, &lt;capability.sense_rgb: 3&gt;]</em><a class="headerlink" href="#bricknil.sensor.DuploVisionSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.DuploSpeaker">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">DuploSpeaker</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploSpeaker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploSpeaker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
+<p>Plays one of five preset sounds through the Duplo built-in speaker</p>
+<p>See <a class="reference internal" href="#bricknil.sensor.DuploSpeaker.sounds" title="bricknil.sensor.DuploSpeaker.sounds"><code class="xref py py-class docutils literal notranslate"><span class="pre">sounds</span></code></a> for the list.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeaker</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speaker&#39;</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">speaker</span><span class="o">.</span><span class="n">play_sound</span><span class="p">(</span><span class="n">DuploSpeaker</span><span class="o">.</span><span class="n">sounds</span><span class="o">.</span><span class="n">brake</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>Uses Mode 1 to play the presets</p>
+<dl class="method">
+<dt id="bricknil.sensor.DuploSpeaker.activate_updates">
+<code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploSpeaker.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.activate_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>For some reason, even though the speaker is an output device
+we need to send a Port Input Format Setup command (0x41) to enable
+notifications.  Otherwise, none of the sound output commands will play.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.DuploSpeaker.play_sound">
+<code class="descname">play_sound</code><span class="sig-paren">(</span><em>sound</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#DuploSpeaker.play_sound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.play_sound" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.DuploSpeaker.sounds">
+<em class="property">class </em><code class="descname">sounds</code><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.sounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeaker.sounds.brake">
+<code class="descname">brake</code><em class="property"> = 3</em><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.sounds.brake" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeaker.sounds.horn">
+<code class="descname">horn</code><em class="property"> = 9</em><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.sounds.horn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeaker.sounds.station">
+<code class="descname">station</code><em class="property"> = 5</em><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.sounds.station" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeaker.sounds.steam">
+<code class="descname">steam</code><em class="property"> = 10</em><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.sounds.steam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.DuploSpeaker.sounds.water">
+<code class="descname">water</code><em class="property"> = 7</em><a class="headerlink" href="#bricknil.sensor.DuploSpeaker.sounds.water" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </dd></dl>
 
 </div>
