@@ -17,22 +17,7 @@ Contents
    authors
    api
    lego_api/lego
-
-Testing
-================
-    `Coverage <http://virantha.github.io/bricknil/docs/testing/index.html>`_
-
-Changelog
-=========
-.. include:: ../CHANGES.rst
-
-.. include:: ../TODO.rst
+   changes.rst
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
