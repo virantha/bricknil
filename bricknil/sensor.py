@@ -19,7 +19,7 @@ from curio import sleep, current_task, spawn  # Needed for motor speed ramp
 from enum import Enum, IntEnum
 from .const import Color
 
-from .peripheral import Peripheral
+from .peripheral import Peripheral, Motor
 
 
 class InternalMotor(Peripheral):
@@ -298,7 +298,7 @@ class LED(Peripheral):
         #b = [0x00, 0x81, self.port, 0x11, 0x51, mode, col ]
         #await self.message_info(f'set color to {color}')
 
-class TrainMotor(Peripheral):
+class TrainMotor(Motor):
     """
         Connects to the train motors.
 
@@ -321,79 +321,6 @@ class TrainMotor(Peripheral):
     """
     _sensor_id = 0x0002
 
-    def __init__(self, name, port=None, capabilities=[]):
-        """Initialize current speed to 0"""
-        self.speed = 0
-        self.ramp_in_progress_task = None
-        super().__init__(name, port, capabilities)
-
-    async def set_speed(self, speed):
-        """ Validate and set the train speed
-
-            If there is an in-progress ramp, and this command is not part of that ramp, 
-            then cancel that in-progress ramp first, before issuing this set_speed command.
-
-            Args:
-                speed (int) : Range -100 to 100 where negative numbers are reverse.
-                    Use 0 to put the motor into neutral.
-                    255 will do a hard brake
-        """
-
-        await self._cancel_existing_differet_ramp()
-        self.speed = speed
-        self.message_info(f'Setting speed to {speed}')
-        await self.set_output(0, self._convert_speed_to_val(speed))
-        
-    async def _cancel_existing_differet_ramp(self):
-        """Cancel the existing speed ramp if it was from a different task
-
-            Remember that speed ramps must be a task with daemon=True, so there is no 
-            one awaiting its future.
-        """
-        # Check if there's a ramp task in progress
-        if self.ramp_in_progress_task:
-            # Check if it's this current task or not
-            current = await current_task()
-            if current != self.ramp_in_progress_task:
-                # We're trying to set the speed 
-                # outside a previously in-progress ramp, so cancel the previous ramp
-                await self.ramp_in_progress_task.cancel()
-                self.ramp_in_progress_task = None
-                self.message_info(f'Canceling previous speed ramp in progress')
-
-
-
-
-    async def ramp_speed(self, target_speed, ramp_time_ms):
-        """Ramp the speed by 10 units in the time given
-
-        """
-        TIME_STEP_MS = 100 
-        await self._cancel_existing_differet_ramp()
-
-        # 500ms ramp time, 100ms per step
-        # Therefore, number of steps = 500/100 = 5
-        # Therefore speed_step = speed_diff/5
-        number_of_steps = ramp_time_ms/TIME_STEP_MS
-        speed_diff = target_speed - self.speed
-        speed_step = speed_diff/number_of_steps
-        start_speed = self.speed
-        self.message(f'ramp_speed steps: {number_of_steps}, speed_diff: {speed_diff}, speed_step: {speed_step}')
-        current_step = 0
-        async def _ramp_speed():
-            nonlocal current_step  # Since this is being assigned to, we need to mark it as coming from the enclosed scope
-            while current_step < number_of_steps:
-                next_speed = int(start_speed + current_step*speed_step)
-                self.message(f'Setting next_speed: {next_speed}')
-                current_step +=1 
-                if current_step == number_of_steps: 
-                    next_speed = target_speed
-                await self.set_speed(next_speed)
-                await sleep(TIME_STEP_MS/1000)
-            self.ramp_in_progress_task = None
-
-        self.message_info(f'Starting ramp of speed: {start_speed} -> {target_speed} ({ramp_time_ms/1000}s)')
-        self.ramp_in_progress_task = await spawn(_ramp_speed, daemon = True)
 
 
 class RemoteButtons(Peripheral):
@@ -494,13 +421,146 @@ class Button(Peripheral):
         b = [0x00, 0x01, 0x02, 0x02]  # Button reports from "Hub Properties Message Type"
         await self.send_message(f'Activate button reports: port {self.port}', b) 
 
-class DuploTrainMotor(Peripheral):
+class DuploTrainMotor(Motor):
+    """Train Motor on Duplo Trains
+
+       Make sure that the train is sitting on the ground (the front wheels need to keep rotating) in 
+       order to keep the train motor powered.  If you pick up the train, the motor will stop operating
+       withina few seconds.
+
+       Examples::
+
+            @attach(DuploTrainMotor, 'motor')
+
+        And then within the run body, use::
+
+            self.train.set_speed(speed)
+
+        Attributes:
+            speed (int): Keep track of the current speed in order to ramp it
+
+        See Also:
+            :class:`TrainMotor` for connecting to a PoweredUp train motor
+    """
     _sensor_id = 0x0029
 
-    def __init__(self, name, port=None, capabilities=[]):
-        """Initialize current speed to 0"""
-        self.speed = 0
-        self.ramp_in_progress_task = None
-        super().__init__(name, port, capabilities)
+class DuploSpeedSensor(Peripheral):
+    """Speedometer on Duplo train base that measures front wheel speed.
+
+       This can measure the following values:
+
+       - *sense_speed*: Returns the speed of the front wheels
+       - *sense_count*: Keeps count of the number of revolutions the front wheels have spun
+
+       Either or both can be enabled for measurement. 
+
+       Examples::
+
+            # Report speed changes
+            @attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed'])
+
+            # Report all
+            @attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed', 'sense_count'])
+
+       The values returned by the sensor will be in `self.value`.  For the first example, get the
+       current speed by::
+
+            speed = self.speed_sensor.value
+        
+       For the second example, the two values will be in a dict::
+
+            speed = self.speed_sensor.value[DuploeSpeedSensor.sense_speed]
+            revs  = self.speed_sensor.value[DuploSpeedSensor.sense_count]
+
+    """
+    _sensor_id = 0x002C
+    capability = Enum("capability", 
+                      [('sense_speed', 0),
+                       ('sense_count', 1),
+                       ])
+
+    datasets = { capability.sense_speed: (1, 2),
+                 capability.sense_count: (1, 4),
+                }
+
+    allowed_combo = [ capability.sense_speed,
+                      capability.sense_count,
+                    ]
+
+class DuploVisionSensor(Peripheral):
+    """ Access the Duplo Vision/Distance Sensor
+
+        Only the sensing capabilities of this sensor is supported right now.
+
+        - *sense_color*: Returns one of the 10 predefined colors
+        - *sense_ctag*: Returns one of the 10 predefined tags
+        - *sense_reflectivity*: Under distances of one inch, the inverse of the distance
+        - *sense_rgb*: R, G, B values (3 sets of uint16)
+
+        Any combination of sense_color, sense_ctag, sense_reflectivity, 
+        and sense_rgb is supported.
+
+        Examples::
+
+            # Basic color sensor
+            @attach(DuploVisionSensor, 'vision', capabilities=['sense_color'])
+            # Or use the capability Enum
+            @attach(DuploVisionSensor, 'vision', capabilities=[DuploVisionSensor.capability.sense_color])
+
+            # Ctag and reflectivity sensor
+            @attach(DuploVisionSensor, 'vision', capabilities=['sense_ctag', 'sense_reflectivity'])
+
+            # Distance and rgb sensor with different thresholds to trigger updates
+            @attach(DuploVisionSensor, 'vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
+
+        The values returned by the sensor will always be available in the instance variable
+        `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are 
+        enabled, the following values will be stored and updated::
+
+            self.value = { DuploVisionSensor.capability.sense_color:  uint8,
+                           DuploVisionSensor.capability.sense_rgb: 
+                                            [ uint16, uint16, uint16 ]
+                         }
+
+        Notes:
+            The actual modes supported by the sensor are as follows:
+
+            -  0 = color (0-10)
+            -  1 = ctag (32-bit int)
+            -  2 = Reflt   (inverse of distance when closer than 1")
+            -  3 = RGB I
+    """
+    _sensor_id = 0x002B
+    capability = Enum("capability", 
+                      [('sense_color', 0),
+                       ('sense_ctag', 1),
+                       ('sense_reflectivity', 2),
+                       ('sense_rgb', 3),
+                       ])
+
+    datasets = { capability.sense_color: (1, 1),
+                 capability.sense_ctag: (1, 1),  # 4-bytes (32-bit)
+                 capability.sense_reflectivity: (1, 1),
+                 capability.sense_rgb: (3, 2)   # 3 16-bit values
+                }
+
+    allowed_combo = [ capability.sense_color,
+                      capability.sense_ctag,
+                      capability.sense_reflectivity,
+                      capability.sense_rgb,
+                    ]
+
+class DuploSpeaker(Peripheral):
+
+    _sensor_id = 0x002A
+
+    async def play_sound(self, sound):
+
+        sounds = [3, 5, 7, 9, 10]
+        for mode in range(1,3):
+            for i in sounds:
+                self.message_info(f'Playing sound {mode}:{i}')
+                await self.set_output(mode, i)
+                await sleep(2)
 
 
