@@ -132,21 +132,17 @@ class BLEventQ(Process):
         for device in devices:
             self.message(f'checking manufacturer ID for device named {device.name} for {name}')
             # Get the device manufacturer id from the advertised data if present
-            if len(device.advertised) > 4 and device.advertised[4]==manufacturer_id \
-                or device.name == name:
+            if device.manufacturer_id == manufacturer_id or device.name == name:
                 if not address:
                     return device
                 else:
-                    if USE_BLEAK: 
-                        ble_address = device.address
-                    else:
-                        ble_address = device.id
+                    ble_address = device.address
                     if address == ble_address:
                         return device
                     else:
                         self.message(f'Address {ble_address} is not a match')
             else:
-                self.message(f'No match for device with advertised data {device.advertised}')
+                self.message(f'No match for device with advertised data {device.manufacturer_id}')
 
         return None
 
@@ -173,8 +169,20 @@ class BLEventQ(Process):
                     await self.ble.out_queue.task_done()
                     # Filter out no-matching uuid
                     devices = [d for d in devices if str(uart_uuid) in d.uuids]
+                    # NOw, extract the manufacturer_id
+                    for device in devices:
+                        assert len(device.manufacturer_data) == 1
+                        data = next(iter(device.manufacturer_data.values())) # Get the one and only key
+                        device.manufacturer_id = data[1]
                 else:
                     devices = self.ble.find_devices(service_uuids=[uart_uuid])
+                    for device in devices:
+                        if len(device.advertised) > 4:
+                            device.manufacturer_id = device.advertised[4]
+                        else:
+                            device.manufacturer_id = None
+                        # Remap device.id to device.address to be consistent with bleak
+                        device.address = device.id
 
                 device = self._check_devices_for(devices, ble_name, ble_manufacturer_id,  ble_id)
                 if device:
@@ -187,7 +195,6 @@ class BLEventQ(Process):
                     await sleep(1)
             if self.device is None:
                 raise RuntimeError('Failed to find UART device!')
-            assert self.device.name == ble_name
         except:
             raise
         finally:
