@@ -21,6 +21,8 @@ from .process import Process
 from .peripheral import Peripheral  # for type check
 from .const import USE_BLEAK
 
+class UnknownPeripheralMessage(Exception): pass
+class DifferentPeripheralOnPortError(Exception): pass
 
 # noinspection SpellCheckingInspection
 class Hub(Process):
@@ -40,6 +42,8 @@ class Hub(Process):
             char_uuid (`uuid.UUID`) : Lego uses only one service characteristic for communicating with the UART services
             tx : Service characteristic for tx/rx messages that's set by :func:`bricknil.ble_queue.BLEventQ.connect`
             peripherals (dict) : Peripheral name => `bricknil.Peripheral`
+            port_to_peripheral (dict): Port number(int) -> `bricknil.Peripheral`
+            port_info (dict):  Keeps track of all the meta-data for each port.  Usually not populated unless `query_port_info` is true
 
     """
     hubs = []
@@ -54,6 +58,8 @@ class Hub(Process):
         self.char_uuid = uuid.UUID('00001624-1212-efde-1623-785feabcd123')
         self.tx = None
         self.peripherals = {}  # attach_sensor method will add sensors to this
+        self.port_to_peripheral = {}   # Quick mapping from a port number to a peripheral object
+                                        # Only gets populated once the peripheral attaches itself physically
         self.peripheral_queue = UniversalQueue()  # Incoming messages from peripherals
 
         # Keep track of port info as we get messages from the hub ('update_port' messages)
@@ -85,27 +91,68 @@ class Hub(Process):
             # - and then register the proper handler inside the message parser
             while True:
                 msg = await self.peripheral_queue.get()
-                peripheral, msg = msg
+                msg, data = msg
                 await self.peripheral_queue.task_done()
                 if msg == 'value_change':
+                    port, msg_bytes = data
+                    peripheral = self.port_to_peripheral[port]
+                    await peripheral.update_value(msg_bytes)
                     self.message_debug(f'peripheral msg: {peripheral} {msg}')
                     handler_name = f'{peripheral.name}_change'
                     handler = getattr(self, handler_name)
                     await handler()
                 elif msg == 'attach':
-                    self.message_debug(f'peripheral msg: {peripheral} {msg}')
-                    peripheral.message_handler = self.send_message
-                    peripheral.enabled = True
-                    await peripheral.activate_updates()
+                    port, device_name = data
+                    peripheral = await self.connect_peripheral_to_port(device_name, port)
+                    if peripheral:
+                        self.message_debug(f'peripheral msg: {peripheral} {msg}')
+                        peripheral.message_handler = self.send_message
+                        await peripheral.activate_updates()
                 elif msg == 'update_port':
-                    port, info = peripheral
+                    port, info = data
                     self.port_info[port] = info
                 elif msg.startswith('port'):
+                    port = data
                     if self.query_port_info:
-                        await self._get_port_info(peripheral, msg)
+                        await self._get_port_info(port, msg)
+                else:
+                    raise UnknownPeripheralMessage
+                    
 
         except CancelledError:
             self.message(f'Terminating peripheral')
+
+    async def connect_peripheral_to_port(self, device_name, port):
+        """Set the port number of the newly attached peripheral
+        
+        When the hub gets an Attached I/O message on a new port with the device_name,
+        this method is called to find the peripheral it should set this port to.  If
+        the user has manually specified a port, then this function just validates that
+        the peripheral name the user has specified on that port is the same as the one
+        that just attached itself to the hub on that port.
+
+        """
+        # register the handler for this IO
+        #  - Check the hub to see if there's a matching device or port
+        for peripheral_name, peripheral in self.peripherals.items():
+            if peripheral.port == port:
+                if device_name == peripheral.sensor_name:
+                    return peripheral
+                else:
+                    raise DifferentPeripheralOnPortError
+
+        # This port has not been reserved for a specific peripheral, so let's just 
+        # search for the first peripheral with a matching name and attach this port to it
+        for peripheral_name, peripheral in self.peripherals.items():
+            if peripheral.sensor_name == device_name and peripheral.port == None:
+                peripheral.message(f"ASSIGNING PORT {port} on {peripheral.name}")
+                peripheral.port = port
+                self.port_to_peripheral[port] = peripheral
+                return peripheral
+
+        # User hasn't specified a matching peripheral, so just ignore this attachment
+        return None
+
 
     def attach_sensor(self, sensor: Peripheral):
         """Add instance variable for this decorated sensor
@@ -126,6 +173,10 @@ class Hub(Process):
             # Request mode info
             b = [0x00, 0x21, port, 0x01]
             await self.send_message(f'req mode info on {port}', b)
+        elif msg == 'port_combination_info_received':
+            pass
+        elif msg == 'port_mode_info_received':
+            pass
         elif msg == 'port_info_received':
             # At this point we know all the available modes for this port
             # let's get the name and value format

@@ -71,7 +71,6 @@ class Peripheral(Process):
        Attributes:
             port (int) : Physical port on the hub this Peripheral attaches to
             sensor_name (str) : Name coming out of `const.DEVICES`
-            enabled (bool) : `True` when the Hub sends an attach message. For future use
             value (dict) : Sensor readings get dumped into this dict
             message_handler (func) : Outgoing message queue to `BLEventQ` that's set by the Hub when an attach message is seen
             capabilites (list [ `capability` ]) : Support capabilities 
@@ -83,7 +82,6 @@ class Peripheral(Process):
         super().__init__(name)
         self.port = port
         self.sensor_name = DEVICES[self._sensor_id]
-        self.enabled = False
         self.value = None
         self.message_handler = None
         self.capabilities, self.thresholds = self._get_validated_capabilities(capabilities)
@@ -137,7 +135,7 @@ class Peripheral(Process):
             val = None
         return val
 
-    def _parse_combined_sensor_values(self, msg: bytearray):
+    async def _parse_combined_sensor_values(self, msg: bytearray):
         """
             Byte sequence is as follows:
                 # uint16 where each set bit indicates data value from that mode is present 
@@ -219,7 +217,7 @@ class Peripheral(Process):
 
 
     # Use these for sensor readings
-    def update_value(self, msg_bytes):
+    async def update_value(self, msg_bytes):
         """ Callback from message parser to update a value from a sensor incoming message
             Depending on the number of capabilities enabled, we end up with different processing:
 
@@ -248,7 +246,7 @@ class Peripheral(Process):
                 else:
                     self.value[capability][i] = val
         if len(self.capabilities) > 1:
-            self._parse_combined_sensor_values(msg)
+            await self._parse_combined_sensor_values(msg)
 
     async def activate_updates(self):
         """ Send a message to the sensor to activate updates

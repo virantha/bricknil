@@ -24,6 +24,7 @@ Submodules
     process
     hub
     ble_queue
+    message_dispatch
     messages
     peripheral
     sensor

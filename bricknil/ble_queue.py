@@ -19,7 +19,7 @@ import sys, functools, uuid
 
 from .sensor import Button # Hack! only to get the button sensor_id for the fake attach message
 from .process import Process
-from .messages import Message
+from .message_dispatch import MessageDispatch
 from .const import USE_BLEAK
 
 # Need a class to represent the bluetooth adapter provided
@@ -93,7 +93,7 @@ class BLEventQ(Process):
            incoming data bytes
         """
         # Message instance to parse and handle messages from this hub
-        msg_parser = Message(hub)
+        msg_parser = MessageDispatch(hub)
 
         # Create a fake attach message on port 255, so that we can attach any instantiated Button listeners if present
         msg_parser.parse(bytearray([15, 0x00, 0x04,255, 1, Button._sensor_id, 0x00, 0,0,0,0, 0,0,0,0]))

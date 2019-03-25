@@ -62,6 +62,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.graphviz',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
 ]
 
 
@@ -202,4 +203,5 @@ epub_exclude_files = ['search.html']
 
 # -- Extension configuration -------------------------------------------------
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
-
+todo_include_todos = True
+todo_link_only = False

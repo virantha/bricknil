@@ -9,7 +9,7 @@ import logging
 
 @attach(Button, name='hub_btn', capabilities=['sense_press'])
 @attach(LED, name='hub_led')
-@attach(VisionSensor, name='vision_sensor', capabilities=['sense_count', 'sense_distance'])
+#@attach(VisionSensor, name='vision_sensor', capabilities=['sense_count', 'sense_distance'])
 @attach(TrainMotor, name='motor_l')
 class Robot(PoweredUpHub):
 

@@ -255,12 +255,12 @@ class InternalTiltSensor(Peripheral):
                         })
 
 
-    def update_value(self, msg_bytes):
+    async def update_value(self, msg_bytes):
         """If sense_orientation, then substitute the `IntenalTiltSensor.orientation`
            enumeration value into the self.value dict.  Otherwise, don't do anything
            special to the self.value dict.
         """
-        super().update_value(msg_bytes)
+        await super().update_value(msg_bytes)
         so = self.capability.sense_orientation
         if so in self.value:
             self.value[so] = self.orientation(self.value[so])
