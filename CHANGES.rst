@@ -1,3 +1,10 @@
+0.7.1 - 3/25/19
+---------------
+- Rewrote message parsing structure to be more modular
+   - Each message is separated out into its own class
+   - State is now stored only in the dispatch and the hub, and not the message parsing
+   - Peripheral value update is now handled safely as messages on the UniversalQueue going to the hub
+
 0.7 - 3/22/19
 -------------
 - Changed hub matching to be more robust

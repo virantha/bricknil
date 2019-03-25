@@ -35,5 +35,5 @@ async def system():
     hub = Robot('robot', query_port_info=True, ble_id='05c5e50e-71e9-4dcf-871a-7e5b93b36d6a')
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     start(system)

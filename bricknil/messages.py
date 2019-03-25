@@ -37,7 +37,7 @@ class Message:
 
     def __init_subclass__(cls):
         """Register message subclasses"""
-        print(f"registering {cls}")
+        logger.debug(f"registering {cls}")
         assert cls.msg_type not in Message.parsers, f'Duplicate Message parser type {cls.msg_type} found in code!'
         Message.parsers[cls.msg_type] = cls()
 
