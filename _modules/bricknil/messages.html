@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bricknil.messages &#8212; BrickNil 0.7 documentation</title>
+    <title>bricknil.messages &#8212; BrickNil 0.7.1 documentation</title>
     <link rel="stylesheet" href="../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">BrickNil 0.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">BrickNil 0.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -57,243 +57,191 @@
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
-
-<span class="sd">&quot;&quot;&quot;Message parser for parsing incoming messages from a Hub</span>
-
-<span class="sd">   Called exclusively by the method :func:`bricknil.ble_queue.BLEventQ.get_message` that is the callback</span>
-<span class="sd">   running inside the Adafruit_BluefruitLE library thread.</span>
-
-<span class="sd">   All communication to the event system in Curio-land should happen through the UniversalQueue instance</span>
-<span class="sd">   to ensure thread safety.  However, for now, value updates happen through a direct method call into</span>
-<span class="sd">   the :func:`bricknil.peripheral.Peripheral.update_value` method of a peripheral instance.  We may want</span>
-<span class="sd">   to change to go through the peripheral_queue in the future.</span>
-
-<span class="sd">   TODO: change msg_bytes to use a Deque instead of a list for faster pop(0) operations</span>
+<span class="sd">&quot;&quot;&quot;Message parsers for each message type</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">struct</span><span class="o">,</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">DEVICES</span>
-<span class="kn">import</span> <span class="nn">struct</span>
 
-<div class="viewcode-block" id="UnknownMessageError"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.UnknownMessageError">[docs]</a><span class="k">class</span> <span class="nc">UnknownMessageError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">pass</span></div>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<div class="viewcode-block" id="UnknownMessageError"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.UnknownMessageError">[docs]</a><span class="k">class</span> <span class="nc">UnknownMessageError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Each hub has its own Message parser instance</span>
+    <span class="sd">&quot;&quot;&quot;Base class for each message parser.</span>
 
-<span class="sd">        Attributes:</span>
-<span class="sd">            hub (:class:`bricknil.hub.Hub`): hub subclass this is sending messages to be parsed</span>
-<span class="sd">            handlers (dict(port =&gt; peripheral)): dict of peripherals for each port</span>
-<span class="sd">            port_info (dict (port =&gt; port_info)): dict containing all the port/mode information</span>
+<span class="sd">       This class instance keeps track of each subclass and stores an object of</span>
+<span class="sd">       each subclass in the attribue `parsers`.  None of these subclass instances</span>
+<span class="sd">       should ever store any instance data since these are shared across multiple</span>
+<span class="sd">       hubs.</span>
+
+<span class="sd">       Attributes:</span>
+<span class="sd">            parsers (dict) : msg_type (int) -&gt; Message parser</span>
+<span class="sd">            msg_type(int)  : msg_type of each subclassed message</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hub</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hub</span> <span class="o">=</span> <span class="n">hub</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">parsers</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="Message.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="nb">bytearray</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Main parse method called by bluetooth event queur</span>
-<span class="sd">           </span>
-<span class="sd">           Args:</span>
-<span class="sd">                msg (bytearray) : The raw message bytes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Remove the first byte that is the legnth</span>
-        <span class="c1"># Remove the second byte that is the hub id</span>
-        <span class="n">msg_bytes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="n">msg_bytes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
-
-        <span class="n">msg_type</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># keep track of the parsed return message</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x01</span><span class="p">:</span> <span class="c1"># Hub properties</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_hub_properties</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x04</span><span class="p">:</span> <span class="c1"># Attached or detached I/O</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_attached_io</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x43</span><span class="p">:</span> <span class="c1"># Port information</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_information</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x44</span><span class="p">:</span> <span class="c1"># Port Mode information</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_mode_information</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x45</span><span class="p">:</span> <span class="c1"># Port Single Value</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x46</span><span class="p">:</span> <span class="c1"># Port Combo Value</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_combo_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="mh">0x82</span><span class="p">:</span> <span class="c1"># Port output command feedback (messages from hub after a command is issued)</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_output_feedback</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">UnknownMessageError</span>
-        <span class="k">except</span> <span class="n">UnknownMessageError</span><span class="p">:</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_msg_bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">l</span><span class="p">])</span></div>
+    <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register message subclasses&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;registering </span><span class="si">{cls}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">cls</span><span class="o">.</span><span class="n">msg_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Message</span><span class="o">.</span><span class="n">parsers</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;Duplicate Message parser type </span><span class="si">{cls.msg_type}</span><span class="s1"> found in code!&#39;</span>
+        <span class="n">Message</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">msg_type</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_parse_msg_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
         <span class="n">hex_bytes</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">msg_bytes</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">hex_bytes</span>
 
-<div class="viewcode-block" id="Message.parse_port_value"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse_port_value">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+<div class="viewcode-block" id="Message.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement this handle parsing of each message body type.</span>
+
+<span class="sd">           Args:</span>
+<span class="sd">               msg_bytes (bytearray): Message body</span>
+<span class="sd">               l (list):  text description of what&#39;s being parsed for logging (just append details as you go along)</span>
+<span class="sd">               dispatcher (:class:`bricknil.message_dispatch.MessageDispatch`):  The dispatch object that is sending messages. </span>
+<span class="sd">                   Call back into its methods to send messages back to the hub.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+
+<div class="viewcode-block" id="PortValueMessage"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortValueMessage">[docs]</a><span class="k">class</span> <span class="nc">PortValueMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Single value update from a sensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg_type</span> <span class="o">=</span> <span class="mh">0x45</span>
+
+<div class="viewcode-block" id="PortValueMessage.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortValueMessage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">):</span>
         <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dispatcher</span><span class="o">.</span><span class="n">message_update_value_to_peripheral</span><span class="p">(</span><span class="n">port</span><span class="p">,</span>  <span class="n">msg_bytes</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port </span><span class="si">{port}</span><span class="s1"> changed value to </span><span class="si">{msg_bytes}</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
 
-        <span class="k">if</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">port</span><span class="p">]</span>
-            <span class="n">sensor</span><span class="o">.</span><span class="n">update_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port </span><span class="si">{port}</span><span class="s1"> changed value to </span><span class="si">{sensor.value}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">sensor</span><span class="p">,</span> <span class="s1">&#39;value_change&#39;</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">l</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnknownMessageError</span></div>
+<div class="viewcode-block" id="PortComboValueMessage"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortComboValueMessage">[docs]</a><span class="k">class</span> <span class="nc">PortComboValueMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Multiple (combination) value updates from different modes of a sensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg_type</span> <span class="o">=</span> <span class="mh">0x46</span>
 
-<div class="viewcode-block" id="Message.parse_port_combo_value"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse_port_combo_value">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_combo_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+<div class="viewcode-block" id="PortComboValueMessage.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortComboValueMessage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">):</span>
         <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dispatcher</span><span class="o">.</span><span class="n">message_update_value_to_peripheral</span><span class="p">(</span><span class="n">port</span><span class="p">,</span>  <span class="n">msg_bytes</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port </span><span class="si">{port}</span><span class="s1"> changed combo value to </span><span class="si">{msg_bytes}</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
 
-        <span class="k">if</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">port</span><span class="p">]</span>
-            <span class="n">sensor</span><span class="o">.</span><span class="n">update_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port </span><span class="si">{port}</span><span class="s1"> changed combo value to </span><span class="si">{sensor.value}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">sensor</span><span class="p">,</span> <span class="s1">&#39;value_change&#39;</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">l</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnknownMessageError</span></div>
+<div class="viewcode-block" id="HubPropertiesMessage"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.HubPropertiesMessage">[docs]</a><span class="k">class</span> <span class="nc">HubPropertiesMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Used to get data on the hub as well as button press information on the hub</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg_type</span> <span class="o">=</span> <span class="mh">0x01</span>
+    <span class="n">prop_names</span> <span class="o">=</span> <span class="p">{</span>  <span class="mh">0x01</span><span class="p">:</span> <span class="s1">&#39;Advertising Name&#39;</span><span class="p">,</span>
+                    <span class="mh">0x02</span><span class="p">:</span> <span class="s1">&#39;Button&#39;</span><span class="p">,</span>
+                    <span class="mh">0x03</span><span class="p">:</span> <span class="s1">&#39;FW Version&#39;</span><span class="p">,</span>
+                    <span class="mh">0x04</span><span class="p">:</span> <span class="s1">&#39;HW Version&#39;</span><span class="p">,</span>
+                    <span class="mh">0x05</span><span class="p">:</span> <span class="s1">&#39;RSSI&#39;</span><span class="p">,</span>
+                    <span class="mh">0x06</span><span class="p">:</span> <span class="s1">&#39;Battery Voltage&#39;</span><span class="p">,</span>
+                    <span class="mh">0x07</span><span class="p">:</span> <span class="s1">&#39;Battery Type&#39;</span><span class="p">,</span>
+                    <span class="mh">0x08</span><span class="p">:</span> <span class="s1">&#39;Manufacturer Name&#39;</span><span class="p">,</span>
+                    <span class="mh">0x09</span><span class="p">:</span> <span class="s1">&#39;Radio FW Version&#39;</span><span class="p">,</span>
+                    <span class="mh">0x0A</span><span class="p">:</span> <span class="s1">&#39;LEGO Wireles Protocol Version&#39;</span><span class="p">,</span>
+                    <span class="mh">0x0B</span><span class="p">:</span> <span class="s1">&#39;System Type ID&#39;</span><span class="p">,</span>
+                    <span class="mh">0x0C</span><span class="p">:</span> <span class="s1">&#39;HW Network ID&#39;</span><span class="p">,</span> 
+                    <span class="mh">0x0D</span><span class="p">:</span> <span class="s1">&#39;Primary MAC address&#39;</span><span class="p">,</span>
+                    <span class="mh">0x0E</span><span class="p">:</span> <span class="s1">&#39;Seconary MAC address&#39;</span><span class="p">,</span>
+                    <span class="mh">0X0F</span><span class="p">:</span> <span class="s1">&#39;HW Network Family&#39;</span><span class="p">,</span>
+                    <span class="p">}</span>
+    <span class="n">operation_names</span> <span class="o">=</span> <span class="p">{</span> <span class="mh">0x01</span><span class="p">:</span> <span class="s1">&#39;Set (downstream)&#39;</span><span class="p">,</span>
+                        <span class="mh">0x02</span><span class="p">:</span> <span class="s1">&#39;Enable Updates (Downstream)&#39;</span><span class="p">,</span>
+                        <span class="mh">0x03</span><span class="p">:</span> <span class="s1">&#39;Disable Updates (Downstream)&#39;</span><span class="p">,</span>
+                        <span class="mh">0x04</span><span class="p">:</span> <span class="s1">&#39;Reset (Downstream)&#39;</span><span class="p">,</span>
+                        <span class="mh">0x05</span><span class="p">:</span> <span class="s1">&#39;Request Update (Downstream)&#39;</span><span class="p">,</span>
+                        <span class="mh">0x06</span><span class="p">:</span> <span class="s1">&#39;Update (Upstream)&#39;</span><span class="p">,</span>
+                        <span class="p">}</span>
+<div class="viewcode-block" id="HubPropertiesMessage.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.HubPropertiesMessage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Hub property: &#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Message.parse_port_information"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse_port_information">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
-        <span class="n">port_info</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Store all the information on this port</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prop</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prop_names</span><span class="p">[</span><span class="n">prop</span><span class="p">])</span>
+
+        <span class="n">op</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_names</span><span class="p">[</span><span class="n">op</span><span class="p">])</span>
+
+        <span class="c1"># Now, just append the number </span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_msg_bytes</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">))</span>
+
+        <span class="c1"># Now forward any button presses as if it were a &quot;port value&quot; change</span>
+        <span class="k">if</span> <span class="n">prop</span><span class="o">==</span><span class="mh">0x02</span> <span class="ow">and</span> <span class="n">op</span> <span class="o">==</span> <span class="mh">0x06</span><span class="p">:</span>  <span class="c1"># Button and update op</span>
+            <span class="n">msg_bytes</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">)</span>  <span class="c1"># Insert Dummy port value of 255</span>
+            <span class="n">Message</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="n">PortValueMessage</span><span class="o">.</span><span class="n">msg_type</span><span class="p">]</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="PortInformationMessage"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortInformationMessage">[docs]</a><span class="k">class</span> <span class="nc">PortInformationMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Information on what modes are supported on a port and whether a port</span>
+<span class="sd">       is input/output.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg_type</span> <span class="o">=</span> <span class="mh">0x43</span>
+
+    <span class="k">def</span> <span class="nf">_parse_mode_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">port_info</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; INFO:&#39;</span><span class="p">)</span>
+        <span class="n">capabilities</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">bitmask</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;combinable&#39;</span><span class="p">,</span> <span class="s1">&#39;synchronizable&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bitmask</span><span class="p">):</span>
+            <span class="n">port_info</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span>
+            <span class="k">if</span> <span class="n">port_info</span><span class="p">[</span><span class="n">attr</span><span class="p">]:</span> <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+        
+    <span class="k">def</span> <span class="nf">_parse_mode_info_input_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">modes_info</span><span class="p">):</span>
+        <span class="n">input_modes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
+        <span class="n">output_modes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">input_modes</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;, output: &#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">output_modes</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_parse_combination_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">port_info</span><span class="p">):</span>
+        <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;mode_combinations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="n">mode_combo</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Combinations:&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">mode_combo</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cmodes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">mode_combo</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
+                    <span class="n">cmodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span><span class="s1">&#39;Mode </span><span class="si">{m}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">cmodes</span><span class="p">]))</span>
+            <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;mode_combinations&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmodes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mode_combo</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mode_combo</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="PortInformationMessage.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortInformationMessage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">):</span>
         <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port </span><span class="si">{port}</span><span class="s1"> Mode </span><span class="si">{mode}</span><span class="s1">:&#39;</span><span class="p">)</span>
 
-        <span class="n">port_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">port_info</span> <span class="o">=</span> <span class="n">dispatcher</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">modes_info</span> <span class="o">=</span> <span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;modes&#39;</span><span class="p">,</span> <span class="p">{})</span>
-
-        
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mh">0x01</span><span class="p">:</span>  <span class="c1"># MODE INFO</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; INFO:&#39;</span><span class="p">)</span>
-            <span class="n">capabilities</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">3</span><span class="p">:</span>
-                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sync&#39;</span><span class="p">)</span>
-                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;synchronizable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">2</span><span class="p">:</span>
-                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;comb&#39;</span><span class="p">)</span>
-                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;combinable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">1</span><span class="p">:</span>
-                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)</span>
-                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">capabilities</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">0</span><span class="p">:</span>
-                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
-                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mh">0x01</span><span class="p">:</span> <span class="c1"># MODE INFO</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_mode_info</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">port_info</span><span class="p">)</span>
             <span class="n">nModes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;nModes:</span><span class="si">{nModes}</span><span class="s1">, input:&#39;</span><span class="p">)</span>
-            <span class="n">input_modes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">input_modes</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
-                    <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                    <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">{})</span>
-                    <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">output_modes</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;, output(): &#39;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">output_modes</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
-                    <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                    <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">{})</span>
-                    <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">((</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]),</span> <span class="s1">&#39;update_port&#39;</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;port_info_received&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_mode_info_input_output</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">modes_info</span><span class="p">)</span>
+            <span class="n">dispatcher</span><span class="o">.</span><span class="n">message_port_info_to_peripheral</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;port_info_received&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mh">0x02</span><span class="p">:</span> <span class="c1"># Combination info</span>
-            <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;mode_combinations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-            
-            <span class="n">mode_combo</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Combinations:&#39;</span><span class="p">)</span>
-            <span class="k">while</span> <span class="n">mode_combo</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">cmodes</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">mode_combo</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="p">):</span>
-                        <span class="n">cmodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span><span class="s1">&#39;Mode </span><span class="si">{m}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">cmodes</span><span class="p">]))</span>
-                <span class="n">port_info</span><span class="p">[</span><span class="s1">&#39;mode_combinations&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmodes</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">mode_combo</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">mode_combo</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">256</span>
-                    <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">((</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]),</span> <span class="s1">&#39;update_port&#39;</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">l</span></div>
-
-
-<div class="viewcode-block" id="Message.parse_port_mode_information"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse_port_mode_information">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_mode_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
-        <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">mode</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">mode_type</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-        <span class="n">port_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">modes_info</span> <span class="o">=</span> <span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;modes&#39;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="p">{})</span>
-
-        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;MODE INFO Port:</span><span class="si">{port}</span><span class="s1"> Mode:</span><span class="si">{mode}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">_unpack_float</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]))</span>
-
-        <span class="k">if</span> <span class="n">mode_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># Name of mode</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Name:&#39;</span><span class="p">)</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">msg_bytes</span> <span class="k">if</span> <span class="n">b</span><span class="o">!=</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="k">elif</span> <span class="n">mode_type</span> <span class="o">==</span> <span class="mh">0x01</span><span class="p">:</span> <span class="c1"># Raw range</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Raw range:&#39;</span><span class="p">)</span>
-            <span class="n">b_array</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
-            <span class="n">raw_min</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">b_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">raw_max</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">b_array</span><span class="p">[</span><span class="mi">4</span><span class="p">:])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{raw_min}</span><span class="s1"> to </span><span class="si">{raw_max}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;raw_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_min</span><span class="p">,</span> <span class="n">raw_max</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">mode_type</span> <span class="o">==</span> <span class="mh">0x02</span><span class="p">:</span> <span class="c1"># Raw range</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Pct range:&#39;</span><span class="p">)</span>
-            <span class="n">b_array</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
-            <span class="n">pct_min</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">b_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">pct_max</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">b_array</span><span class="p">[</span><span class="mi">4</span><span class="p">:])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{pct_min}</span><span class="s1"> to </span><span class="si">{pct_max}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;pct_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pct_min</span><span class="p">,</span> <span class="n">pct_max</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">mode_type</span> <span class="o">==</span> <span class="mh">0x03</span><span class="p">:</span> <span class="c1"># Raw range</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;SI range:&#39;</span><span class="p">)</span>
-            <span class="n">mn</span> <span class="o">=</span> <span class="n">_unpack_float</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">mx</span> <span class="o">=</span> <span class="n">_unpack_float</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">:])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{mn}</span><span class="s1"> to </span><span class="si">{mx}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;si_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span class="n">mx</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">mode_type</span> <span class="o">==</span> <span class="mh">0x04</span><span class="p">:</span> <span class="c1"># Symbol</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Symbol:&#39;</span><span class="p">)</span>
-            <span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">msg_bytes</span> <span class="k">if</span> <span class="n">b</span><span class="o">!=</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;symbol&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">symbol</span>
-        <span class="k">elif</span> <span class="n">mode_type</span> <span class="o">==</span> <span class="mh">0x05</span><span class="p">:</span> <span class="c1"># Mappig</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Input Mapping:&#39;</span><span class="p">)</span>
-            <span class="n">bits</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;Discrete&#39;</span><span class="p">,</span> <span class="s1">&#39;Relative&#39;</span><span class="p">,</span> <span class="s1">&#39;Absolute&#39;</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;Supports Functional Mapping 2.0}&#39;</span><span class="p">,</span> <span class="s1">&#39;Supports NULL&#39;</span><span class="p">]</span>
-            <span class="c1"># First byte is bit-mask of input details</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">maps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">bits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">mask</span><span class="o">&gt;&gt;</span><span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">]</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">maps</span><span class="p">))</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;input_mapping&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maps</span>
-
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Output Mapping:&#39;</span><span class="p">)</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">maps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">bits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">mask</span><span class="o">&gt;&gt;</span><span class="n">i</span><span class="p">)</span><span class="o">&amp;</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">maps</span><span class="p">))</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;output_mapping&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maps</span>
-        <span class="k">elif</span> <span class="n">mode_type</span> <span class="o">==</span><span class="mh">0x80</span><span class="p">:</span>  <span class="c1"># Value format of mode</span>
-            <span class="c1"># 4 bytes</span>
-            <span class="c1"># [0] = Number of datasets (e.g. RBG has 3 for each color)</span>
-            <span class="c1"># [1] = Dataset type.  00-byte, 01=16b, 10=32b, 11=float</span>
-            <span class="c1"># [2] = Total figures</span>
-            <span class="c1"># [3] = Decimals if any</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;datasets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">dataset_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;8b&#39;</span><span class="p">,</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span> <span class="s1">&#39;32b&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">]</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset_types</span><span class="p">[</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_combination_info</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">port_info</span><span class="p">)</span>
+            <span class="n">dispatcher</span><span class="o">.</span><span class="n">message_port_info_to_peripheral</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;port_combination_info_received&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">((</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]),</span> <span class="s1">&#39;update_port&#39;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">l</span></div>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span></div></div>
 
-<div class="viewcode-block" id="Message.parse_port_output_feedback"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse_port_output_feedback">[docs]</a>    <span class="k">def</span> <span class="nf">parse_port_output_feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+<div class="viewcode-block" id="PortOutputFeedbackMessage"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortOutputFeedbackMessage">[docs]</a><span class="k">class</span> <span class="nc">PortOutputFeedbackMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Ack messages/error messages sent in response to a command being issued to the hub</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg_type</span> <span class="o">=</span> <span class="mh">0x82</span>
+
+<div class="viewcode-block" id="PortOutputFeedbackMessage.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortOutputFeedbackMessage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">):</span>
         <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Command feedback: Port </span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">feedback</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -306,31 +254,110 @@
         <span class="k">if</span> <span class="n">feedback</span> <span class="o">&amp;</span> <span class="mi">8</span><span class="p">:</span>
             <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Idle&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">feedback</span> <span class="o">&amp;</span> <span class="mi">16</span><span class="p">:</span> 
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Busy/Full&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">l</span></div>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Busy/Full&#39;</span><span class="p">)</span></div></div>
 
-    <span class="k">def</span> <span class="nf">_get_hub_registerd_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_name</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">peripheral_name</span><span class="p">,</span> <span class="n">peripheral</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripherals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">port</span> <span class="o">==</span> <span class="n">port</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">device_name</span> <span class="o">==</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">sensor_name</span>
-                <span class="k">return</span> <span class="n">peripheral</span>
-        <span class="c1"># No matching port name, so let&#39;s just search for the name and assign the port</span>
-        <span class="k">for</span> <span class="n">peripheral_name</span><span class="p">,</span> <span class="n">peripheral</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripherals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">sensor_name</span> <span class="o">==</span> <span class="n">device_name</span> <span class="ow">and</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">port</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">peripheral</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;ASSIGNING PORT </span><span class="si">{port}</span><span class="s2"> on </span><span class="si">{peripheral.name}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">peripheral</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
-                <span class="k">return</span> <span class="n">peripheral</span>
-        <span class="k">return</span> <span class="kc">None</span>
+<div class="viewcode-block" id="PortModeInformationMessage"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortModeInformationMessage">[docs]</a><span class="k">class</span> <span class="nc">PortModeInformationMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Information on a specific mode</span>
+
+<span class="sd">       This tells us a mode&#39;s name, what numeric format it uses, and it&#39;s range.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg_type</span> <span class="o">=</span> <span class="mh">0x44</span>
+<div class="viewcode-block" id="PortModeInformationMessage.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.PortModeInformationMessage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">):</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mode_type</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">port_info</span> <span class="o">=</span> <span class="n">dispatcher</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">modes_info</span> <span class="o">=</span> <span class="n">port_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;modes&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">mode_info</span> <span class="o">=</span> <span class="n">modes_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;MODE INFO Port:</span><span class="si">{port}</span><span class="s1"> Mode:</span><span class="si">{mode}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">mode_types</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_name</span><span class="p">,</span>
+                       <span class="mh">0x1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_raw_range</span><span class="p">,</span>
+                       <span class="mh">0x2</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_pct_range</span><span class="p">,</span>
+                       <span class="mh">0x3</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_si_range</span><span class="p">,</span>
+                       <span class="mh">0x4</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_symbol</span><span class="p">,</span>
+                       <span class="mh">0x5</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_mapping</span><span class="p">,</span>
+                       <span class="mh">0x82</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_format</span><span class="p">,</span>
+                     <span class="p">}</span>
+        <span class="k">if</span> <span class="n">mode_type</span> <span class="ow">in</span> <span class="n">mode_types</span><span class="p">:</span>
+            <span class="n">mode_types</span><span class="p">[</span><span class="n">mode_type</span><span class="p">](</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mode_info</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
+        <span class="n">dispatcher</span><span class="o">.</span><span class="n">message_port_info_to_peripheral</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;port_mode_info_received&#39;</span><span class="p">)</span></div>
 
 
+    <span class="k">def</span> <span class="nf">_parse_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mode_info</span><span class="p">):</span>
+        <span class="c1"># 4 bytes</span>
+        <span class="c1"># [0] = Number of datasets (e.g. RBG has 3 for each color)</span>
+        <span class="c1"># [1] = Dataset type.  00-byte, 01=16b, 10=32b, 11=float</span>
+        <span class="c1"># [2] = Total figures</span>
+        <span class="c1"># [3] = Decimals if any</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;datasets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dataset_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;8b&#39;</span><span class="p">,</span> <span class="s1">&#39;16b&#39;</span><span class="p">,</span> <span class="s1">&#39;32b&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">]</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset_types</span><span class="p">[</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_total_figures&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;dataset_decimals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_add_port_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">info_key</span><span class="p">,</span> <span class="n">info_val</span><span class="p">):</span>
-        <span class="n">port_info_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">port_info_item</span><span class="p">[</span><span class="n">info_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_val</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">port_info_item</span>
+    <span class="k">def</span> <span class="nf">_parse_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mode_info</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Input Mapping:&#39;</span><span class="p">)</span>
+        <span class="n">bits</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;Discrete&#39;</span><span class="p">,</span> <span class="s1">&#39;Relative&#39;</span><span class="p">,</span> <span class="s1">&#39;Absolute&#39;</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;Supports Functional Mapping 2.0}&#39;</span><span class="p">,</span> <span class="s1">&#39;Supports NULL&#39;</span><span class="p">]</span>
+        <span class="c1"># First byte is bit-mask of input details</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">maps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">bits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">mask</span><span class="o">&gt;&gt;</span><span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">maps</span><span class="p">))</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;input_mapping&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maps</span>
 
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Output Mapping:&#39;</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">maps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">bits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">mask</span><span class="o">&gt;&gt;</span><span class="n">i</span><span class="p">)</span><span class="o">&amp;</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">maps</span><span class="p">))</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;output_mapping&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maps</span>
 
-<div class="viewcode-block" id="Message.parse_attached_io"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse_attached_io">[docs]</a>    <span class="k">def</span> <span class="nf">parse_attached_io</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_parse_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mode_info</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Symbol:&#39;</span><span class="p">)</span>
+        <span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">msg_bytes</span> <span class="k">if</span> <span class="n">b</span><span class="o">!=</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;symbol&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">symbol</span>
+
+    <span class="k">def</span> <span class="nf">_unpack_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">_parse_si_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mode_info</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;SI range:&#39;</span><span class="p">)</span>
+        <span class="n">mn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_float</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">mx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_float</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">:])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{mn}</span><span class="s1"> to </span><span class="si">{mx}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;si_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span class="n">mx</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_pct_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mode_info</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Pct range:&#39;</span><span class="p">)</span>
+        <span class="n">b_array</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
+        <span class="n">pct_min</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">b_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">pct_max</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">b_array</span><span class="p">[</span><span class="mi">4</span><span class="p">:])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{pct_min}</span><span class="s1"> to </span><span class="si">{pct_max}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;pct_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pct_min</span><span class="p">,</span> <span class="n">pct_max</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_raw_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mode_info</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Raw range:&#39;</span><span class="p">)</span>
+        <span class="n">b_array</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
+        <span class="n">raw_min</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">b_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">raw_max</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">b_array</span><span class="p">[</span><span class="mi">4</span><span class="p">:])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{raw_min}</span><span class="s1"> to </span><span class="si">{raw_max}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;raw_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_min</span><span class="p">,</span> <span class="n">raw_max</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mode_info</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Name:&#39;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">msg_bytes</span> <span class="k">if</span> <span class="n">b</span><span class="o">!=</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">mode_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span></div>
+
+<div class="viewcode-block" id="AttachedIOMessage"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.AttachedIOMessage">[docs]</a><span class="k">class</span> <span class="nc">AttachedIOMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Peripheral attach and detach message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg_type</span> <span class="o">=</span> <span class="mh">0x04</span>
+
+<div class="viewcode-block" id="AttachedIOMessage.parse"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.AttachedIOMessage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">):</span>
         <span class="c1"># 5-bytes = detached</span>
         <span class="c1"># 15 bytes = attached</span>
         <span class="c1"># 9 bytes = virtual attached</span>
@@ -340,6 +367,7 @@
         <span class="n">detach</span><span class="p">,</span> <span class="n">attach</span><span class="p">,</span> <span class="n">virtual_attach</span> <span class="o">=</span> <span class="p">[</span><span class="n">event</span><span class="o">==</span><span class="n">x</span>  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
         <span class="k">if</span> <span class="n">detach</span><span class="p">:</span>
             <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Detached IO Port:</span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="k">elif</span> <span class="n">attach</span><span class="p">:</span>
             <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Attached IO Port:</span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">virtual_attach</span><span class="p">:</span>
@@ -350,25 +378,14 @@
             <span class="n">device_id</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">assert</span> <span class="n">device_id</span> <span class="ow">in</span> <span class="n">DEVICES</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;Unknown device with id </span><span class="si">{device_id}</span><span class="s1"> being attached (port </span><span class="si">{port}</span><span class="s1">&#39;</span>
             <span class="n">device_name</span> <span class="o">=</span> <span class="n">DEVICES</span><span class="p">[</span><span class="n">device_id</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">device_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">dispatcher</span><span class="p">,</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">dispatcher</span><span class="p">,</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">device_name</span><span class="p">)</span>
 
             <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># pop off MSB that&#39;s always 0 </span>
             <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{device_name}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-            <span class="c1"># Send a message saying this port is detected, in case the hub</span>
-            <span class="c1"># wants to query for more properties</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;port_detected&#39;</span><span class="p">))</span>
-
             <span class="c1"># register the handler for this IO</span>
-            <span class="c1">#  - Check the hub to see if there&#39;s a matching device or port</span>
-            <span class="n">peripheral</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_hub_registerd_device</span><span class="p">(</span><span class="n">device_name</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">peripheral</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">peripheral</span>
-                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;:Attached to handler:&#39;</span><span class="p">)</span>
-                <span class="c1"># Now, we should activate updates from this sensor</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">peripheral</span><span class="p">,</span> <span class="s1">&#39;attach&#39;</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">peripheral_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">((</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]),</span> <span class="s1">&#39;update_port&#39;</span><span class="p">))</span>
+            <span class="n">dispatcher</span><span class="o">.</span><span class="n">message_attach_to_hub</span><span class="p">(</span><span class="n">device_name</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">attach</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">ver_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;HW&#39;</span><span class="p">,</span> <span class="s1">&#39;SW&#39;</span><span class="p">]:</span>
@@ -378,65 +395,32 @@
                 <span class="n">bugfix</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
                 <span class="n">ver</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
                 <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{ver_type}</span><span class="s1">:</span><span class="si">{ver}</span><span class="s1">.</span><span class="si">{bugfix}</span><span class="s1">.</span><span class="si">{build1}{build0}</span><span class="s1">&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">virtual_attach</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
             <span class="n">port0</span><span class="p">,</span> <span class="n">port1</span> <span class="o">=</span> <span class="n">msg_bytes</span>
             <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Port A: </span><span class="si">{port0}</span><span class="s1">, Port B: </span><span class="si">{port1}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;virtual&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">port0</span><span class="p">,</span> <span class="n">port1</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_port_info</span><span class="p">(</span><span class="n">dispatcher</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="s1">&#39;virtual&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">port0</span><span class="p">,</span> <span class="n">port1</span><span class="p">))</span></div>
 
-        <span class="k">return</span> <span class="n">l</span></div>
-
-
-<div class="viewcode-block" id="Message.parse_hub_properties"><a class="viewcode-back" href="../../_autosummary/bricknil.messages.html#bricknil.messages.Message.parse_hub_properties">[docs]</a>    <span class="k">def</span> <span class="nf">parse_hub_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
-        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Hub property: &#39;</span><span class="p">)</span>
-        <span class="n">prop</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">prop_names</span> <span class="o">=</span> <span class="p">{</span>  <span class="mh">0x01</span><span class="p">:</span> <span class="s1">&#39;Advertising Name&#39;</span><span class="p">,</span>
-                        <span class="mh">0x02</span><span class="p">:</span> <span class="s1">&#39;Button&#39;</span><span class="p">,</span>
-                        <span class="mh">0x03</span><span class="p">:</span> <span class="s1">&#39;FW Version&#39;</span><span class="p">,</span>
-                        <span class="mh">0x04</span><span class="p">:</span> <span class="s1">&#39;HW Version&#39;</span><span class="p">,</span>
-                        <span class="mh">0x05</span><span class="p">:</span> <span class="s1">&#39;RSSI&#39;</span><span class="p">,</span>
-                        <span class="mh">0x06</span><span class="p">:</span> <span class="s1">&#39;Battery Voltage&#39;</span><span class="p">,</span>
-                        <span class="mh">0x07</span><span class="p">:</span> <span class="s1">&#39;Battery Type&#39;</span><span class="p">,</span>
-                        <span class="mh">0x08</span><span class="p">:</span> <span class="s1">&#39;Manufacturer Name&#39;</span><span class="p">,</span>
-                        <span class="mh">0x09</span><span class="p">:</span> <span class="s1">&#39;Radio FW Version&#39;</span><span class="p">,</span>
-                        <span class="mh">0x0A</span><span class="p">:</span> <span class="s1">&#39;LEGO Wireles Protocol Version&#39;</span><span class="p">,</span>
-                        <span class="mh">0x0B</span><span class="p">:</span> <span class="s1">&#39;System Type ID&#39;</span><span class="p">,</span>
-                        <span class="mh">0x0C</span><span class="p">:</span> <span class="s1">&#39;HW Network ID&#39;</span><span class="p">,</span> 
-                        <span class="mh">0x0D</span><span class="p">:</span> <span class="s1">&#39;Primary MAC address&#39;</span><span class="p">,</span>
-                        <span class="mh">0x0E</span><span class="p">:</span> <span class="s1">&#39;Seconary MAC address&#39;</span><span class="p">,</span>
-                        <span class="mh">0X0F</span><span class="p">:</span> <span class="s1">&#39;HW Network Family&#39;</span><span class="p">,</span>
-                        <span class="p">}</span>
-        <span class="k">if</span> <span class="n">prop</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prop_names</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop_names</span><span class="p">[</span><span class="n">prop</span><span class="p">])</span>
-
-        <span class="n">operation_names</span> <span class="o">=</span> <span class="p">{</span> <span class="mh">0x01</span><span class="p">:</span> <span class="s1">&#39;Set (downstream)&#39;</span><span class="p">,</span>
-                            <span class="mh">0x02</span><span class="p">:</span> <span class="s1">&#39;Enable Updates (Downstream)&#39;</span><span class="p">,</span>
-                            <span class="mh">0x03</span><span class="p">:</span> <span class="s1">&#39;Disable Updates (Downstream)&#39;</span><span class="p">,</span>
-                            <span class="mh">0x04</span><span class="p">:</span> <span class="s1">&#39;Reset (Downstream)&#39;</span><span class="p">,</span>
-                            <span class="mh">0x05</span><span class="p">:</span> <span class="s1">&#39;Request Update (Downstream)&#39;</span><span class="p">,</span>
-                            <span class="mh">0x06</span><span class="p">:</span> <span class="s1">&#39;Update (Downstream)&#39;</span><span class="p">,</span>
-                            <span class="p">}</span>
-        <span class="n">op</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">operation_names</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">UnknownMessageError</span>
-
-        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operation_names</span><span class="p">[</span><span class="n">op</span><span class="p">])</span>
-
-        <span class="c1"># Now, just append the number </span>
-        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_msg_bytes</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">))</span>
-
-        <span class="c1"># Now forward any button presses as if it were a &quot;port value&quot; change</span>
-        <span class="k">if</span> <span class="n">prop</span><span class="o">==</span><span class="mh">0x02</span> <span class="ow">and</span> <span class="n">op</span> <span class="o">==</span> <span class="mh">0x06</span><span class="p">:</span>  <span class="c1"># Button and update op</span>
-            <span class="n">msg_bytes</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">)</span>  <span class="c1"># Insert Dummy port value of 255</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parse_port_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">l</span></div></div>
+    <span class="k">def</span> <span class="nf">_add_port_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dispatcher</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">info_key</span><span class="p">,</span> <span class="n">info_val</span><span class="p">):</span>
+        <span class="n">port_info_item</span> <span class="o">=</span> <span class="n">dispatcher</span><span class="o">.</span><span class="n">port_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">port_info_item</span><span class="p">[</span><span class="n">info_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_val</span>
+        <span class="n">dispatcher</span><span class="o">.</span><span class="n">port_info</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">port_info_item</span></div>
 
 
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">mock</span> <span class="k">import</span> <span class="n">MagicMock</span>
+    <span class="n">hub</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">()</span>
+    <span class="n">dis</span> <span class="o">=</span> <span class="n">MessageDispatch</span><span class="p">(</span><span class="n">hub</span><span class="p">)</span>
+    <span class="n">dis</span><span class="o">.</span><span class="n">port_to_peripheral</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">()</span>
 
+    <span class="n">msg</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mh">0x45</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">])</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
 
+    <span class="n">msg</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mh">0x46</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">])</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
 </pre></div>
 
           </div>

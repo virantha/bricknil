@@ -15,7 +15,21 @@ bricknil.messages
       .. autosummary::
 
 	  
+	  AttachedIOMessage
+	  
+	  HubPropertiesMessage
+	  
 	  Message
+	  
+	  PortComboValueMessage
+	  
+	  PortInformationMessage
+	  
+	  PortModeInformationMessage
+	  
+	  PortOutputFeedbackMessage
+	  
+	  PortValueMessage
 	  
 
       
