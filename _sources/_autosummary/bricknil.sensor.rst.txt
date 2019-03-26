@@ -17,6 +17,8 @@ bricknil.sensor
 	  
 	  Button
 	  
+	  CurrentSensor
+	  
 	  DuploSpeaker
 	  
 	  DuploSpeedSensor
@@ -36,6 +38,8 @@ bricknil.sensor
 	  TrainMotor
 	  
 	  VisionSensor
+	  
+	  VoltageSensor
 	  
 
       
