@@ -137,6 +137,7 @@ class Hub(Process):
         for peripheral_name, peripheral in self.peripherals.items():
             if peripheral.port == port:
                 if device_name == peripheral.sensor_name:
+                    self.port_to_peripheral[port] = peripheral
                     return peripheral
                 else:
                     raise DifferentPeripheralOnPortError

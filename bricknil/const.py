@@ -35,6 +35,7 @@ class Color(Enum):
     orange = 8
     red = 9
     white = 10
+    none = 255
 
 DEVICES = {     0x0001:   'Motor',
                 0x0002:   'System Train Motor',

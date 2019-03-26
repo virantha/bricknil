@@ -1,3 +1,8 @@
+0.7.2 - 3/26/19
+---------------
+- Added support for current and voltage sensors
+- Fixed bug with hub buttons
+
 0.7.1 - 3/25/19
 ---------------
 - Rewrote message parsing structure to be more modular

@@ -342,7 +342,7 @@ class Motor(Peripheral):
                 # outside a previously in-progress ramp, so cancel the previous ramp
                 await self.ramp_in_progress_task.cancel()
                 self.ramp_in_progress_task = None
-                self.message_info(f'Canceling previous speed ramp in progress')
+                self.message_debug(f'Canceling previous speed ramp in progress')
 
 
     async def ramp_speed(self, target_speed, ramp_time_ms):
@@ -359,13 +359,13 @@ class Motor(Peripheral):
         speed_diff = target_speed - self.speed
         speed_step = speed_diff/number_of_steps
         start_speed = self.speed
-        self.message(f'ramp_speed steps: {number_of_steps}, speed_diff: {speed_diff}, speed_step: {speed_step}')
+        self.message_debug(f'ramp_speed steps: {number_of_steps}, speed_diff: {speed_diff}, speed_step: {speed_step}')
         current_step = 0
         async def _ramp_speed():
             nonlocal current_step  # Since this is being assigned to, we need to mark it as coming from the enclosed scope
             while current_step < number_of_steps:
                 next_speed = int(start_speed + current_step*speed_step)
-                self.message(f'Setting next_speed: {next_speed}')
+                self.message_debug(f'Setting next_speed: {next_speed}')
                 current_step +=1 
                 if current_step == number_of_steps: 
                     next_speed = target_speed
@@ -373,7 +373,7 @@ class Motor(Peripheral):
                 await sleep(TIME_STEP_MS/1000)
             self.ramp_in_progress_task = None
 
-        self.message_info(f'Starting ramp of speed: {start_speed} -> {target_speed} ({ramp_time_ms/1000}s)')
+        self.message_debug(f'Starting ramp of speed: {start_speed} -> {target_speed} ({ramp_time_ms/1000}s)')
         self.ramp_in_progress_task = await spawn(_ramp_speed, daemon = True)
 
 

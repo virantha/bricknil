@@ -581,3 +581,48 @@ class DuploSpeaker(Peripheral):
         await self.set_output(mode, sound.value)
 
 
+class VoltageSensor(Peripheral):
+    """Voltage sensor
+
+       Returns the raw mV value (0-3893) which probably needs to be scaled to 0-9600.
+
+       It contains two capabilities, although they both appear to do the same thing:
+       * sense_l
+       * sense_s
+
+       Examples::
+
+            @attach(VoltageSensor, name='volts', capabilities=['sense_l'])
+
+    """
+    _sensor_id = 0x14
+
+    capability = Enum("capability", {'sense_s': 0, 'sense_l': 1})
+    datasets = {capability.sense_s: (1, 2),   # 2-bytes (16-bit)
+                capability.sense_l: (1, 2), 
+               }
+    allowed_combo = [ ]
+
+class CurrentSensor(Peripheral):
+    """Voltage sensor
+
+       Returns the raw mA value (0-4095) which probably needs to be scaled to 0-2444.
+
+       It contains two capabilities, although they both appear to do the same thing:
+       * sense_l
+       * sense_s
+
+       Examples::
+
+            @attach(CurrentSensor, name='cur', capabilities=['sense_l'])
+
+    """
+    _sensor_id = 0x15
+
+    capability = Enum("capability", {'sense_s': 0, 'sense_l': 1})
+    datasets = {capability.sense_s: (1, 2),   # 2-bytes (16-bit)
+                capability.sense_l: (1, 2), 
+               }
+    allowed_combo = [ ]
+
+
