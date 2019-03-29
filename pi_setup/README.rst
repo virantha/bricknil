@@ -71,15 +71,17 @@ Run the setup playbook
    The install will take around two hours, so please be patient.  Most of the time is spent compiling and installing Python from source. 
    Here's the playbook being executed:
 
-.. literalinclude:: ../pi_setup/tasks.yml
-    :language: yaml
+   .. literalinclude:: ../pi_setup/tasks.yml
+       :language: yaml
 
-# And that's it! Your raspberry pi should be ready to go as a networked appliance to run your Lego controller scripts from.
+#. And that's it! Your raspberry pi should be ready to go as a networked appliance to run your Lego controller scripts from.
 
 Running Bricknil examples on the Pi
 -----------------------------------
-#. The script also installed the bricknil_ source from github, so all the examples should be ready to go. 
-#. Just ssh into the Pi and::
+#. The script installs a virtualenv called `bricknil`, so you can activate it in the normal way to get access to Python 3.7+ and the python
+   dependencies for running bricknil.
+
+#. The script also installed the bricknil_ source from github, so all the examples should be ready to go.  Just ssh into the Pi and::
 
       cd bricknil
   

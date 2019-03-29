@@ -495,13 +495,13 @@ working.
 Installation
 ############
 
-On all platforms, it should just be a simple:
+On all platforms (OS X, Linux, Win10), it should just be a simple:
 
 .. code-block:: bash
 
     $ pip install bricknil
 
-On Linux, you might need to instlal `BlueZ >= 5.43`.
+On Linux, you might need to install the `BlueZ >= 5.43` libraries. 
 
 On a Raspberry Pi (and other Linux boxes should be similar), you can follow my automated 
 :doc:`setup instructions <pi_setup>`
