@@ -13,6 +13,7 @@ Contents
    :maxdepth: 2
 
    readme
+   pi_setup
    contributing
    authors
    api

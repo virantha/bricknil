@@ -17,7 +17,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Development" href="contributing.html" />
+    <link rel="next" title="Setting up a Raspberry Pi with Python 3.7+ using Ansible" href="pi_setup.html" />
     <link rel="prev" title="BrickNil Docs (version 0.7.2)" href="index.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -36,7 +36,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="contributing.html" title="Development"
+          <a href="pi_setup.html" title="Setting up a Raspberry Pi with Python 3.7+ using Ansible"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="BrickNil Docs (version 0.7.2)"
@@ -628,7 +628,7 @@ those sets.  Here’s an example that puts everything together:</p>
 <span class="kn">from</span> <span class="nn">curio</span> <span class="kn">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">bricknil</span> <span class="kn">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
 <span class="kn">from</span> <span class="nn">bricknil.hub</span> <span class="kn">import</span> <span class="n">DuploTrainHub</span>
-<span class="kn">from</span> <span class="nn">bricknil.sensor</span> <span class="kn">import</span> <span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">LED</span><span class="p">,</span> <span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">DuploSpeaker</span>
+<span class="kn">from</span> <span class="nn">bricknil.sensor</span> <span class="kn">import</span> <span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">LED</span><span class="p">,</span> <span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">DuploSpeaker</span><span class="p">,</span> <span class="n">Button</span>
 <span class="kn">from</span> <span class="nn">bricknil.const</span> <span class="kn">import</span> <span class="n">Color</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
@@ -639,17 +639,26 @@ those sets.  Here’s an example that puts everything together:</p>
 <span class="nd">@attach</span><span class="p">(</span><span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">DuploTrainHub</span><span class="p">):</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="bp">False</span>     <span class="c1"># Only becomes true with hub button is pressed</span>
+
     <span class="n">async</span> <span class="k">def</span> <span class="nf">speed_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">]</span>
-        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Speed sensor changed speed: {speed} count: {count}&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="ow">and</span> <span class="n">speed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;Movement detected: starting...&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">go</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Speed sensor changed speed: {speed} count: {count}&#39;</span><span class="p">)</span>
 
     <span class="n">async</span> <span class="k">def</span> <span class="nf">vision_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">cap</span> <span class="o">=</span> <span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span>
         <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_color</span><span class="p">]</span>
         <span class="n">ctag</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_ctag</span><span class="p">]</span>
         <span class="n">reflt</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_reflectivity</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">go</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}&#39;</span><span class="p">)</span>
 
     <span class="n">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
@@ -658,6 +667,11 @@ those sets.  Here’s an example that puts everything together:</p>
 
         <span class="n">snd</span> <span class="o">=</span> <span class="n">DuploSpeaker</span><span class="o">.</span><span class="n">sounds</span>
         <span class="n">sounds</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="n">snd</span><span class="o">.</span><span class="n">brake</span><span class="p">,</span> <span class="n">snd</span><span class="o">.</span><span class="n">station</span><span class="p">,</span> <span class="n">snd</span><span class="o">.</span><span class="n">water</span><span class="p">,</span> <span class="n">snd</span><span class="o">.</span><span class="n">horn</span><span class="p">,</span> <span class="n">snd</span><span class="o">.</span><span class="n">steam</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;Please move the train to start the program&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">go</span><span class="p">:</span>
+            <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">led</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+            <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
             <span class="n">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">led</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>       <span class="c1"># Cycle through the colors</span>
@@ -751,7 +765,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">BrickNil Docs (version 0.7.2)</a></li>
-      <li>Next: <a href="contributing.html" title="next chapter">Development</a></li>
+      <li>Next: <a href="pi_setup.html" title="next chapter">Setting up a Raspberry Pi with Python 3.7+ using Ansible</a></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">

@@ -1,0 +1,444 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Setting up a Raspberry Pi with Python 3.7+ using Ansible &#8212; BrickNil 0.7.2 documentation</title>
+    <link rel="stylesheet" href="_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Development" href="contributing.html" />
+    <link rel="prev" title="BrickNil - Control LEGO Bluetooth Sensors and Motors with Python" href="readme.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="contributing.html" title="Development"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="readme.html" title="BrickNil - Control LEGO Bluetooth Sensors and Motors with Python"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">BrickNil 0.7.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="setting-up-a-raspberry-pi-with-python-3-7-using-ansible">
+<h1>Setting up a Raspberry Pi with Python 3.7+ using Ansible<a class="headerlink" href="#setting-up-a-raspberry-pi-with-python-3-7-using-ansible" title="Permalink to this headline">¶</a></h1>
+<p>Here’s a set of files to automatically setup <a class="reference external" href="https://virantha.github.io/bricknil">bricknil</a> on a Raspberry Pi.
+These <a class="reference external" href="https://www.ansible.com/resources/get-started">Ansible</a> playbooks will help you take a clean Raspbian image and compile
+Python 3.7+ along with all the Bricknil required libraries.  You just need a
+Raspberry Pi; these instructions do not require you to plug in a monitor and
+works over Wifi.  This compilation of Python is necessary because the raspbian distro
+does not ship with the latest version of Python at the time of this writing.  And it
+took me a little bit of effort to figure out how to compile Python with the SSL libraries (so pip works),
+so I hope this might be of use to some folks.</p>
+<p>The steps required are listed below in order, and you can find the Ansible yaml playbooks
+in the Bricknil source under <a class="reference external" href="https://github.com/virantha/bricknil/tree/master/bricknil/pi_setup/">pi_setup</a>.</p>
+<div class="section" id="steps">
+<h2>Steps<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="download-a-raspbian-image-and-burn-it-to-a-sd-card">
+<h3>Download a Raspbian image and burn it to a SD card<a class="headerlink" href="#download-a-raspbian-image-and-burn-it-to-a-sd-card" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Download the <a class="reference external" href="https://www.raspberrypi.org/downloads/raspbian/">Raspbian Stretch Lite</a> image</p>
+</li>
+<li><p class="first">Burn it to a suitable SD card.  On OS X, <a class="reference external" href="https://www.balena.io/etcher/">Balena Etcher</a> is a good tool to do this.</p>
+</li>
+<li><p class="first">On the newly imaged SD card’s <cite>/boot</cite> folder:</p>
+<ol class="arabic">
+<li><p class="first">Make an empty file called <cite>ssh</cite> to enable SSH access.</p>
+</li>
+<li><p class="first">Make <cite>wpa_supplicant.conf</cite> file to supply your wifi credentials:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">country</span><span class="o">=</span><span class="n">US</span>
+<span class="n">ctrl_interface</span><span class="o">=</span><span class="n">DIR</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">wpa_supplicant</span> <span class="n">GROUP</span><span class="o">=</span><span class="n">netdev</span>
+<span class="n">update_config</span><span class="o">=</span><span class="mi">1</span>
+
+<span class="n">network</span><span class="o">=</span><span class="p">{</span>
+      <span class="n">ssid</span><span class="o">=</span><span class="s2">&quot;NETWORK_NAME</span>
+      <span class="n">psk</span><span class="o">=</span><span class="s2">&quot;WIFI PASSWORD&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+<li><p class="first">Now, you should be able to use this SD card to boot your raspberry pi. After giving it a few minutes to boot, you can login in by doing the following on your local machine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="n">pi</span><span class="nd">@raspberrypi</span><span class="o">.</span><span class="n">local</span>
+<span class="o">&lt;</span><span class="n">enter</span> <span class="s1">&#39;raspberry&#39;</span> <span class="k">as</span> <span class="n">the</span> <span class="n">default</span> <span class="n">password</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="install-ansbile-on-your-local-machine">
+<h3>Install Ansbile on your local machine<a class="headerlink" href="#install-ansbile-on-your-local-machine" title="Permalink to this headline">¶</a></h3>
+<p>You can just type <cite>pip install ansible</cite></p>
+</div>
+<div class="section" id="change-the-default-password-on-the-pi">
+<h3>Change the default password on the Pi<a class="headerlink" href="#change-the-default-password-on-the-pi" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">You may need to modify the <cite>hosts</cite> file in <cite>pi_setup</cite> directory to put in your own IP address for the Pi.</p>
+</li>
+<li><p class="first">You will need to install the python library <cite>passlib</cite> by running <cite>pip install passlib</cite> on your local machine (not the Pi)</p>
+</li>
+<li><p class="first">Use the <cite>change_password.yml</cite> playbook to test your ansible install and change the default password on the pi (use <cite>raspberry</cite> for the
+ssh password when prompted, and then enter your new password):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">hosts</span> <span class="n">change_password</span><span class="o">.</span><span class="n">yml</span> <span class="o">--</span><span class="n">ask</span><span class="o">-</span><span class="k">pass</span>
+</pre></div>
+</div>
+<p>The playbook being run is simply:</p>
+</li>
+</ol>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
+  <span class="nt">remote_user</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">pi</span>
+  <span class="nt">become_method</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sudo</span>
+  <span class="nt">vars_prompt</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">new_password</span>
+        <span class="nt">prompt</span><span class="p">:</span> <span class="s">&quot;Enter</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">password</span><span class="nv"> </span><span class="s">you</span><span class="nv"> </span><span class="s">would</span><span class="nv"> </span><span class="s">like</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">use</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">user</span><span class="nv"> </span><span class="s">pi&quot;</span>
+        <span class="nt">confirm</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
+  <span class="nt">tasks</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backup shadow file</span>
+      <span class="nt">copy</span><span class="p">:</span>
+        <span class="nt">remote_src</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+        <span class="nt">src</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/etc/shadow</span>
+        <span class="nt">dest</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/tmp/shadow</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">generate hash pass</span>
+      <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
+      <span class="nt">command</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">python -c &quot;from passlib.hash import md5_crypt; import getpass; print (md5_crypt.hash(&#39;{{new_password}}&#39;))&quot;</span>
+      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hash</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">debug</span><span class="p">:</span>
+        <span class="nt">var</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hash.stdout</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update password</span>
+      <span class="nt">user</span><span class="p">:</span>
+        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">pi</span>
+        <span class="nt">password</span><span class="p">:</span>  <span class="s">&#39;{{hash.stdout}}&#39;</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-the-setup-playbook">
+<h3>Run the setup playbook<a class="headerlink" href="#run-the-setup-playbook" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">The final step is to just run the the install playbook.  This will install all the packages, download Python 3.7, compile it, and set up
+a virtualenv to run bricknil from.   The actual playbook is in <cite>tasks.yml</cite>, shown below and included in the source, and the command to
+execute it on your local machine is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">hosts</span> <span class="n">tasks</span><span class="o">.</span><span class="n">yml</span> <span class="o">--</span><span class="n">ask</span><span class="o">-</span><span class="k">pass</span>
+</pre></div>
+</div>
+<p>The install will take around two hours, so please be patient.  Most of the time is spent compiling and installing Python from source.
+Here’s the playbook being executed:</p>
+</li>
+</ol>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
+  <span class="nt">remote_user</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">pi</span>
+  <span class="nt">become_method</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sudo</span>
+  <span class="nt">environment</span><span class="p">:</span>
+      <span class="nt">LD_LIBRARY_PATH</span><span class="p">:</span> <span class="s">&quot;/usr/local/lib/&quot;</span>
+  <span class="nt">vars</span><span class="p">:</span>
+    <span class="nt">PYTHON</span><span class="p">:</span> <span class="s">&quot;3.7.2&quot;</span>
+    <span class="nt">OPEN_SSL</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">openssl-1.0.2g</span>
+    <span class="nt">build_path</span><span class="p">:</span> <span class="s">&quot;{{ansible_env.HOME}}/build&quot;</span>
+    <span class="nt">HOME</span><span class="p">:</span> <span class="s">&quot;{{ansible_env.HOME}}&quot;</span>
+
+  <span class="nt">tasks</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Update APT package cache</span>
+      <span class="nt">apt</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update_cache=no</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Update packages</span>
+      <span class="nt">apt</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">upgrade=dist</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install build-essential</span>
+      <span class="nt">package</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">name=&quot;build-essential&quot; state=present</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install build packages</span>
+      <span class="nt">apt</span><span class="p">:</span> 
+          <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+          <span class="nt">name</span><span class="p">:</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">tk-dev</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libncurses5-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libncursesw5-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libreadline6-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libdb5.3-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libgdbm-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libsqlite3-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libssl-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libbz2-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libexpat1-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">liblzma-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">zlib1g-dev</span> 
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">libffi-dev</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">uuid-dev</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">vim</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">python-pip</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">screen</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+      
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Ensure build directory exists</span>
+      <span class="nt">file</span><span class="p">:</span>
+          <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}&quot;</span>
+          <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">directory</span>
+          <span class="nt">recurse</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Download openssl</span>
+      <span class="nt">get_url</span><span class="p">:</span>
+          <span class="nt">url</span><span class="p">:</span> <span class="s">&quot;https://www.openssl.org/source/{{</span><span class="nv"> </span><span class="s">OPEN_SSL</span><span class="nv"> </span><span class="s">}}.tar.gz&quot;</span>
+          <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">OPEN_SSL</span><span class="nv"> </span><span class="s">}}.tar.gz&quot;</span>
+          <span class="nt">mode</span><span class="p">:</span> <span class="s">&quot;755&quot;</span>
+      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">openssl_download</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Untar openssl</span>
+      <span class="nt">unarchive</span><span class="p">:</span>
+          <span class="nt">remote_src</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+          <span class="nt">src</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">OPEN_SSL</span><span class="nv"> </span><span class="s">}}.tar.gz&quot;</span>
+          <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}&quot;</span>
+      <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">openssl_download.changed</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">configure openssl</span>
+      <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./config shared --prefix=/usr/local</span>
+      <span class="nt">args</span><span class="p">:</span> 
+          <span class="nt">chdir</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">OPEN_SSL</span><span class="nv"> </span><span class="s">}}&quot;</span>
+      <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">openssl_download.changed</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make openssl</span>
+      <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make -j 4</span>
+      <span class="nt">args</span><span class="p">:</span> 
+          <span class="nt">chdir</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">OPEN_SSL</span><span class="nv"> </span><span class="s">}}&quot;</span>
+      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make_openssl</span>
+      <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">openssl_download.changed</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">install openssl</span>
+      <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make install</span>
+      <span class="nt">args</span><span class="p">:</span>
+          <span class="nt">chdir</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">OPEN_SSL</span><span class="nv"> </span><span class="s">}}&quot;</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+      <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make_openssl.changed</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Download python 3.7</span>
+      <span class="nt">get_url</span><span class="p">:</span>
+          <span class="nt">url</span><span class="p">:</span> <span class="s">&quot;https://www.python.org/ftp/python/{{PYTHON}}/Python-{{PYTHON}}.tgz&quot;</span>
+          <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/Python-{{</span><span class="nv"> </span><span class="s">PYTHON</span><span class="nv"> </span><span class="s">}}.tgz&quot;</span>
+          <span class="nt">mode</span><span class="p">:</span> <span class="s">&quot;755&quot;</span>
+      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_download</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Untar python</span>
+      <span class="nt">unarchive</span><span class="p">:</span>
+          <span class="nt">remote_src</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+          <span class="nt">src</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/Python-{{</span><span class="nv"> </span><span class="s">PYTHON</span><span class="nv"> </span><span class="s">}}.tgz&quot;</span>
+          <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}&quot;</span>
+      <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_download.changed</span>
+      
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Uncomment SSL</span>
+      <span class="nt">blockinfile</span><span class="p">:</span>
+          <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path}}/Python-{{</span><span class="nv"> </span><span class="s">PYTHON</span><span class="nv"> </span><span class="s">}}/Modules/Setup.dist&quot;</span>
+          <span class="nt">insertbefore</span><span class="p">:</span> <span class="s">&quot;#SSL=/usr/local/ssl&quot;</span>
+          <span class="nt">block</span><span class="p">:</span> <span class="p p-Indicator">|</span>
+              <span class="no">SSL=/usr/local/ssl</span>
+              <span class="no">_ssl _ssl.c \</span>
+                  <span class="no">-DUSE_SSL -I$(SSL)/include -I$(SSL)/include/openssl \</span>
+                      <span class="no">-L$(SSL)/lib -lssl -lcrypto</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">configure python</span>
+      <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./configure --enable-optimizations --with-openssl=/usr/local --prefix=/usr/local</span>
+      <span class="nt">args</span><span class="p">:</span> 
+          <span class="nt">chdir</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/Python-{{</span><span class="nv"> </span><span class="s">PYTHON</span><span class="nv"> </span><span class="s">}}&quot;</span>
+      <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_download.changed</span>
+      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_configure</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make python</span>
+      <span class="nt">shell</span><span class="p">:</span> <span class="s">&#39;LDFLAGS=&quot;-L/usr/local/lib&quot;</span><span class="nv"> </span><span class="s">make</span><span class="nv"> </span><span class="s">-j</span><span class="nv"> </span><span class="s">4&#39;</span>
+      <span class="nt">args</span><span class="p">:</span> 
+          <span class="nt">chdir</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/Python-{{</span><span class="nv"> </span><span class="s">PYTHON</span><span class="nv"> </span><span class="s">}}&quot;</span>
+      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make_python</span>
+      <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_configure.changed</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">install python</span>
+      <span class="nt">shell</span><span class="p">:</span> <span class="s">&#39;LDFLAGS=&quot;-L/usr/local/lib&quot;</span><span class="nv"> </span><span class="s">make</span><span class="nv"> </span><span class="s">altinstall&#39;</span>
+      <span class="nt">args</span><span class="p">:</span>
+          <span class="nt">chdir</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">build_path</span><span class="nv"> </span><span class="s">}}/Python-{{</span><span class="nv"> </span><span class="s">PYTHON</span><span class="nv"> </span><span class="s">}}&quot;</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+      <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_configure.changed</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Setup .bashrc</span>
+      <span class="nt">blockinfile</span><span class="p">:</span>
+          <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">HOME</span><span class="nv"> </span><span class="s">}}/.bashrc&quot;</span>
+          <span class="nt">block</span><span class="p">:</span> <span class="p p-Indicator">|</span>
+              <span class="no">export LD_LIBRARY_PATH=&quot;/usr/local/lib&quot;</span>
+              <span class="no">export VIRTUALENVWRAPPER_PYTHON=&quot;/usr/local/bin/python3.7&quot;</span>
+              <span class="no">source /usr/local/bin/virtualenvwrapper.sh</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install pip virtualenv</span>
+      <span class="nt">pip</span><span class="p">:</span> 
+        <span class="nt">executable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/usr/local/bin/pip3.7</span>
+        <span class="nt">name</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">virtualenv</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">virtualenvwrapper</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">pip install bricknil</span>
+      <span class="nt">pip</span><span class="p">:</span> 
+        <span class="nt">name</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">bricknil</span>
+        <span class="nt">virtualenv</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">HOME</span><span class="nv"> </span><span class="s">}}/.virtualenvs/bricknil&quot;</span>
+        <span class="nt">virtualenv_python</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python3.7</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">git clone bricknil</span>
+      <span class="nt">git</span><span class="p">:</span>
+          <span class="nt">repo</span><span class="p">:</span> <span class="s">&#39;https://github.com/virantha/bricknil.git&#39;</span>
+          <span class="nt">dest</span><span class="p">:</span> <span class="s">&#39;{{</span><span class="nv"> </span><span class="s">HOME</span><span class="nv"> </span><span class="s">}}/bricknil&#39;</span>
+          <span class="nt">clone</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+</pre></div>
+</div>
+<p># And that’s it! Your raspberry pi should be ready to go as a networked appliance to run your Lego controller scripts from.</p>
+</div>
+<div class="section" id="running-bricknil-examples-on-the-pi">
+<h3>Running Bricknil examples on the Pi<a class="headerlink" href="#running-bricknil-examples-on-the-pi" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">The script also installed the <a class="reference external" href="https://virantha.github.io/bricknil">bricknil</a> source from github, so all the examples should be ready to go.</p>
+</li>
+<li><p class="first">Just ssh into the Pi and:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">bricknil</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">On linux,  you need to run as sudo to
+access the bluetooth libraries; after you login to the Pi over ssh  you can do the following to run the virtualenv installed Python as sudo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">~/.</span><span class="n">virtualenvs</span><span class="o">/</span><span class="n">bricknil</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python</span> <span class="n">examples</span><span class="o">/</span><span class="n">train_all</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="section" id="bricknil-architecture">
+<h1>BrickNil Architecture<a class="headerlink" href="#bricknil-architecture" title="Permalink to this headline">¶</a></h1>
+<p>This section documents the internal architecture of BrickNil and how all the components communicate with
+each other.</p>
+<p>There are actually two threads of execution in the current system architecture.
+The main Bluetooth radio communication loop is provided by the BluetoothLE
+library, which manages everything in the background and can callback directly
+into user code.  In parallel with this, inside this library, a separate
+execution loop is running the Curio event library, which provides the async
+event loop that executes our user code. Thus, we need to be careful about
+maintaining thread safety between the Curio async event loop and the background
+Bluetooth event processing.</p>
+<div class="figure align-center" id="id1">
+<img alt="_images/run_loops.svg" src="_images/run_loops.svg" /><p class="caption"><span class="caption-text">BrickNil running inside Curio’s event loop, which in turn is run by the
+Adafruit_BluefruitLE library run loop</span></p>
+</div>
+<p>I’d much have preferred to have the Bluetooth library be implemented via an
+async library like Curio, asyncio, or Trio, but I wasn’t able to find any such
+library. This admitted kludge of nested run loops was the only way I could get everything
+working.</p>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>On Mac OS X, it should just be a simple:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install bricknil
+</pre></div>
+</div>
+<p>Installing on other platforms like Linux is not supported at this time until I can break out the
+mac requirements, and test bluez.</p>
+</div>
+<div class="section" id="disclaimer">
+<h1>Disclaimer<a class="headerlink" href="#disclaimer" title="Permalink to this headline">¶</a></h1>
+<p>The software is distributed on an “AS IS” BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under ASL 2.0</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Setting up a Raspberry Pi with Python 3.7+ using Ansible</a><ul>
+<li><a class="reference internal" href="#steps">Steps</a><ul>
+<li><a class="reference internal" href="#download-a-raspbian-image-and-burn-it-to-a-sd-card">Download a Raspbian image and burn it to a SD card</a></li>
+<li><a class="reference internal" href="#install-ansbile-on-your-local-machine">Install Ansbile on your local machine</a></li>
+<li><a class="reference internal" href="#change-the-default-password-on-the-pi">Change the default password on the Pi</a></li>
+<li><a class="reference internal" href="#run-the-setup-playbook">Run the setup playbook</a></li>
+<li><a class="reference internal" href="#running-bricknil-examples-on-the-pi">Running Bricknil examples on the Pi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bricknil-architecture">BrickNil Architecture</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#disclaimer">Disclaimer</a></li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="readme.html" title="previous chapter">BrickNil - Control LEGO Bluetooth Sensors and Motors with Python</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">Development</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pi_setup.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>
