@@ -1,0 +1,162 @@
+- hosts: all
+  remote_user: pi
+  become_method: sudo
+  environment:
+      LD_LIBRARY_PATH: "/usr/local/lib/"
+  vars:
+    PYTHON: "3.7.2"
+    OPEN_SSL: openssl-1.0.2g
+    build_path: "{{ansible_env.HOME}}/build"
+    HOME: "{{ansible_env.HOME}}"
+
+  tasks:
+    - name: Update APT package cache
+      apt: update_cache=no
+      become: yes
+
+    - name: Update packages
+      apt: upgrade=dist
+      become: yes
+
+    - name: Install build-essential
+      package: name="build-essential" state=present
+      become: yes
+
+    - name: Install build packages
+      apt: 
+          state: present
+          name: 
+              - tk-dev
+              - libncurses5-dev 
+              - libncursesw5-dev 
+              - libreadline6-dev 
+              - libdb5.3-dev 
+              - libgdbm-dev 
+              - libsqlite3-dev 
+              - libssl-dev 
+              - libbz2-dev 
+              - libexpat1-dev 
+              - liblzma-dev 
+              - zlib1g-dev 
+              - libffi-dev
+              - uuid-dev
+              - vim
+              - git
+              - python-pip
+              - screen
+      become: yes
+      
+    - name: Ensure build directory exists
+      file:
+          path: "{{ build_path }}"
+          state: directory
+          recurse: yes
+
+    - name: Download openssl
+      get_url:
+          url: "https://www.openssl.org/source/{{ OPEN_SSL }}.tar.gz"
+          dest: "{{ build_path }}/{{ OPEN_SSL }}.tar.gz"
+          mode: "755"
+      register: openssl_download
+
+    - name: Untar openssl
+      unarchive:
+          remote_src: yes
+          src: "{{ build_path }}/{{ OPEN_SSL }}.tar.gz"
+          dest: "{{ build_path }}"
+      when: openssl_download.changed
+
+    - name: configure openssl
+      command: ./config shared --prefix=/usr/local
+      args: 
+          chdir: "{{ build_path }}/{{ OPEN_SSL }}"
+      when: openssl_download.changed
+
+    - name: make openssl
+      command: make -j 4
+      args: 
+          chdir: "{{ build_path }}/{{ OPEN_SSL }}"
+      register: make_openssl
+      when: openssl_download.changed
+
+    - name: install openssl
+      command: make install
+      args:
+          chdir: "{{ build_path }}/{{ OPEN_SSL }}"
+      become: yes
+      when: make_openssl.changed
+
+    - name: Download python 3.7
+      get_url:
+          url: "https://www.python.org/ftp/python/{{PYTHON}}/Python-{{PYTHON}}.tgz"
+          dest: "{{ build_path }}/Python-{{ PYTHON }}.tgz"
+          mode: "755"
+      register: python_download
+
+    - name: Untar python
+      unarchive:
+          remote_src: yes
+          src: "{{ build_path }}/Python-{{ PYTHON }}.tgz"
+          dest: "{{ build_path }}"
+      when: python_download.changed
+      
+    - name: Uncomment SSL
+      blockinfile:
+          path: "{{ build_path}}/Python-{{ PYTHON }}/Modules/Setup.dist"
+          insertbefore: "#SSL=/usr/local/ssl"
+          block: |
+              SSL=/usr/local/ssl
+              _ssl _ssl.c \
+                  -DUSE_SSL -I$(SSL)/include -I$(SSL)/include/openssl \
+                      -L$(SSL)/lib -lssl -lcrypto
+
+    - name: configure python
+      command: ./configure --enable-optimizations --with-openssl=/usr/local --prefix=/usr/local
+      args: 
+          chdir: "{{ build_path }}/Python-{{ PYTHON }}"
+      when: python_download.changed
+      register: python_configure
+
+    - name: make python
+      shell: 'LDFLAGS="-L/usr/local/lib" make -j 4'
+      args: 
+          chdir: "{{ build_path }}/Python-{{ PYTHON }}"
+      register: make_python
+      when: python_configure.changed
+
+    - name: install python
+      shell: 'LDFLAGS="-L/usr/local/lib" make altinstall'
+      args:
+          chdir: "{{ build_path }}/Python-{{ PYTHON }}"
+      become: yes
+      when: python_configure.changed
+
+    - name: Setup .bashrc
+      blockinfile:
+          path: "{{ HOME }}/.bashrc"
+          block: |
+              export LD_LIBRARY_PATH="/usr/local/lib"
+              export VIRTUALENVWRAPPER_PYTHON="/usr/local/bin/python3.7"
+              source /usr/local/bin/virtualenvwrapper.sh
+
+    - name: Install pip virtualenv
+      pip: 
+        executable: /usr/local/bin/pip3.7
+        name:
+            - virtualenv
+            - virtualenvwrapper
+      become: yes
+
+    - name: pip install bricknil
+      pip: 
+        name:
+            - bricknil
+        virtualenv: "{{ HOME }}/.virtualenvs/bricknil"
+        virtualenv_python: python3.7
+
+    - name: git clone bricknil
+      git:
+          repo: 'https://github.com/virantha/bricknil.git'
+          dest: '{{ HOME }}/bricknil'
+          clone: yes
+
