@@ -495,14 +495,16 @@ working.
 Installation
 ############
 
-On Mac OS X, it should just be a simple:
+On all platforms, it should just be a simple:
 
 .. code-block:: bash
 
     $ pip install bricknil
 
-Installing on other platforms like Linux is not supported at this time until I can break out the
-mac requirements, and test bluez.
+On Linux, you might need to instlal `BlueZ >= 5.43`.
+
+On a Raspberry Pi (and other Linux boxes should be similar), you can follow my automated 
+:doc:`setup instructions <pi_setup>`
 
 Disclaimer
 ##########
