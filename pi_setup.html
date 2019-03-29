@@ -346,41 +346,6 @@ access the bluetooth libraries; after you login to the Pi over ssh  you can do t
 </div>
 </div>
 </div>
-<div class="section" id="bricknil-architecture">
-<h1>BrickNil Architecture<a class="headerlink" href="#bricknil-architecture" title="Permalink to this headline">¶</a></h1>
-<p>This section documents the internal architecture of BrickNil and how all the components communicate with
-each other.</p>
-<p>There are actually two threads of execution in the current system architecture.
-The main Bluetooth radio communication loop is provided by the BluetoothLE
-library, which manages everything in the background and can callback directly
-into user code.  In parallel with this, inside this library, a separate
-execution loop is running the Curio event library, which provides the async
-event loop that executes our user code. Thus, we need to be careful about
-maintaining thread safety between the Curio async event loop and the background
-Bluetooth event processing.</p>
-<div class="figure align-center" id="id1">
-<img alt="_images/run_loops.svg" src="_images/run_loops.svg" /><p class="caption"><span class="caption-text">BrickNil running inside Curio’s event loop, which in turn is run by the
-Adafruit_BluefruitLE library run loop</span></p>
-</div>
-<p>I’d much have preferred to have the Bluetooth library be implemented via an
-async library like Curio, asyncio, or Trio, but I wasn’t able to find any such
-library. This admitted kludge of nested run loops was the only way I could get everything
-working.</p>
-</div>
-<div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>On Mac OS X, it should just be a simple:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install bricknil
-</pre></div>
-</div>
-<p>Installing on other platforms like Linux is not supported at this time until I can break out the
-mac requirements, and test bluez.</p>
-</div>
-<div class="section" id="disclaimer">
-<h1>Disclaimer<a class="headerlink" href="#disclaimer" title="Permalink to this headline">¶</a></h1>
-<p>The software is distributed on an “AS IS” BASIS, WITHOUT
-WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under ASL 2.0</p>
-</div>
 
 
           </div>
@@ -401,9 +366,6 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#bricknil-architecture">BrickNil Architecture</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#disclaimer">Disclaimer</a></li>
 </ul>
 <h3>Related Topics</h3>
 <ul>
