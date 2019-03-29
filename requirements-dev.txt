@@ -1,6 +1,6 @@
+ansible
 pyobjc
 curio
-git+git://github.com/virantha/Adafruit_Python_BluefruitLE@master#egg=Adafruit-BluefruitLE
 fabric
 sphinx
 sphinx-readable-theme

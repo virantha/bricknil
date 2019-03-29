@@ -46,3 +46,7 @@ output/*/index.html
 # Sphinx
 docs/_build
 docs/_autosummary
+
+*.retry
+wpa_supplicant.conf
+

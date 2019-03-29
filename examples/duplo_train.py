@@ -3,7 +3,7 @@ from itertools import cycle
 from curio import sleep
 from bricknil import attach, start
 from bricknil.hub import DuploTrainHub
-from bricknil.sensor import DuploTrainMotor, DuploSpeedSensor, LED, DuploVisionSensor, DuploSpeaker
+from bricknil.sensor import DuploTrainMotor, DuploSpeedSensor, LED, DuploVisionSensor, DuploSpeaker, Button
 from bricknil.const import Color
 import logging
 
@@ -14,17 +14,26 @@ import logging
 @attach(DuploTrainMotor, name='motor')
 class Train(DuploTrainHub):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.go = False     # Only becomes true with hub button is pressed
+
     async def speed_sensor_change(self):
         speed = self.speed_sensor.value[DuploSpeedSensor.capability.sense_speed]
-        count = self.speed_sensor.value[DuploSpeedSensor.capability.sense_count]
-        self.message_info(f'Speed sensor changed speed: {speed} count: {count}')
+        if not self.go and speed > 0:
+            self.go = True
+            self.message_info('Movement detected: starting...')
+        elif self.go:
+            count = self.speed_sensor.value[DuploSpeedSensor.capability.sense_count]
+            self.message_info(f'Speed sensor changed speed: {speed} count: {count}')
 
     async def vision_sensor_change(self):
         cap = DuploVisionSensor.capability
         color = self.vision_sensor.value[cap.sense_color]
         ctag  = self.vision_sensor.value[cap.sense_ctag]
         reflt  = self.vision_sensor.value[cap.sense_reflectivity]
-        self.message_info(f'Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}')
+        if self.go:
+            self.message_info(f'Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}')
 
     async def run(self):
         self.message_info("Running")
@@ -33,6 +42,11 @@ class Train(DuploTrainHub):
 
         snd = DuploSpeaker.sounds
         sounds = cycle([snd.brake, snd.station, snd.water, snd.horn, snd.steam])
+
+        self.message_info('Please move the train to start the program')
+        while not self.go:
+            await self.led.set_color(next(colors))
+            await sleep(0.1)
 
         for i in range(5):
             await self.led.set_color(next(colors))       # Cycle through the colors
