@@ -1,5 +1,5 @@
 ansible
-pyobjc
+pyobjc; sys_platform == "darwin"
 curio
 fabric
 sphinx
