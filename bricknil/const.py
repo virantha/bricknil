@@ -40,6 +40,7 @@ class Color(Enum):
 DEVICES = {     0x0001:   'Motor',
                 0x0002:   'System Train Motor',
                 0x0005:   'Button',
+                0x0008:   'Light',
                 0x0014:   'Voltage',
                 0x0015:   'Current',
                 0x0016:   'Piezo Tone (Sound)',

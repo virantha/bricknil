@@ -47,6 +47,9 @@ output/*/index.html
 docs/_build
 docs/_autosummary
 
+# Virtual Environment
+.venv/
+
 *.retry
 wpa_supplicant.conf
 

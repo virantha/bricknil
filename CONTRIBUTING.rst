@@ -10,11 +10,7 @@ Make sure to install all the dev packages in your local environment::
 
 * **Making the documentation**::
     
-       cd docs
-       make html
-   
-  Docs by default are built in `../../githubdocs/bricknil`, but you can change this in 
-  `docs/Makefile`.
+       make -C docs html
 
 * **Deploying documentation**: Documentation is hosted on github pages.  We use fabric (see `tasks.py`) for deploying::
 
