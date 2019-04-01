@@ -28,10 +28,10 @@ def docs(c):
     #c.run("head CHANGES.rst > CHANGES_RECENT.rst")
     #c.run("tail -n 1 CHANGES.rst >> CHANGES_RECENT.rst")
     with c.cd("docs"):
-        print("Running sphinx in docs/ and building to ~/dev/githubpages/bricknil")
+        print("Running sphinx in docs/ and building to ~/dev/githubdocs/bricknil")
         c.run("make clean")
         c.run('rm -rf _auto_summary')
-        c.run("make html")
+        c.run("make html BUILDDIR=%s" % githubpages)
         #c.run("cp -R ../test/htmlcov %s/html/testing" % githubpages)
     with c.cd(githubpages):
         #c.run("mv html/* .")

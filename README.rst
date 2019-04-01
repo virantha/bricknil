@@ -82,14 +82,13 @@ Features
    * The current implementation uses the async library Curio_ by David Beazley 
 * Cross-platform
    * Uses the Adafruit Bluefruit BluetoothLE library for Mac OS X
-   * Uses the Bleak Bluetooth library for Linux and Win10\ [*]_, tested on Raspberry Pi
+   * Uses the Bleak Bluetooth library for Linux and Win10; also tested on Raspberry Pi.
 
 
 .. _Curio: http://curio.readthedocs.io
 .. _EuroBricks: https://www.eurobricks.com/forum/index.php?/forums/topic/162288-powered-up-a-tear-down/
 .. _Powered-Up: https://github.com/nathankellenicki/node-poweredup
 .. _Bleak: https://github.com/hbldh/bleak
-.. [*] Untested 
 
 Building a simple train controller
 ##################################
@@ -505,6 +504,24 @@ On Linux, you might need to install the `BlueZ >= 5.43` libraries.
 
 On a Raspberry Pi (and other Linux boxes should be similar), you can follow my automated 
 :doc:`setup instructions <pi_setup>`
+
+
+Credits
+#######
+
+* Virantha N. Ekanayake :gh_user:`virantha` - lead developer
+* David Lechner :gh_user:`dlec` - contributor
+   * Added Windows 10 support
+
+This project is also greatly indebted to the following persons, as well as their open-sourced libraries, portions of which have been incorporated into
+BrickNil under the terms of their respective licenses:
+
+* **Tony DiCola** for his Adafruit_Python_BluefruitLE_ library that provides the BluetoothLE communication stack on Mac OS X
+* :gh_user:`Henrik Blidh <hbldh>` for his Bleak_ library that provided a pure python way to communicate with BluetoothLE over DBus on Linux.
+
+.. _Bleak: https://github.com/hbldh/bleak
+.. _Adafruit_Python_BluefruitLE: https://github.com/adafruit/Adafruit_Python_BluefruitLE
+
 
 Disclaimer
 ##########

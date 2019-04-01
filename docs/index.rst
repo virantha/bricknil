@@ -15,7 +15,6 @@ Contents
    readme
    pi_setup
    contributing
-   authors
    api
    lego_api/lego
    changes.rst
