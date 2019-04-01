@@ -510,7 +510,7 @@ Credits
 #######
 
 * Virantha N. Ekanayake :gh_user:`virantha` - lead developer
-* David Lechner :gh_user:`dlec` - contributor
+* David Lechner :gh_user:`dlech` - contributor
    * Added Windows 10 support
 
 This project is also greatly indebted to the following persons, as well as their open-sourced libraries, portions of which have been incorporated into

@@ -1,6 +1,6 @@
 0.8 - 4/1/19
 ------------
-- Added support for PoweredUp light module 88005 and Win10 (thanks to :gh_user:`dlec`)
+- Added support for PoweredUp light module 88005 and Win10 (thanks to :gh_user:`dlech`)
 
 0.7.2 - 3/26/19
 ---------------
