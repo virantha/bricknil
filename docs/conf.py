@@ -208,5 +208,6 @@ todo_include_todos = True
 todo_link_only = False
 
 # External links shortcut
-extlinks = { 'gh_user': ('https://github.com/%s', '@')
+extlinks = { 'gh_user': ('https://github.com/%s', '@'),
+             'amzn'   : ('https://www.amazon.com/gp/product/%s/ref=as_li_tl?ie=UTF8&tag=virantha-20&camp=1789&creative=9325&linkCode=as2', ''),
            }

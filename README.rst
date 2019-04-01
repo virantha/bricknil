@@ -506,12 +506,71 @@ On a Raspberry Pi (and other Linux boxes should be similar), you can follow my a
 :doc:`setup instructions <pi_setup>`
 
 
+Supported Devices
+#################
+
+.. list-table:: BrickNil supported |lego| devices
+   :header-rows: 1
+   :widths: 35 25 40
+
+   * - Peripheral
+     - Sets
+     - Support
+   * - PoweredUp Hub (88009)
+     - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`, :amzn:`76112 <B07BMGR1FN>`
+     - :class:`~bricknil.hub.PoweredUpHub` 
+         - LED: :class:`~bricknil.sensor.LED`
+         - Button: :class:`~bricknil.sensor.Button`
+         - Current: :class:`~bricknil.sensor.CurrentSensor`
+         - Voltage: :class:`~bricknil.sensor.VoltageSensor`
+   * - PoweredUp Train Motor (88011)
+     - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`
+     - :class:`~bricknil.sensor.TrainMotor`
+   * - PoweredUp Remote (88010)
+     - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`
+     - :class:`~bricknil.hub.PoweredUpRemote`
+         - :class:`~bricknil.sensor.RemoteButtons`
+   * - PoweredUp Light (88005)
+     - direct from |lego| shop
+     - :class:`~bricknil.sensor.Light`
+   * - Boost Hub (88009)
+     - :amzn:`17101 <B06Y6JCTKH>`
+     - :class:`~bricknil.hub.BoostHub` 
+         - Motors: :class:`~bricknil.sensor.InternalMotor`
+         - Tilt: :class:`~bricknil.sensor.InternalTiltSensor` 
+         - LED: :class:`~bricknil.sensor.LED`
+         - Button: :class:`~bricknil.sensor.Button`
+         - Current: :class:`~bricknil.sensor.CurrentSensor`
+         - Voltage: :class:`~bricknil.sensor.VoltageSensor`
+   * - Boost Vision Sensor (88007)
+     - :amzn:`17101 <B06Y6JCTKH>`
+     - :class:`~bricknil.sensor.VisionSensor`
+   * - Boost External Motor (88008)
+     - :amzn:`17101 <B06Y6JCTKH>`
+     - todo
+   * - Duplo Train Base
+     - :amzn:`10874 <B07BK6M2WC>`, :amzn:`10875 <B07BK6KQR6>`
+     - :class:`~bricknil.hub.DuploTrainHub`
+         - Motor: :class:`~bricknil.sensor.DuploTrainMotor`
+         - Speedometer: :class:`~bricknil.sensor.DuploSpeedSensor`
+         - Vision: :class:`~bricknil.sensor.VisionSensor`
+         - Speaker: :class:`~bricknil.sensor.DuploSpeaker`
+         - Voltage: :class:`~bricknil.sensor.VoltageSensor`
+
+
+
+
+
+.. |lego|  replace:: Lego\ |reg|
+   
+
 Credits
 #######
 
 * Virantha N. Ekanayake :gh_user:`virantha` - lead developer
 * David Lechner :gh_user:`dlech` - contributor
    * Added Windows 10 support
+   * Added support for Lego 88005 stand-alone LED peripheral
 
 This project is also greatly indebted to the following persons, as well as their open-sourced libraries, portions of which have been incorporated into
 BrickNil under the terms of their respective licenses:
