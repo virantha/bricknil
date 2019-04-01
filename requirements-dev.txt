@@ -1,4 +1,4 @@
-ansible
+ansible; sys_platform != "win32"
 pyobjc; sys_platform == "darwin"
 curio
 fabric

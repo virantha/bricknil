@@ -219,6 +219,9 @@ class BLEventQ(Process):
             hub.ble_id = self.device.address
             self.message_info(f'Device advertised: {device.characteristics}')
             hub.tx = (device, hub.char_uuid)   # Need to store device because the char is not an object in Bleak, unlike Bluefruit library
+            # Hack to fix device name on Windows
+            if self.device.name == "Unknown" and hasattr(device._requester, 'Name'):
+                self.device.name = device._requester.Name
         else:
             self.device.connect()
             hub.ble_id = self.device.id
