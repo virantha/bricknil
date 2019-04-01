@@ -95,16 +95,19 @@
 <tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LED</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Changes the LED color on the Hubs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.Light" title="bricknil.sensor.Light"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Light</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Connects to the external light.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Represents one set of ‘+’, ‘-‘, ‘red’ buttons on the PoweredHub Remote</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Connects to the train motors.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the Boost Vision/Distance Sensor</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.VoltageSensor" title="bricknil.sensor.VoltageSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.VoltageSensor" title="bricknil.sensor.VoltageSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Voltage sensor</td>
 </tr>
 </tbody>
@@ -455,18 +458,43 @@ special to the self.value dict.</p>
 <dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
 <p>Changes the LED color on the Hubs:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;hub_led&#39;</span><span class="p">)</span>
-
-<span class="bp">self</span><span class="o">.</span><span class="n">hub_led</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">No support yet for the standalone LEDs that connect to the Hub ports.</p>
-</div>
+<p>self.hub_led.set_output(Color.red)</p>
 <dl class="method">
 <dt id="bricknil.sensor.LED.set_color">
 <code class="descname">set_color</code><span class="sig-paren">(</span><em>color: bricknil.const.Color</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#LED.set_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.LED.set_color" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a Color enumeration to a color value</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.Light">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">Light</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#Light"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.Light" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
+<p>Connects to the external light.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">Light</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And then within the run body, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">light</span><span class="o">.</span><span class="n">set_brightness</span><span class="p">(</span><span class="n">brightness</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="bricknil.sensor.Light.set_brightness">
+<code class="descname">set_brightness</code><span class="sig-paren">(</span><em>brightness: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#Light.set_brightness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.Light.set_brightness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the brightness of the light.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>brightness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – A value between -100 and 100 where 0 is off and
+-100 or 100 are both maximum brightness.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

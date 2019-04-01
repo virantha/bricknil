@@ -707,7 +707,7 @@ execution loop is running the Curio event library, which provides the async
 event loop that executes our user code. Thus, we need to be careful about
 maintaining thread safety between the Curio async event loop and the background
 Bluetooth event processing.</p>
-<div class="figure align-center" id="id9">
+<div class="figure align-center" id="id10">
 <img alt="_images/run_loops.svg" src="_images/run_loops.svg" /><p class="caption"><span class="caption-text">BrickNil running inside Curio’s event loop, which in turn is run by the
 Adafruit_BluefruitLE library run loop</span></p>
 </div>
@@ -726,6 +726,26 @@ working.</p>
 <p>On Linux, you might need to install the <cite>BlueZ &gt;= 5.43</cite> libraries.</p>
 <p>On a Raspberry Pi (and other Linux boxes should be similar), you can follow my automated
 <a class="reference internal" href="pi_setup.html"><span class="doc">setup instructions</span></a></p>
+</div>
+<div class="section" id="credits">
+<h2>Credits<a class="headerlink" href="#credits" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Virantha N. Ekanayake <a class="reference external" href="https://github.com/virantha">&#64;virantha</a> - lead developer</li>
+<li><dl class="first docutils">
+<dt>David Lechner <a class="reference external" href="https://github.com/dlec">&#64;dlec</a> - contributor</dt>
+<dd><ul class="first last">
+<li>Added Windows 10 support</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>This project is also greatly indebted to the following persons, as well as their open-sourced libraries, portions of which have been incorporated into
+BrickNil under the terms of their respective licenses:</p>
+<ul class="simple">
+<li><strong>Tony DiCola</strong> for his <a class="reference external" href="https://github.com/adafruit/Adafruit_Python_BluefruitLE">Adafruit_Python_BluefruitLE</a> library that provides the BluetoothLE communication stack on Mac OS X</li>
+<li><a class="reference external" href="https://github.com/hbldh">Henrik Blidh</a> for his <a class="reference external" href="https://github.com/hbldh/bleak">Bleak</a> library that provided a pure python way to communicate with BluetoothLE over DBus on Linux.</li>
+</ul>
 </div>
 <div class="section" id="disclaimer">
 <h2>Disclaimer<a class="headerlink" href="#disclaimer" title="Permalink to this headline">¶</a></h2>
@@ -758,6 +778,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 </ul>
 </li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#credits">Credits</a></li>
 <li><a class="reference internal" href="#disclaimer">Disclaimer</a></li>
 </ul>
 </li>

@@ -63,6 +63,7 @@
 <span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">current_task</span><span class="p">,</span> <span class="n">spawn</span>  <span class="c1"># Needed for motor speed ramp</span>
 
 <span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">pack</span>
 <span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">Color</span>
 
 <span class="kn">from</span> <span class="nn">.peripheral</span> <span class="k">import</span> <span class="n">Peripheral</span><span class="p">,</span> <span class="n">Motor</span>
@@ -318,10 +319,6 @@
 <span class="sd">            @attach(LED, name=&#39;hub_led&#39;)</span>
 
 <span class="sd">            self.hub_led.set_output(Color.red)</span>
-
-<span class="sd">        Warnings:</span>
-<span class="sd">            No support yet for the standalone LEDs that connect to the Hub ports.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0017</span>
 
@@ -336,6 +333,33 @@
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span></div></div>
         <span class="c1">#b = [0x00, 0x81, self.port, 0x11, 0x51, mode, col ]</span>
         <span class="c1">#await self.message_info(f&#39;set color to {color}&#39;)</span>
+
+
+<div class="viewcode-block" id="Light"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.Light">[docs]</a><span class="k">class</span> <span class="nc">Light</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connects to the external light.</span>
+
+<span class="sd">        Example::</span>
+
+<span class="sd">             @attach(Light, name=&#39;light&#39;)</span>
+
+<span class="sd">        And then within the run body, use::</span>
+
+<span class="sd">            await self.light.set_brightness(brightness)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0008</span>
+
+<div class="viewcode-block" id="Light.set_brightness"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.Light.set_brightness">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_brightness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">brightness</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the brightness of the light.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            brightness (int) : A value between -100 and 100 where 0 is off and</span>
+<span class="sd">                -100 or 100 are both maximum brightness.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">brightness</span><span class="p">,</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">brightness</span><span class="p">))</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">brightness</span><span class="p">)</span></div></div>
+
 
 <div class="viewcode-block" id="TrainMotor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.TrainMotor">[docs]</a><span class="k">class</span> <span class="nc">TrainMotor</span><span class="p">(</span><span class="n">Motor</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>

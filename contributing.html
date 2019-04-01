@@ -17,7 +17,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Credits" href="authors.html" />
+    <link rel="next" title="API Documentation" href="api.html" />
     <link rel="prev" title="Setting up a Raspberry Pi with Python 3.7+ using Ansible" href="pi_setup.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -36,7 +36,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="authors.html" title="Credits"
+          <a href="api.html" title="API Documentation"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="pi_setup.html" title="Setting up a Raspberry Pi with Python 3.7+ using Ansible"
@@ -60,12 +60,9 @@
 </div>
 <ul>
 <li><p class="first"><strong>Making the documentation</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">docs</span>
-<span class="n">make</span> <span class="n">html</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">docs</span> <span class="n">html</span>
 </pre></div>
 </div>
-<p>Docs by default are built in <cite>../../githubdocs/bricknil</cite>, but you can change this in
-<cite>docs/Makefile</cite>.</p>
 </li>
 <li><p class="first"><strong>Deploying documentation</strong>: Documentation is hosted on github pages.  We use fabric (see <cite>tasks.py</cite>) for deploying:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">invoke</span> <span class="n">docs</span>
@@ -204,7 +201,7 @@ and make sure that the tests pass for all supported Python versions.</li>
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
       <li>Previous: <a href="pi_setup.html" title="previous chapter">Setting up a Raspberry Pi with Python 3.7+ using Ansible</a></li>
-      <li>Next: <a href="authors.html" title="next chapter">Credits</a></li>
+      <li>Next: <a href="api.html" title="next chapter">API Documentation</a></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">

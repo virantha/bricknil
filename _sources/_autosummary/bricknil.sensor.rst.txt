@@ -33,6 +33,8 @@ bricknil.sensor
 	  
 	  LED
 	  
+	  Light
+	  
 	  RemoteButtons
 	  
 	  TrainMotor
