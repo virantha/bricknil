@@ -17,6 +17,7 @@
 from curio import sleep, current_task, spawn  # Needed for motor speed ramp
 
 from enum import Enum, IntEnum
+from struct import pack
 from .const import Color
 
 from .peripheral import Peripheral, Motor
@@ -272,10 +273,6 @@ class LED(Peripheral):
             @attach(LED, name='hub_led')
 
             self.hub_led.set_output(Color.red)
-
-        Warnings:
-            No support yet for the standalone LEDs that connect to the Hub ports.
-
     """
     _sensor_id = 0x0017
 
@@ -290,6 +287,33 @@ class LED(Peripheral):
         await self.set_output(mode, col)
         #b = [0x00, 0x81, self.port, 0x11, 0x51, mode, col ]
         #await self.message_info(f'set color to {color}')
+
+
+class Light(Peripheral):
+    """
+        Connects to the external light.
+
+        Example::
+
+             @attach(Light, name='light')
+
+        And then within the run body, use::
+
+            await self.light.set_brightness(brightness)
+    """
+    _sensor_id = 0x0008
+
+    async def set_brightness(self, brightness: int):
+        """Sets the brightness of the light.
+
+        Args:
+            brightness (int) : A value between -100 and 100 where 0 is off and
+                -100 or 100 are both maximum brightness.
+        """
+        mode = 0
+        brightness, = pack('b', int(brightness))
+        await self.set_output(mode, brightness)
+
 
 class TrainMotor(Motor):
     """
