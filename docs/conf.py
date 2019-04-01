@@ -63,6 +63,7 @@ extensions = [
     'sphinx.ext.graphviz',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    'sphinx.ext.extlinks',
 ]
 
 
@@ -205,3 +206,7 @@ epub_exclude_files = ['search.html']
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
 todo_include_todos = True
 todo_link_only = False
+
+# External links shortcut
+extlinks = { 'gh_user': ('https://github.com/%s', '@')
+           }
