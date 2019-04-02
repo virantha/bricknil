@@ -239,6 +239,7 @@ we can go ahead and implement the full program that calls
 <span class="kn">from</span> <span class="nn">bricknil.hub</span> <span class="kn">import</span> <span class="n">PoweredUpHub</span>
 <span class="kn">from</span> <span class="nn">bricknil.sensor</span> <span class="kn">import</span> <span class="n">TrainMotor</span>
 <span class="kn">from</span> <span class="nn">bricknil.process</span> <span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">PoweredUpHub</span><span class="p">):</span>
@@ -257,7 +258,7 @@ we can go ahead and implement the full program that calls
     <span class="n">train</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;My train&#39;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">Process</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">Process</span><span class="o">.</span><span class="n">MSG_LEVEL</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
     <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -376,6 +377,7 @@ and end.</p>
 <span class="kn">from</span> <span class="nn">bricknil.hub</span> <span class="kn">import</span> <span class="n">PoweredUpHub</span>
 <span class="kn">from</span> <span class="nn">bricknil.sensor</span> <span class="kn">import</span> <span class="n">TrainMotor</span><span class="p">,</span> <span class="n">VisionSensor</span>
 <span class="kn">from</span> <span class="nn">bricknil.process</span> <span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
 <span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
@@ -410,7 +412,7 @@ and end.</p>
     <span class="n">train</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;My Train&#39;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">Process</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">Process</span><span class="o">.</span><span class="n">MSG_LEVEL</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
     <span class="n">start</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
 </pre></div>
 </div>

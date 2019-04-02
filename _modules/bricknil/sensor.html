@@ -150,6 +150,39 @@
         <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x07</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_speed_to_val</span><span class="p">(</span><span class="n">target_speed</span><span class="p">),</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s1">&#39;set speed&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div></div>
         
+<div class="viewcode-block" id="ExternalMotor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.ExternalMotor">[docs]</a><span class="k">class</span> <span class="nc">ExternalMotor</span><span class="p">(</span><span class="n">Motor</span><span class="p">):</span>
+
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x26</span>
+
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;sense_power&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;sense_speed&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;sense_pos&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">})</span>
+    <span class="c1"># Dict of cap: (num_datasets, bytes_per_dataset)</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_power</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> 
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_pos</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                <span class="p">}</span>
+
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_pos</span><span class="p">,</span>
+                    <span class="p">]</span>
+
+<div class="viewcode-block" id="ExternalMotor.set_pos"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.ExternalMotor.set_pos">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the position of the motor</span>
+
+<span class="sd">           Use command GotoAbsolutePosition</span>
+<span class="sd">            * 0x00 = hub id</span>
+<span class="sd">            * 0x81 = Port Output command</span>
+<span class="sd">            * port</span>
+<span class="sd">            * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</span>
+<span class="sd">            * 0x0d = Subcommand</span>
+<span class="sd">            * abs_pos (int32)</span>
+<span class="sd">            * speed -100 - 100</span>
+<span class="sd">            * max_power abs(0-100%)</span>
+<span class="sd">            * endstate = 0 (float), 126 (hold), 127 (brake)</span>
+<span class="sd">            * Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)</span>
+<span class="sd">            *</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x11</span><span class="p">,</span> <span class="mh">0x0d</span><span class="p">,]</span></div></div>
+
 <div class="viewcode-block" id="VisionSensor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.VisionSensor">[docs]</a><span class="k">class</span> <span class="nc">VisionSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Access the Boost Vision/Distance Sensor</span>
 

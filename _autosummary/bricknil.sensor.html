@@ -86,28 +86,31 @@
 <tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.DuploVisionSensor" title="bricknil.sensor.DuploVisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploVisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the Duplo Vision/Distance Sensor</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.InternalMotor" title="bricknil.sensor.InternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.ExternalMotor" title="bricknil.sensor.ExternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.InternalMotor" title="bricknil.sensor.InternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the internal motor(s) in the Boost Move Hub.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.InternalTiltSensor" title="bricknil.sensor.InternalTiltSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.InternalTiltSensor" title="bricknil.sensor.InternalTiltSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the internal tilt sensor in the Boost Move Hub.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LED</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LED</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Changes the LED color on the Hubs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.Light" title="bricknil.sensor.Light"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Light</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.Light" title="bricknil.sensor.Light"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Light</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Connects to the external light.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Represents one set of ‘+’, ‘-‘, ‘red’ buttons on the PoweredHub Remote</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Connects to the train motors.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Access the Boost Vision/Distance Sensor</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.VoltageSensor" title="bricknil.sensor.VoltageSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.VoltageSensor" title="bricknil.sensor.VoltageSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Voltage sensor</td>
 </tr>
 </tbody>
@@ -211,6 +214,67 @@ to do some sanity checking and bounding.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.ExternalMotor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.</code><code class="descname">ExternalMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#ExternalMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.ExternalMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.peripheral.html#bricknil.peripheral.Motor" title="bricknil.peripheral.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Motor</span></code></a></p>
+<dl class="class">
+<dt id="bricknil.sensor.ExternalMotor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.ExternalMotor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.ExternalMotor.capability.sense_pos">
+<code class="descname">sense_pos</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.ExternalMotor.capability.sense_pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.ExternalMotor.capability.sense_power">
+<code class="descname">sense_power</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.ExternalMotor.capability.sense_power" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.ExternalMotor.capability.sense_speed">
+<code class="descname">sense_speed</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.ExternalMotor.capability.sense_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.ExternalMotor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_power: 0&gt;: (1, 1), &lt;capability.sense_speed: 1&gt;: (1, 1), &lt;capability.sense_pos: 2&gt;: (1, 4)}</em><a class="headerlink" href="#bricknil.sensor.ExternalMotor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.ExternalMotor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_speed: 1&gt;, &lt;capability.sense_pos: 2&gt;]</em><a class="headerlink" href="#bricknil.sensor.ExternalMotor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.ExternalMotor.set_pos">
+<code class="descname">set_pos</code><span class="sig-paren">(</span><em>pos</em>, <em>speed=50</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor.html#ExternalMotor.set_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.ExternalMotor.set_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the position of the motor</p>
+<dl class="docutils">
+<dt>Use command GotoAbsolutePosition</dt>
+<dd><ul class="first last simple">
+<li>0x00 = hub id</li>
+<li>0x81 = Port Output command</li>
+<li>port</li>
+<li>0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</li>
+<li>0x0d = Subcommand</li>
+<li>abs_pos (int32)</li>
+<li>speed -100 - 100</li>
+<li>max_power abs(0-100%)</li>
+<li>endstate = 0 (float), 126 (hold), 127 (brake)</li>
+<li>Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)</li>
+<li></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

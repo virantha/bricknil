@@ -27,6 +27,8 @@ bricknil.sensor
 	  
 	  DuploVisionSensor
 	  
+	  ExternalMotor
+	  
 	  InternalMotor
 	  
 	  InternalTiltSensor
