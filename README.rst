@@ -208,6 +208,7 @@ we can go ahead and implement the full program that calls
    from bricknil.hub import PoweredUpHub
    from bricknil.sensor import TrainMotor
    from bricknil.process import Process
+   import logging
 
    @attach(TrainMotor, name='motor')
    class Train(PoweredUpHub):
@@ -226,7 +227,7 @@ we can go ahead and implement the full program that calls
        train = Train('My train')
 
    if __name__ == '__main__':
-       Process.level = Process.MSG_LEVEL.INFO
+       logging.basicConfig(level=logging.INFO)
        start(system)
 
 
@@ -359,6 +360,7 @@ Here's the full code:
    from bricknil.hub import PoweredUpHub
    from bricknil.sensor import TrainMotor, VisionSensor
    from bricknil.process import Process
+   import logging
 
    @attach(VisionSensor, name='train_sensor', capabilities=['sense_count', 'sense_distance'])
    @attach(TrainMotor, name='motor')
@@ -393,7 +395,7 @@ Here's the full code:
        train = Train('My Train')
 
    if __name__ == '__main__':
-       Process.level = Process.MSG_LEVEL.INFO
+       logging.basicConfig(level=logging.INFO)
        start(system)
 
 Further examples
