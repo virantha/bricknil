@@ -162,8 +162,6 @@ Here’s the playbook being executed:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
   <span class="nt">remote_user</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">pi</span>
   <span class="nt">become_method</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sudo</span>
-  <span class="nt">environment</span><span class="p">:</span>
-      <span class="nt">LD_LIBRARY_PATH</span><span class="p">:</span> <span class="s">&quot;/usr/local/lib/&quot;</span>
   <span class="nt">vars</span><span class="p">:</span>
     <span class="nt">PYTHON</span><span class="p">:</span> <span class="s">&quot;3.7.2&quot;</span>
     <span class="nt">OPEN_SSL</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">openssl-1.0.2g</span>
@@ -247,6 +245,17 @@ Here’s the playbook being executed:</p>
       <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
       <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make_openssl.changed</span>
 
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set /etc/ld.so.conf.d to add /usr/local/</span>
+      <span class="nt">lineinfile</span><span class="p">:</span>
+          <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/etc/ld.so.conf.d/openssl.conf</span>
+          <span class="nt">create</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+          <span class="nt">line</span><span class="p">:</span> <span class="s">&quot;/usr/local/lib&quot;</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">run ldconfig to update dynamic link lib path to use /usr/local/lib</span>
+      <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ldconfig</span>
+      <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+
     <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Download python 3.7</span>
       <span class="nt">get_url</span><span class="p">:</span>
           <span class="nt">url</span><span class="p">:</span> <span class="s">&quot;https://www.python.org/ftp/python/{{PYTHON}}/Python-{{PYTHON}}.tgz&quot;</span>
@@ -296,7 +305,6 @@ Here’s the playbook being executed:</p>
       <span class="nt">blockinfile</span><span class="p">:</span>
           <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">HOME</span><span class="nv"> </span><span class="s">}}/.bashrc&quot;</span>
           <span class="nt">block</span><span class="p">:</span> <span class="p p-Indicator">|</span>
-              <span class="no">export LD_LIBRARY_PATH=&quot;/usr/local/lib&quot;</span>
               <span class="no">export VIRTUALENVWRAPPER_PYTHON=&quot;/usr/local/bin/python3.7&quot;</span>
               <span class="no">source /usr/local/bin/virtualenvwrapper.sh</span>
 
