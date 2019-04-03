@@ -68,7 +68,9 @@ Features
 ########
 
 * Supports the following LEGO\ |reg| Bluetooth systems:
-   * PoweredUp hubs for trains 60197_, 60198_, and 10874_
+   * PoweredUp hubs for trains 60197_, 60198_
+   * Duplo trains 10874_ and 10875_
+   * PoweredUp remote
    * Boost_ Move hub
 * Supports the following actuators/sensors:
    * Internal motors
@@ -76,6 +78,8 @@ Features
    * Hub LED color
    * Boost vision sensor (color, distance)
    * Internal tilt/orientation/accelerometer 
+   * Boost external motor 
+   * External light
    * Hub buttons
 * Fully supports Python asynchronous keywords and coroutines
    * Allows expressive concurrent programming using async/await syntax
@@ -560,7 +564,7 @@ Supported Devices
      - :class:`~bricknil.sensor.VisionSensor`
    * - Boost External Motor (88008)
      - :amzn:`17101 <B06Y6JCTKH>`
-     - todo
+     - :class:`~bricknil.sensor.ExternalMotor`
    * - Duplo Train Base
      - :amzn:`10874 <B07BK6M2WC>`, :amzn:`10875 <B07BK6KQR6>`
      - :class:`~bricknil.hub.DuploTrainHub`

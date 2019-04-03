@@ -20,15 +20,16 @@ from enum import Enum, IntEnum
 from struct import pack
 from .const import Color
 
-from .peripheral import Peripheral, Motor
+from .peripheral import Peripheral, Motor, TachoMotor
 
 
-class InternalMotor(Peripheral):
+class InternalMotor(TachoMotor):
     """ Access the internal motor(s) in the Boost Move Hub.
 
-        Unlike the train motors, these motors have a built-in sensor for sending back
-        the motor's current speed and position.  You don't need to use the sensors, and
-        can treat this as strictly an output.
+        Unlike the train motors, these motors (as well as the stand-alone Boost
+        motors :class:`ExternalMotor`) have a built-in sensor/tachometer for sending back
+        the motor's current speed and position.  However, you don't need to use the
+        sensors, and can treat this motor strictly as an output device.
 
         Examples::
 
@@ -39,34 +40,28 @@ class InternalMotor(Peripheral):
             # Any speed command will cause both motors to rotate at the same speed
             @attach(InternalMotor, name='motors', port=InternalMotor.Port.AB)
 
-            # Report back when motor speed changes. You must have a motors_change method defined 
-            @attach(InternalMotor, name='motors', port=InternalMotor.Port.A, capabilities=['sense_speed'])
+            # Report back when motor speed changes. You must have a motor_change method defined 
+            @attach(InternalMotor, name='motor', port=InternalMotor.Port.A, capabilities=['sense_speed'])
+
             # Only report back when speed change exceeds 5 units
             @attach(InternalMotor, name='motors', port=InternalMotor.Port.A, capabilities=[('sense_speed', 5)])
 
+        And within the run body you can control the motor output::
+            await self.motor.set_speed(50)   # Setting the speed
+            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
+            await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position
+
         See Also:
-            :class:`TrainMotor` for connecting to a train motor
+            * :class:`TrainMotor` for connecting to a train motor
+            * :class:`ExternalMotor` for connecting to a train motor
 
     """
     _sensor_id = 0x0027
     _DEFAULT_THRESHOLD=2
     """Set to 2 to avoid a lot of updates since the speed seems to oscillate a lot"""
 
-    capability = Enum("capability", {"sense_speed":1, "sense_pos":2})
-
     Port = Enum('Port', 'A B AB', start=0)
     """Address either motor A or Motor B, or both AB at the same time"""
-
-    # Dict of cap: (num_datasets, bytes_per_dataset)
-    datasets = { capability.sense_speed: (1, 1),
-                 capability.sense_pos: (1, 4),
-                }
-    """ Dict of (num_datasets, bytes_per_dataset).
-       `sense_speed` (1-byte), and `sense_pos` (uint32)"""
-
-    allowed_combo = [ capability.sense_speed,
-                      capability.sense_pos,
-                    ]
 
     def __init__(self, name, port=None, capabilities=[]):
         """Maps the port names `A`, `B`, `AB` to hard-coded port numbers"""
@@ -76,66 +71,40 @@ class InternalMotor(Peripheral):
         self.speed = 0
         super().__init__(name, port, capabilities)
     
-    async def set_speed(self, speed):
-        """Sets the speed of the motor, and calls the :func:`bricknil.peripheral.Peripheral._convert_speed_to_val` method
-           to do some sanity checking and bounding.
-
-           Args:
-               speed (int) : -100 to 100 (I believe this is a percentage)
-        """
-        self.speed = speed
-        speed = self._convert_speed_to_val(speed)
-        mode = 0
-        await self.set_output(mode, speed)
-
-    async def ramp_speed2(self, target_speed, ramp_time_ms):
         
-        # Set acceleration profile
-        delta_speed = target_speed - self.speed
-        zero_100_ramp_time_ms = int(ramp_time_ms/delta_speed * 100.0) 
-        zero_100_ramp_time_ms = zero_100_ramp_time_ms % 10000 # limit time to 10s
+class ExternalMotor(TachoMotor):
+    """ Access the stand-alone Boost motors
 
-        hi = (zero_100_ramp_time_ms >> 8) & 255
-        lo = zero_100_ramp_time_ms & 255
+        These are similar to the :class:`InternalMotor` with build-in tachometer and
+        sensor for sending back the motor's current speed and position.  You
+        don't need to use the sensors, and can treat this as strictly an
+        output.
 
-        profile = 1
-        b = [0x00, 0x81, self.port, 0x01, 0x05, 10, 10, profile]
-        await self.send_message(f'set accel profile {zero_100_ramp_time_ms} {hi} {lo} ', b)
-        b = [0x00, 0x81, self.port, 0x01, 0x07, self._convert_speed_to_val(target_speed), 80, 1]
-        await self.send_message('set speed', b)
-        
-class ExternalMotor(Motor):
+        Examples::
+
+            # Basic connection to the motor on Port A
+            @attach(ExternalMotor, name='motor')
+
+            # Report back when motor speed changes. You must have a motor_change method defined 
+            @attach(ExternalMotor, name='motor', capabilities=['sense_speed'])
+
+            # Only report back when speed change exceeds 5 units, and position changes (degrees)
+            @attach(ExternalMotor, name='motor', capabilities=[('sense_speed', 5), 'sense_pos'])
+
+        And then within the run body::
+
+            await self.motor.set_speed(50)   # Setting the speed
+            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
+            await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position
+
+        See Also:
+            * :class:`TrainMotor` for connecting to a train motor
+            * :class:`InternalMotor` for connecting to the Boost hub built-in motors
+
+    """
 
     _sensor_id = 0x26
 
-    capability = Enum("capability", {"sense_power": 0, "sense_speed":1, "sense_pos":2})
-    # Dict of cap: (num_datasets, bytes_per_dataset)
-    datasets = { capability.sense_power: (1, 1), 
-                 capability.sense_speed: (1, 1),
-                 capability.sense_pos: (1, 4),
-                }
-
-    allowed_combo = [ capability.sense_speed,
-                      capability.sense_pos,
-                    ]
-
-    async def set_pos(self, pos, speed=50):
-        """Set the position of the motor
-
-           Use command GotoAbsolutePosition
-            * 0x00 = hub id
-            * 0x81 = Port Output command
-            * port
-            * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)
-            * 0x0d = Subcommand
-            * abs_pos (int32)
-            * speed -100 - 100
-            * max_power abs(0-100%)
-            * endstate = 0 (float), 126 (hold), 127 (brake)
-            * Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)
-            *
-        """
-        b = [0x00, 0x81, self.port, 0x11, 0x0d,]
 
 class VisionSensor(Peripheral):
     """ Access the Boost Vision/Distance Sensor

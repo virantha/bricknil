@@ -16,6 +16,8 @@
 
 """
 import struct
+from enum import Enum
+
 from .process import Process
 from curio import sleep, spawn, current_task
 from .const import DEVICES
@@ -212,7 +214,7 @@ class Peripheral(Process):
             * mode
             * value(s)
         """
-        b = [0x00, 0x81, self.port, 0x11, 0x51, mode, value ]
+        b = [0x00, 0x81, self.port, 0x01, 0x51, mode, value ]
         await self.send_message('set output', b)
 
 
@@ -303,7 +305,7 @@ class Peripheral(Process):
 
 
 class Motor(Peripheral):
-    """Utility functions for a train motor.
+    """Utility class for common functions shared between Train Motors, Internal Motors, and External Motors
 
     """
     def __init__(self, name, port=None, capabilities=[]):
@@ -376,4 +378,113 @@ class Motor(Peripheral):
         self.message_debug(f'Starting ramp of speed: {start_speed} -> {target_speed} ({ramp_time_ms/1000}s)')
         self.ramp_in_progress_task = await spawn(_ramp_speed, daemon = True)
 
+class TachoMotor(Motor):
 
+    capability = Enum("capability", {"sense_speed":1, "sense_pos":2})
+
+    datasets = { 
+                 capability.sense_speed: (1, 1),
+                 capability.sense_pos: (1, 4),
+                }
+    """ Dict of (num_datasets, bytes_per_dataset).
+       `sense_speed` (1-byte), and `sense_pos` (uint32)"""
+
+    allowed_combo = [ capability.sense_speed,
+                      capability.sense_pos,
+                    ]
+
+    async def set_pos(self, pos, speed=50, max_power=50):
+        """Set the absolute position of the motor
+
+           Everytime the hub is powered up, the zero-angle reference will be reset to the
+           motor's current position. When you issue this command, the motor will rotate to 
+           the position given in degrees.  The sign of the pos tells you which direction to rotate:
+           (1) a positive number will rotate clockwise as looking from end of shaft towards the motor,
+           (2) a negative number will rotate counter-clockwise
+
+
+           Examples::
+
+              await self.motor.set_pos(90)   # Rotate 90 degrees clockwise (looking from end of shaft towards motor)
+              await self.motor.set_pos(-90)  # Rotate conter-clockwise 90 degrees
+              await self.motor.set_pos(720)  # Rotate two full circles clockwise
+
+           Args:
+              pos (int) : Absolute position in degrees.
+              speed (int) : Absolute value from 0-100
+              max_power (int):  Max percentage power that will be applied (0-100%)
+
+           Notes: 
+
+               Use command GotoAbsolutePosition
+                * 0x00 = hub id
+                * 0x81 = Port Output command
+                * port
+                * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)
+                * 0x0d = Subcommand
+                * abs_pos (int32)
+                * speed -100 - 100
+                * max_power abs(0-100%)
+                * endstate = 0 (float), 126 (hold), 127 (brake)
+                * Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)
+                *
+        """
+        abs_pos = list(struct.pack('i', pos))
+        speed = self._convert_speed_to_val(speed)
+
+        b = [0x00, 0x81, self.port, 0x01, 0x0d] + abs_pos + [speed, max_power, 126, 3]
+        await self.send_message(f'set pos {pos} with speed {speed}', b)
+
+
+    async def rotate(self, degrees, speed, max_power=50):
+        """Rotate the given number of degrees from current position, with direction given by sign of speed
+
+           Examples::
+
+              await self.motor.rotate(90, speed=50)   # Rotate 90 degrees clockwise (looking from end of shaft towards motor)
+              await self.motor.set_pos(90, speed=-50)  # Rotate conter-clockwise 90 degrees
+              await self.motor.set_pos(720, speed=50)  # Rotate two full circles clockwise
+
+           Args:
+              degrees (uint) : Relative number of degrees to rotate
+              speed (int) : -100 to 100
+              max_power (int):  Max percentage power that will be applied (0-100%)
+
+           Notes: 
+
+               Use command StartSpeedForDegrees
+                * 0x00 = hub id
+                * 0x81 = Port Output command
+                * port
+                * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)
+                * 0x0b = Subcommand
+                * degrees (int32) 0..1000000
+                * speed -100 - 100%
+                * max_power abs(0-100%)
+                * endstate = 0 (float), 126 (hold), 127 (brake)
+                * Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)
+                *
+        """
+        degrees = list(struct.pack('i', degrees))
+        speed = self._convert_speed_to_val(speed)
+
+        b = [0x00, 0x81, self.port, 0x01, 0x0b] + degrees + [speed, max_power, 126, 3]
+        await self.send_message(f'rotate {degrees} deg with speed {speed}', b)
+
+
+    async def ramp_speed2(self, target_speed, ramp_time_ms):
+        """Experimental function, not implemented yet DO NOT USE
+        """
+        # Set acceleration profile
+        delta_speed = target_speed - self.speed
+        zero_100_ramp_time_ms = int(ramp_time_ms/delta_speed * 100.0) 
+        zero_100_ramp_time_ms = zero_100_ramp_time_ms % 10000 # limit time to 10s
+
+        hi = (zero_100_ramp_time_ms >> 8) & 255
+        lo = zero_100_ramp_time_ms & 255
+
+        profile = 1
+        b = [0x00, 0x81, self.port, 0x01, 0x05, 10, 10, profile]
+        await self.send_message(f'set accel profile {zero_100_ramp_time_ms} {hi} {lo} ', b)
+        b = [0x00, 0x81, self.port, 0x01, 0x07, self._convert_speed_to_val(target_speed), 80, 1]
+        await self.send_message('set speed', b)

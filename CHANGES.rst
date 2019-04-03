@@ -1,3 +1,10 @@
+0.8.2 - 4/3/19
+--------------
+- Added support for Boost external motors (:class:`~bricknil.sensor.ExternalMotor`)
+- Added positioning commands for External and Internal motors:
+    - :meth:`~bricknil.peripheral.TachoMotor.set_pos` to set an absolute position in degrees on a clock-face
+    - :meth:`~bricknil.peripheral.TachoMotor.rotate` to rotate a relative number of degrees
+
 0.8.1 - 4/2/19
 --------------
 - Quick fix for :gh_issue:`3`. When instantiating a hub, use arg `ble_id` with either a UUID (mac) or BLE Network Address (Linux/Win) string

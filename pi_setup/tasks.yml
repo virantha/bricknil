@@ -1,8 +1,6 @@
 - hosts: all
   remote_user: pi
   become_method: sudo
-  environment:
-      LD_LIBRARY_PATH: "/usr/local/lib/"
   vars:
     PYTHON: "3.7.2"
     OPEN_SSL: openssl-1.0.2g
@@ -11,7 +9,7 @@
 
   tasks:
     - name: Update APT package cache
-      apt: update_cache=no
+      apt: update_cache=yes
       become: yes
 
     - name: Update packages
@@ -86,6 +84,17 @@
       become: yes
       when: make_openssl.changed
 
+    - name: set /etc/ld.so.conf.d to add /usr/local/
+      lineinfile:
+          path: /etc/ld.so.conf.d/openssl.conf
+          create: yes
+          line: "/usr/local/lib"
+      become: yes
+
+    - name: run ldconfig to update dynamic link lib path to use /usr/local/lib
+      command: ldconfig
+      become: yes
+
     - name: Download python 3.7
       get_url:
           url: "https://www.python.org/ftp/python/{{PYTHON}}/Python-{{PYTHON}}.tgz"
@@ -135,7 +144,6 @@
       blockinfile:
           path: "{{ HOME }}/.bashrc"
           block: |
-              export LD_LIBRARY_PATH="/usr/local/lib"
               export VIRTUALENVWRAPPER_PYTHON="/usr/local/bin/python3.7"
               source /usr/local/bin/virtualenvwrapper.sh
 

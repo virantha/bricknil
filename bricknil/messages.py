@@ -203,12 +203,12 @@ class PortOutputFeedbackMessage(Message):
             l.append('Buffer empty, Command in progess')
         if feedback & 2:
             l.append('Buffer empty, Command completed')
-        if feedback & 4:
-            l.append('Command discarded')
         if feedback & 8:
-            l.append('Idle')
+            l.append(': Idle ')
+        if feedback & 4:
+            l.append(': Command discarded')
         if feedback & 16: 
-            l.append('Busy/Full')
+            l.append(': Busy/Full')
 
 class PortModeInformationMessage(Message):
     """Information on a specific mode
