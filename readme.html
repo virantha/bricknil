@@ -417,17 +417,23 @@ and end.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="further-examples">
-<h2>Further examples<a class="headerlink" href="#further-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="more-examples">
+<h2>More examples<a class="headerlink" href="#more-examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="connecting-to-a-specific-hub">
 <h3>Connecting to a specific hub<a class="headerlink" href="#connecting-to-a-specific-hub" title="Permalink to this headline">¶</a></h3>
 <p>If you know the BluetoothLE network address of the hub you want to connect to, then you can force a Hub object
 to only connect to that hub.  This can be useful, for example, for connecting to two trains that need to have different
-code and can be accomplished by passing in the <code class="docutils literal notranslate"><span class="pre">ble_id</span></code> argument like so during instantiation of the Hub:</p>
+code and can be accomplished by passing in the <code class="docutils literal notranslate"><span class="pre">ble_id</span></code> argument during instantiation of the Hub.</p>
+<p>On Windows and Linux, you will use the 6-byte Bluetooth network address:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
+    <span class="n">hub</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;train1&#39;</span><span class="p">,</span> <span class="n">ble_id</span><span class="o">=</span><span class="s1">&#39;XX:XX:XX:XX:XX:XX&#39;</span><span class="p">)</span>
+    <span class="n">hub</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;train2&#39;</span><span class="p">,</span> <span class="n">ble_id</span><span class="o">=</span><span class="s1">&#39;YY:YY:YY:YY:YY:YY&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And on OS X systems, you will use the UUID for the Bluetooth hub like so:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
     <span class="n">hub</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;train1&#39;</span><span class="p">,</span> <span class="n">ble_id</span><span class="o">=</span><span class="s1">&#39;05c5e50e-XXXX-XXXX-XXXX-XXXXXXXXXXXX&#39;</span><span class="p">)</span>
     <span class="n">hub</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;train2&#39;</span><span class="p">,</span> <span class="n">ble_id</span><span class="o">=</span><span class="s1">&#39;05c5e50e-YYYY-YYYY-YYYY-YYYYYYYYYYYY&#39;</span><span class="p">)</span>
-    <span class="n">hub</span> <span class="o">=</span> <span class="n">CargoTrain</span><span class="p">(</span><span class="s1">&#39;train3&#39;</span><span class="p">,</span> <span class="n">ble_id</span><span class="o">=</span><span class="s1">&#39;05c5e50e-ZZZZ-ZZZZ-ZZZZ-ZZZZZZZZZZZZ&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -854,7 +860,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 <li><a class="reference internal" href="#features">Features</a></li>
 <li><a class="reference internal" href="#building-a-simple-train-controller">Building a simple train controller</a></li>
 <li><a class="reference internal" href="#integrating-a-vision-sensor-into-a-simple-train-controller">Integrating a vision sensor into a simple train controller</a></li>
-<li><a class="reference internal" href="#further-examples">Further examples</a><ul>
+<li><a class="reference internal" href="#more-examples">More examples</a><ul>
 <li><a class="reference internal" href="#connecting-to-a-specific-hub">Connecting to a specific hub</a></li>
 <li><a class="reference internal" href="#hub-buttons-and-led-colors">Hub buttons and LED colors</a></li>
 <li><a class="reference internal" href="#controlling-vernie-boost-hub-with-the-poweredup-remote">Controlling Vernie (Boost Hub) with the PoweredUp Remote</a></li>
