@@ -104,6 +104,39 @@ class InternalMotor(Peripheral):
         b = [0x00, 0x81, self.port, 0x01, 0x07, self._convert_speed_to_val(target_speed), 80, 1]
         await self.send_message('set speed', b)
         
+class ExternalMotor(Motor):
+
+    _sensor_id = 0x26
+
+    capability = Enum("capability", {"sense_power": 0, "sense_speed":1, "sense_pos":2})
+    # Dict of cap: (num_datasets, bytes_per_dataset)
+    datasets = { capability.sense_power: (1, 1), 
+                 capability.sense_speed: (1, 1),
+                 capability.sense_pos: (1, 4),
+                }
+
+    allowed_combo = [ capability.sense_speed,
+                      capability.sense_pos,
+                    ]
+
+    async def set_pos(self, pos, speed=50):
+        """Set the position of the motor
+
+           Use command GotoAbsolutePosition
+            * 0x00 = hub id
+            * 0x81 = Port Output command
+            * port
+            * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)
+            * 0x0d = Subcommand
+            * abs_pos (int32)
+            * speed -100 - 100
+            * max_power abs(0-100%)
+            * endstate = 0 (float), 126 (hold), 127 (brake)
+            * Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)
+            *
+        """
+        b = [0x00, 0x81, self.port, 0x11, 0x0d,]
+
 class VisionSensor(Peripheral):
     """ Access the Boost Vision/Distance Sensor
 

@@ -105,7 +105,7 @@
           path: "{{ build_path}}/Python-{{ PYTHON }}/Modules/Setup.dist"
           insertbefore: "#SSL=/usr/local/ssl"
           block: |
-              SSL=/usr/local/ssl
+              SSL=/usr/local
               _ssl _ssl.c \
                   -DUSE_SSL -I$(SSL)/include -I$(SSL)/include/openssl \
                       -L$(SSL)/lib -lssl -lcrypto
@@ -118,14 +118,14 @@
       register: python_configure
 
     - name: make python
-      shell: 'LDFLAGS="-L/usr/local/lib" make -j 4'
+      shell: 'make -j 4'
       args: 
           chdir: "{{ build_path }}/Python-{{ PYTHON }}"
       register: make_python
       when: python_configure.changed
 
     - name: install python
-      shell: 'LDFLAGS="-L/usr/local/lib" make altinstall'
+      shell: 'make altinstall'
       args:
           chdir: "{{ build_path }}/Python-{{ PYTHON }}"
       become: yes

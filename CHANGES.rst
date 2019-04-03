@@ -1,3 +1,7 @@
+0.8.1 - 4/2/19
+--------------
+- Quick fix for :gh_issue:`3`. When instantiating a hub, use arg `ble_id` with either a UUID (mac) or BLE Network Address (Linux/Win) string
+
 0.8 - 4/1/19
 ------------
 - Added support for PoweredUp light module 88005 and Win10 (thanks to :gh_user:`dlech`)

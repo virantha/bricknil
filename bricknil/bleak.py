@@ -16,12 +16,25 @@
 
 """
 import curio, asyncio, threading, logging
-from curio.bridge import AsyncioLoop
 
 import bleak
 from bleak import BleakClient
 
 class Bleak:
+    """Interface class between curio loop and asyncio loop running bleak
+       
+       This class is basically just a queue interface.  It has two queue, 
+       one for incoming messages `in_queue` and one for outgoing messages `out_queue`.
+
+       A loop running in asyncio's event_loop waits for messages on the `in_queue`.
+
+       The `out_queue` is used to respond to "discover" and "connect" messages with the
+       list of discovered devices and a connected device respectively.  All messages
+       incoming from a device are relayed directly to a call back function, and does
+       not go through either of these queues.
+
+
+    """
 
     def __init__(self):
         # Need to start an event loop
