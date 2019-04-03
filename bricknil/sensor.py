@@ -49,7 +49,8 @@ class InternalMotor(TachoMotor):
         And within the run body you can control the motor output::
             await self.motor.set_speed(50)   # Setting the speed
             await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
-            await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position
+            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o'clock position
+            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position
 
         See Also:
             * :class:`TrainMotor` for connecting to a train motor
@@ -95,7 +96,8 @@ class ExternalMotor(TachoMotor):
 
             await self.motor.set_speed(50)   # Setting the speed
             await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
-            await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position
+            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o'clock position
+            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position
 
         See Also:
             * :class:`TrainMotor` for connecting to a train motor
