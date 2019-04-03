@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bricknil.peripheral &#8212; BrickNil 0.8.1 documentation</title>
+    <title>bricknil.peripheral &#8212; BrickNil 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="bricknil.messages.html" title="bricknil.messages"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.8.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -69,10 +69,13 @@
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#bricknil.peripheral.Motor" title="bricknil.peripheral.Motor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Motor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
-<td>Utility functions for a train motor.</td>
+<td>Utility class for common functions shared between Train Motors, Internal Motors, and External Motors</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Peripheral</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
 <td>Abstract base class for any Lego Boost/PoweredUp/WeDo peripherals</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.peripheral.TachoMotor" title="bricknil.peripheral.TachoMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TachoMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -334,7 +337,7 @@ Depending on the number of capabilities enabled, we end up with different proces
 <dt id="bricknil.peripheral.Motor">
 <em class="property">class </em><code class="descclassname">bricknil.peripheral.</code><code class="descname">Motor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/peripheral.html#Motor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.peripheral.Motor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bricknil.peripheral.Peripheral" title="bricknil.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Peripheral</span></code></a></p>
-<p>Utility functions for a train motor.</p>
+<p>Utility class for common functions shared between Train Motors, Internal Motors, and External Motors</p>
 <dl class="method">
 <dt id="bricknil.peripheral.Motor.ramp_speed">
 <code class="descname">ramp_speed</code><span class="sig-paren">(</span><em>target_speed</em>, <em>ramp_time_ms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/peripheral.html#Motor.ramp_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.peripheral.Motor.ramp_speed" title="Permalink to this definition">¶</a></dt>
@@ -357,6 +360,138 @@ Use 0 to put the motor into neutral.
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.peripheral.TachoMotor">
+<em class="property">class </em><code class="descclassname">bricknil.peripheral.</code><code class="descname">TachoMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/peripheral.html#TachoMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.peripheral.TachoMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bricknil.peripheral.Motor" title="bricknil.peripheral.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.peripheral.Motor</span></code></a></p>
+<dl class="class">
+<dt id="bricknil.peripheral.TachoMotor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.peripheral.TachoMotor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.peripheral.TachoMotor.capability.sense_pos">
+<code class="descname">sense_pos</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.peripheral.TachoMotor.capability.sense_pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.peripheral.TachoMotor.capability.sense_speed">
+<code class="descname">sense_speed</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.peripheral.TachoMotor.capability.sense_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.peripheral.TachoMotor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_speed: 1&gt;: (1, 1), &lt;capability.sense_pos: 2&gt;: (1, 4)}</em><a class="headerlink" href="#bricknil.peripheral.TachoMotor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dict of (num_datasets, bytes_per_dataset).
+<cite>sense_speed</cite> (1-byte), and <cite>sense_pos</cite> (uint32)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.peripheral.TachoMotor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_speed: 1&gt;, &lt;capability.sense_pos: 2&gt;]</em><a class="headerlink" href="#bricknil.peripheral.TachoMotor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bricknil.peripheral.TachoMotor.ramp_speed2">
+<code class="descname">ramp_speed2</code><span class="sig-paren">(</span><em>target_speed</em>, <em>ramp_time_ms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/peripheral.html#TachoMotor.ramp_speed2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.peripheral.TachoMotor.ramp_speed2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Experimental function, not implemented yet DO NOT USE</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.peripheral.TachoMotor.rotate">
+<code class="descname">rotate</code><span class="sig-paren">(</span><em>degrees</em>, <em>speed</em>, <em>max_power=50</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/peripheral.html#TachoMotor.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.peripheral.TachoMotor.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the given number of degrees from current position, with direction given by sign of speed</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>   <span class="c1"># Rotate 90 degrees clockwise (looking from end of shaft towards motor)</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">speed</span><span class="o">=-</span><span class="mi">50</span><span class="p">)</span>  <span class="c1"># Rotate conter-clockwise 90 degrees</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">720</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>  <span class="c1"># Rotate two full circles clockwise</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>degrees</strong> (<em>uint</em>) – Relative number of degrees to rotate</li>
+<li><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – -100 to 100</li>
+<li><strong>max_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Max percentage power that will be applied (0-100%)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>Use command StartSpeedForDegrees</dt>
+<dd><ul class="first last simple">
+<li>0x00 = hub id</li>
+<li>0x81 = Port Output command</li>
+<li>port</li>
+<li>0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</li>
+<li>0x0b = Subcommand</li>
+<li>degrees (int32) 0..1000000</li>
+<li>speed -100 - 100%</li>
+<li>max_power abs(0-100%)</li>
+<li>endstate = 0 (float), 126 (hold), 127 (brake)</li>
+<li>Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)</li>
+<li></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.peripheral.TachoMotor.set_pos">
+<code class="descname">set_pos</code><span class="sig-paren">(</span><em>pos</em>, <em>speed=50</em>, <em>max_power=50</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/peripheral.html#TachoMotor.set_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.peripheral.TachoMotor.set_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the absolute position of the motor</p>
+<p>Everytime the hub is powered up, the zero-angle reference will be reset to the
+motor’s current position. When you issue this command, the motor will rotate to
+the position given in degrees.  The sign of the pos tells you which direction to rotate:
+(1) a positive number will rotate clockwise as looking from end of shaft towards the motor,
+(2) a negative number will rotate counter-clockwise</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>   <span class="c1"># Rotate 90 degrees clockwise (looking from end of shaft towards motor)</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">)</span>  <span class="c1"># Rotate conter-clockwise 90 degrees</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">720</span><span class="p">)</span>  <span class="c1"># Rotate two full circles clockwise</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pos</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Absolute position in degrees.</li>
+<li><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Absolute value from 0-100</li>
+<li><strong>max_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Max percentage power that will be applied (0-100%)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>Use command GotoAbsolutePosition</dt>
+<dd><ul class="first last simple">
+<li>0x00 = hub id</li>
+<li>0x81 = Port Output command</li>
+<li>port</li>
+<li>0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</li>
+<li>0x0d = Subcommand</li>
+<li>abs_pos (int32)</li>
+<li>speed -100 - 100</li>
+<li>max_power abs(0-100%)</li>
+<li>endstate = 0 (float), 126 (hold), 127 (brake)</li>
+<li>Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)</li>
+<li></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

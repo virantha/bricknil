@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bricknil.sensor &#8212; BrickNil 0.8.1 documentation</title>
+    <title>bricknil.sensor &#8212; BrickNil 0.8.2 documentation</title>
     <link rel="stylesheet" href="../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">BrickNil 0.8.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">BrickNil 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -66,15 +66,16 @@
 <span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">pack</span>
 <span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">Color</span>
 
-<span class="kn">from</span> <span class="nn">.peripheral</span> <span class="k">import</span> <span class="n">Peripheral</span><span class="p">,</span> <span class="n">Motor</span>
+<span class="kn">from</span> <span class="nn">.peripheral</span> <span class="k">import</span> <span class="n">Peripheral</span><span class="p">,</span> <span class="n">Motor</span><span class="p">,</span> <span class="n">TachoMotor</span>
 
 
-<div class="viewcode-block" id="InternalMotor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.InternalMotor">[docs]</a><span class="k">class</span> <span class="nc">InternalMotor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+<div class="viewcode-block" id="InternalMotor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.InternalMotor">[docs]</a><span class="k">class</span> <span class="nc">InternalMotor</span><span class="p">(</span><span class="n">TachoMotor</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Access the internal motor(s) in the Boost Move Hub.</span>
 
-<span class="sd">        Unlike the train motors, these motors have a built-in sensor for sending back</span>
-<span class="sd">        the motor&#39;s current speed and position.  You don&#39;t need to use the sensors, and</span>
-<span class="sd">        can treat this as strictly an output.</span>
+<span class="sd">        Unlike the train motors, these motors (as well as the stand-alone Boost</span>
+<span class="sd">        motors :class:`ExternalMotor`) have a built-in sensor/tachometer for sending back</span>
+<span class="sd">        the motor&#39;s current speed and position.  However, you don&#39;t need to use the</span>
+<span class="sd">        sensors, and can treat this motor strictly as an output device.</span>
 
 <span class="sd">        Examples::</span>
 
@@ -85,34 +86,28 @@
 <span class="sd">            # Any speed command will cause both motors to rotate at the same speed</span>
 <span class="sd">            @attach(InternalMotor, name=&#39;motors&#39;, port=InternalMotor.Port.AB)</span>
 
-<span class="sd">            # Report back when motor speed changes. You must have a motors_change method defined </span>
-<span class="sd">            @attach(InternalMotor, name=&#39;motors&#39;, port=InternalMotor.Port.A, capabilities=[&#39;sense_speed&#39;])</span>
+<span class="sd">            # Report back when motor speed changes. You must have a motor_change method defined </span>
+<span class="sd">            @attach(InternalMotor, name=&#39;motor&#39;, port=InternalMotor.Port.A, capabilities=[&#39;sense_speed&#39;])</span>
+
 <span class="sd">            # Only report back when speed change exceeds 5 units</span>
 <span class="sd">            @attach(InternalMotor, name=&#39;motors&#39;, port=InternalMotor.Port.A, capabilities=[(&#39;sense_speed&#39;, 5)])</span>
 
+<span class="sd">        And within the run body you can control the motor output::</span>
+<span class="sd">            await self.motor.set_speed(50)   # Setting the speed</span>
+<span class="sd">            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds</span>
+<span class="sd">            await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position</span>
+
 <span class="sd">        See Also:</span>
-<span class="sd">            :class:`TrainMotor` for connecting to a train motor</span>
+<span class="sd">            * :class:`TrainMotor` for connecting to a train motor</span>
+<span class="sd">            * :class:`ExternalMotor` for connecting to a train motor</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0027</span>
     <span class="n">_DEFAULT_THRESHOLD</span><span class="o">=</span><span class="mi">2</span>
     <span class="sd">&quot;&quot;&quot;Set to 2 to avoid a lot of updates since the speed seems to oscillate a lot&quot;&quot;&quot;</span>
 
-    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;sense_speed&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;sense_pos&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">})</span>
-
     <span class="n">Port</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;Port&#39;</span><span class="p">,</span> <span class="s1">&#39;A B AB&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Address either motor A or Motor B, or both AB at the same time&quot;&quot;&quot;</span>
-
-    <span class="c1"># Dict of cap: (num_datasets, bytes_per_dataset)</span>
-    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_pos</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-                <span class="p">}</span>
-    <span class="sd">&quot;&quot;&quot; Dict of (num_datasets, bytes_per_dataset).</span>
-<span class="sd">       `sense_speed` (1-byte), and `sense_pos` (uint32)&quot;&quot;&quot;</span>
-
-    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">,</span>
-                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_pos</span><span class="p">,</span>
-                    <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;Maps the port names `A`, `B`, `AB` to hard-coded port numbers&quot;&quot;&quot;</span>
@@ -120,73 +115,42 @@
             <span class="n">port_map</span> <span class="o">=</span> <span class="p">[</span><span class="mi">55</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">57</span><span class="p">]</span>
             <span class="n">port</span> <span class="o">=</span> <span class="n">port_map</span><span class="p">[</span><span class="n">port</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">capabilities</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">capabilities</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="InternalMotor.set_speed"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.InternalMotor.set_speed">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets the speed of the motor, and calls the :func:`bricknil.peripheral.Peripheral._convert_speed_to_val` method</span>
-<span class="sd">           to do some sanity checking and bounding.</span>
-
-<span class="sd">           Args:</span>
-<span class="sd">               speed (int) : -100 to 100 (I believe this is a percentage)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span>
-        <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_speed_to_val</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
-        <span class="n">mode</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">speed</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="InternalMotor.ramp_speed2"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.InternalMotor.ramp_speed2">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">ramp_speed2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_speed</span><span class="p">,</span> <span class="n">ramp_time_ms</span><span class="p">):</span>
         
-        <span class="c1"># Set acceleration profile</span>
-        <span class="n">delta_speed</span> <span class="o">=</span> <span class="n">target_speed</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span>
-        <span class="n">zero_100_ramp_time_ms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ramp_time_ms</span><span class="o">/</span><span class="n">delta_speed</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">)</span> 
-        <span class="n">zero_100_ramp_time_ms</span> <span class="o">=</span> <span class="n">zero_100_ramp_time_ms</span> <span class="o">%</span> <span class="mi">10000</span> <span class="c1"># limit time to 10s</span>
+<div class="viewcode-block" id="ExternalMotor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.ExternalMotor">[docs]</a><span class="k">class</span> <span class="nc">ExternalMotor</span><span class="p">(</span><span class="n">TachoMotor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Access the stand-alone Boost motors</span>
 
-        <span class="n">hi</span> <span class="o">=</span> <span class="p">(</span><span class="n">zero_100_ramp_time_ms</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">255</span>
-        <span class="n">lo</span> <span class="o">=</span> <span class="n">zero_100_ramp_time_ms</span> <span class="o">&amp;</span> <span class="mi">255</span>
+<span class="sd">        These are similar to the :class:`InternalMotor` with build-in tachometer and</span>
+<span class="sd">        sensor for sending back the motor&#39;s current speed and position.  You</span>
+<span class="sd">        don&#39;t need to use the sensors, and can treat this as strictly an</span>
+<span class="sd">        output.</span>
 
-        <span class="n">profile</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">profile</span><span class="p">]</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;set accel profile </span><span class="si">{zero_100_ramp_time_ms}</span><span class="s1"> </span><span class="si">{hi}</span><span class="s1"> </span><span class="si">{lo}</span><span class="s1"> &#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x07</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_speed_to_val</span><span class="p">(</span><span class="n">target_speed</span><span class="p">),</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s1">&#39;set speed&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div></div>
-        
-<div class="viewcode-block" id="ExternalMotor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.ExternalMotor">[docs]</a><span class="k">class</span> <span class="nc">ExternalMotor</span><span class="p">(</span><span class="n">Motor</span><span class="p">):</span>
+<span class="sd">        Examples::</span>
 
-    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x26</span>
+<span class="sd">            # Basic connection to the motor on Port A</span>
+<span class="sd">            @attach(ExternalMotor, name=&#39;motor&#39;)</span>
 
-    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;sense_power&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;sense_speed&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;sense_pos&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">})</span>
-    <span class="c1"># Dict of cap: (num_datasets, bytes_per_dataset)</span>
-    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_power</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> 
-                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_pos</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-                <span class="p">}</span>
+<span class="sd">            # Report back when motor speed changes. You must have a motor_change method defined </span>
+<span class="sd">            @attach(ExternalMotor, name=&#39;motor&#39;, capabilities=[&#39;sense_speed&#39;])</span>
 
-    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">,</span>
-                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_pos</span><span class="p">,</span>
-                    <span class="p">]</span>
+<span class="sd">            # Only report back when speed change exceeds 5 units, and position changes (degrees)</span>
+<span class="sd">            @attach(ExternalMotor, name=&#39;motor&#39;, capabilities=[(&#39;sense_speed&#39;, 5), &#39;sense_pos&#39;])</span>
 
-<div class="viewcode-block" id="ExternalMotor.set_pos"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.ExternalMotor.set_pos">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set the position of the motor</span>
+<span class="sd">        And then within the run body::</span>
 
-<span class="sd">           Use command GotoAbsolutePosition</span>
-<span class="sd">            * 0x00 = hub id</span>
-<span class="sd">            * 0x81 = Port Output command</span>
-<span class="sd">            * port</span>
-<span class="sd">            * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</span>
-<span class="sd">            * 0x0d = Subcommand</span>
-<span class="sd">            * abs_pos (int32)</span>
-<span class="sd">            * speed -100 - 100</span>
-<span class="sd">            * max_power abs(0-100%)</span>
-<span class="sd">            * endstate = 0 (float), 126 (hold), 127 (brake)</span>
-<span class="sd">            * Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)</span>
-<span class="sd">            *</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">abs_pos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="p">))</span>
-        <span class="n">max_power</span> <span class="o">=</span> <span class="mi">30</span>
-        <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_speed_to_val</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+<span class="sd">            await self.motor.set_speed(50)   # Setting the speed</span>
+<span class="sd">            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds</span>
+<span class="sd">            await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position</span>
 
-        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x11</span><span class="p">,</span> <span class="mh">0x0d</span><span class="p">]</span> <span class="o">+</span> <span class="n">abs_pos</span> <span class="o">+</span> <span class="p">[</span><span class="n">speed</span><span class="p">,</span> <span class="n">max_power</span><span class="p">,</span> <span class="mi">126</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;set pos </span><span class="si">{pos}</span><span class="s1"> with speed </span><span class="si">{speed}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div></div>
+<span class="sd">        See Also:</span>
+<span class="sd">            * :class:`TrainMotor` for connecting to a train motor</span>
+<span class="sd">            * :class:`InternalMotor` for connecting to the Boost hub built-in motors</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x26</span></div>
+
 
 <div class="viewcode-block" id="VisionSensor"><a class="viewcode-back" href="../../_autosummary/bricknil.sensor.html#bricknil.sensor.VisionSensor">[docs]</a><span class="k">class</span> <span class="nc">VisionSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Access the Boost Vision/Distance Sensor</span>

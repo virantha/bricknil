@@ -19,6 +19,8 @@ bricknil.peripheral
 	  
 	  Peripheral
 	  
+	  TachoMotor
+	  
 
       
 
