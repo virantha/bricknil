@@ -95,7 +95,8 @@
 <span class="sd">        And within the run body you can control the motor output::</span>
 <span class="sd">            await self.motor.set_speed(50)   # Setting the speed</span>
 <span class="sd">            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds</span>
-<span class="sd">            await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position</span>
+<span class="sd">            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o&#39;clock position</span>
+<span class="sd">            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position</span>
 
 <span class="sd">        See Also:</span>
 <span class="sd">            * :class:`TrainMotor` for connecting to a train motor</span>
@@ -141,7 +142,8 @@
 
 <span class="sd">            await self.motor.set_speed(50)   # Setting the speed</span>
 <span class="sd">            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds</span>
-<span class="sd">            await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position</span>
+<span class="sd">            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o&#39;clock position</span>
+<span class="sd">            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position</span>
 
 <span class="sd">        See Also:</span>
 <span class="sd">            * :class:`TrainMotor` for connecting to a train motor</span>

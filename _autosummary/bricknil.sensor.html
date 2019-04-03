@@ -146,7 +146,8 @@ sensors, and can treat this motor strictly as an output device.</p>
 <dt>And within the run body you can control the motor output::</dt>
 <dd>await self.motor.set_speed(50)   # Setting the speed
 await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
-await self.motor.set_pos(90, speed=20) # Turn clockwise to 90 degree position</dd>
+await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o’clock position
+await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position</dd>
 </dl>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
@@ -203,7 +204,8 @@ output.</p>
 <p>And then within the run body:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>   <span class="c1"># Setting the speed</span>
 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>  <span class="c1"># Ramp speed to 80 over 2 seconds</span>
-<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span> <span class="c1"># Turn clockwise to 90 degree position</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span> <span class="c1"># Turn clockwise to 3 o&#39;clock position</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="n">speed</span><span class="o">=-</span><span class="mi">50</span><span class="p">)</span> <span class="c1"># Turn 60 degrees counter-clockwise from current position</span>
 </pre></div>
 </div>
 <div class="admonition seealso">
