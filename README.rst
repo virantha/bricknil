@@ -398,21 +398,32 @@ Here's the full code:
        logging.basicConfig(level=logging.INFO)
        start(system)
 
-Further examples
+More examples
 ################
 
 Connecting to a specific hub
 ----------------------------
 If you know the BluetoothLE network address of the hub you want to connect to, then you can force a Hub object
 to only connect to that hub.  This can be useful, for example, for connecting to two trains that need to have different
-code and can be accomplished by passing in the ``ble_id`` argument like so during instantiation of the Hub:
+code and can be accomplished by passing in the ``ble_id`` argument during instantiation of the Hub.  
+
+On Windows and Linux, you will use the 6-byte Bluetooth network address:
+
+.. code-block:: python
+
+   async def system():
+       hub = Train('train1', ble_id='XX:XX:XX:XX:XX:XX')
+       hub = Train('train2', ble_id='YY:YY:YY:YY:YY:YY')
+
+And on OS X systems, you will use the UUID for the Bluetooth hub like so:
 
 .. code-block:: python
 
    async def system():
        hub = Train('train1', ble_id='05c5e50e-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
        hub = Train('train2', ble_id='05c5e50e-YYYY-YYYY-YYYY-YYYYYYYYYYYY')
-       hub = CargoTrain('train3', ble_id='05c5e50e-ZZZZ-ZZZZ-ZZZZ-ZZZZZZZZZZZZ')
+
+
 
 
 
