@@ -177,6 +177,7 @@ class BLEventQ(Process):
                 else:
                     devices = self.ble.find_devices(service_uuids=[uart_uuid])
                     for device in devices:
+                        self.message_info(f'advertised: {device.advertised}')
                         if len(device.advertised) > 4:
                             device.manufacturer_id = device.advertised[4]
                         else:
@@ -203,10 +204,26 @@ class BLEventQ(Process):
 
 
     async def connect(self, hub):
+        """
+            We probably need a different ble_queue type per operating system,
+            and try to abstract away some of these hacks.
+
+            Todo:
+                * This needs to be cleaned up to get rid of all the hacks for
+                  different OS and libraries
+
+        """
         # Connect the messaging queue for communication between self and the hub
         hub.message_queue = self.q
         self.message(f'Starting scan for UART {hub.uart_uuid}')
-        ble_id = uuid.UUID(hub.ble_id) if hub.ble_id else None
+
+        # HACK
+        try:
+            ble_id = uuid.UUID(hub.ble_id) if hub.ble_id else None
+        except ValueError:
+            # In case the user passed in a 
+            self.message_info(f"ble_id {hub.ble_id} is not a parseable UUID, so assuming it's a BLE network addresss")
+            ble_id = hub.ble_id
 
         await self._ble_connect(hub.uart_uuid, hub.ble_name, hub.manufacturer_id, ble_id)
 
