@@ -533,24 +533,24 @@ Supported Devices
    * - Peripheral
      - Sets
      - Support
-   * - PoweredUp Hub (88009)
+   * - PoweredUp Hub (88009_)
      - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`, :amzn:`76112 <B07BMGR1FN>`
      - :class:`~bricknil.hub.PoweredUpHub` 
          - LED: :class:`~bricknil.sensor.LED`
          - Button: :class:`~bricknil.sensor.Button`
          - Current: :class:`~bricknil.sensor.CurrentSensor`
          - Voltage: :class:`~bricknil.sensor.VoltageSensor`
-   * - PoweredUp Train Motor (88011)
+   * - PoweredUp Train Motor (88011_)
      - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`
      - :class:`~bricknil.sensor.TrainMotor`
-   * - PoweredUp Remote (88010)
+   * - PoweredUp Remote (88010_)
      - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`
      - :class:`~bricknil.hub.PoweredUpRemote`
          - :class:`~bricknil.sensor.RemoteButtons`
-   * - PoweredUp Light (88005)
-     - direct from |lego| shop
+   * - PoweredUp Light (88005_)
+     - 88005_
      - :class:`~bricknil.sensor.Light`
-   * - Boost Hub (88009)
+   * - Boost Hub (88006_)
      - :amzn:`17101 <B06Y6JCTKH>`
      - :class:`~bricknil.hub.BoostHub` 
          - Motors: :class:`~bricknil.sensor.InternalMotor`
@@ -559,10 +559,10 @@ Supported Devices
          - Button: :class:`~bricknil.sensor.Button`
          - Current: :class:`~bricknil.sensor.CurrentSensor`
          - Voltage: :class:`~bricknil.sensor.VoltageSensor`
-   * - Boost Vision Sensor (88007)
+   * - Boost Vision Sensor (88007_)
      - :amzn:`17101 <B06Y6JCTKH>`
      - :class:`~bricknil.sensor.VisionSensor`
-   * - Boost External Motor (88008)
+   * - Boost External Motor (88008_)
      - :amzn:`17101 <B06Y6JCTKH>`
      - :class:`~bricknil.sensor.ExternalMotor`
    * - Duplo Train Base
@@ -575,7 +575,13 @@ Supported Devices
          - Voltage: :class:`~bricknil.sensor.VoltageSensor`
 
 
-
+.. _88005: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FLight-88005
+.. _88006: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FMove-Hub-88006
+.. _88007: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FColor-Distance-Sensor-88007
+.. _88008: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FMedium-Linear-Motor-88008
+.. _88009: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FHub-88009
+.. _88010: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FRemote-Control-88010
+.. _88011: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FTrain-Motor-88011
 
 
 .. |lego|  replace:: Lego\ |reg|
