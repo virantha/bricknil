@@ -232,7 +232,7 @@ class PortModeInformationMessage(Message):
                        0x3: self._parse_si_range,
                        0x4: self._parse_symbol,
                        0x5: self._parse_mapping,
-                       0x82: self._parse_format,
+                       0x80: self._parse_format,
                      }
         if mode_type in mode_types:
             mode_types[mode_type](msg_bytes, l, mode_info)
