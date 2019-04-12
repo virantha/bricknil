@@ -28,7 +28,7 @@ class Robot(BoostHub):
 
     async def run(self):
         self.message_info("Running")
-        await sleep(10) # Give it enough time to gather data
+        await sleep(20) # Give it enough time to gather data
 
 async def system():
     hub = Robot('robot', True)
