@@ -86,6 +86,7 @@ class Peripheral(Process):
         self.sensor_name = DEVICES[self._sensor_id]
         self.value = None
         self.message_handler = None
+        self.web_queue_output = None
         self.capabilities, self.thresholds = self._get_validated_capabilities(capabilities)
 
     def _get_validated_capabilities(self, caps):
@@ -182,7 +183,7 @@ class Peripheral(Process):
         """ Send outgoing message to BLEventQ """
         while not self.message_handler:
             await sleep(1)
-        await self.message_handler(msg, msg_bytes)
+        await self.message_handler(msg, msg_bytes, peripheral=self)
 
     def _convert_speed_to_val(self, speed):
         """Map speed of -100 to 100 to a byte range
@@ -215,12 +216,11 @@ class Peripheral(Process):
             * value(s)
         """
         b = [0x00, 0x81, self.port, 0x01, 0x51, mode, value ]
-        await self.send_message('set output', b)
-
+        await self.send_message(f'set output port:{self.port} mode: {mode} = {value}', b)
 
     # Use these for sensor readings
     async def update_value(self, msg_bytes):
-        """ Callback from message parser to update a value from a sensor incoming message
+        """ Message from message_dispatch will trigger Hub to call this to update a value from a sensor incoming message
             Depending on the number of capabilities enabled, we end up with different processing:
 
             If zero, then just set the `self.value` field to the raw message.

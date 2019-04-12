@@ -20,7 +20,10 @@ BrickNil [*]_ provides an easy way to connect to and program LEGO\ |reg|
 Bluetooth hubs (including the PoweredUp Passenger Train 60197_ and Cargo Train 60198_ sets, and the Lego
 Duplo Steam Train 10874_ and Cargo Train 10875_ ) using Python on OS X and
 Linux.  This work was inspired by this EuroBricks_ thread, and the NodeJS Powered-Up_
-library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
+library. Unlike the official apps available from LEGO, BrickNil allows you to control multiple
+hubs with a single program, which lets you easily scale to programming large interactive systems.
+
+BrickNil requires modern Python (designed and tested for 3.7) and uses asynchronous
 event programming built on top of the Curio_ async library.  As an aside, the choice of
 async library is fairly arbitrary; and enabling another library such as asyncio or Trio 
 should be straightforward.

@@ -247,6 +247,7 @@ class PortModeInformationMessage(Message):
         # [1] = Dataset type.  00-byte, 01=16b, 10=32b, 11=float
         # [2] = Total figures
         # [3] = Decimals if any
+        assert False
         mode_info['datasets'] = msg_bytes.pop(0)
         dataset_types = ['8b', '16b', '32b', 'float']
         mode_info['dataset_type'] = dataset_types[msg_bytes.pop(0)]

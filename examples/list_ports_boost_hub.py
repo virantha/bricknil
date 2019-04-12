@@ -9,7 +9,7 @@ from bricknil.const import Color
 
 @attach(Button, name='hub_btn', capabilities=['sense_press'])
 @attach(LED, name='hub_led')
-@attach(VisionSensor, name='vision_sensor', capabilities=['sense_count', 'sense_distance'])
+#@attach(VisionSensor, name='vision_sensor', capabilities=['sense_count', 'sense_distance'])
 @attach(InternalTiltSensor, name='tilt_sensor', capabilities=['sense_angle'])
 @attach(InternalMotor, name='motor_l')
 @attach(InternalMotor, name='motor_r')
@@ -28,7 +28,7 @@ class Robot(BoostHub):
 
     async def run(self):
         self.message_info("Running")
-        await sleep(10) # Give it enough time to gather data
+        await sleep(30) # Give it enough time to gather data
 
 async def system():
     hub = Robot('robot', True)

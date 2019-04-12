@@ -289,8 +289,6 @@ class LED(Peripheral):
         assert col < 11
         mode = 0
         await self.set_output(mode, col)
-        #b = [0x00, 0x81, self.port, 0x11, 0x51, mode, col ]
-        #await self.message_info(f'set color to {color}')
 
 
 class Light(Peripheral):

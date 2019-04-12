@@ -3,14 +3,15 @@ from itertools import cycle
 from curio import sleep
 from bricknil import attach, start
 from bricknil.hub import DuploTrainHub
-from bricknil.sensor import DuploTrainMotor, DuploSpeedSensor, LED, DuploVisionSensor, DuploSpeaker, Button
+from bricknil.sensor import DuploTrainMotor, DuploSpeedSensor, LED, DuploVisionSensor, DuploSpeaker, Button, VoltageSensor
 from bricknil.const import Color
 import logging
 
 @attach(DuploSpeaker, name='speaker')
-@attach(DuploVisionSensor, name='vision_sensor', capabilities=['sense_color', 'sense_ctag', 'sense_reflectivity'])
+@attach(DuploVisionSensor, name='vision_sensor', capabilities=[('sense_reflectivity', 5)])
 @attach(LED, name='led')
-@attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed', 'sense_count'])
+@attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed'])
+@attach(VoltageSensor, name='voltage', capabilities=[('sense_l', 50)])
 @attach(DuploTrainMotor, name='motor')
 class Train(DuploTrainHub):
 
@@ -18,22 +19,26 @@ class Train(DuploTrainHub):
         super().__init__(*args, **kwargs)
         self.go = False     # Only becomes true with hub button is pressed
 
+    async def voltage_change(self):
+        pass
     async def speed_sensor_change(self):
         speed = self.speed_sensor.value[DuploSpeedSensor.capability.sense_speed]
         if not self.go and speed > 0:
             self.go = True
             self.message_info('Movement detected: starting...')
         elif self.go:
-            count = self.speed_sensor.value[DuploSpeedSensor.capability.sense_count]
-            self.message_info(f'Speed sensor changed speed: {speed} count: {count}')
+            #count = self.speed_sensor.value[DuploSpeedSensor.capability.sense_count]
+            #self.message_info(f'Speed sensor changed speed: {speed} count: {count}')
+            self.message_info(f'Speed sensor changed speed: {speed}')
 
     async def vision_sensor_change(self):
         cap = DuploVisionSensor.capability
-        color = self.vision_sensor.value[cap.sense_color]
-        ctag  = self.vision_sensor.value[cap.sense_ctag]
+        #color = self.vision_sensor.value[cap.sense_color]
+        #ctag  = self.vision_sensor.value[cap.sense_ctag]
         reflt  = self.vision_sensor.value[cap.sense_reflectivity]
         if self.go:
-            self.message_info(f'Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}')
+            #self.message_info(f'Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}')
+            self.message_info(f'Vision sensor changed color: reflt: {reflt}')
 
     async def run(self):
         self.message_info("Running")
@@ -59,7 +64,7 @@ class Train(DuploTrainHub):
         self.message_info("Done")
 
 async def system():
-    hub = Train('train')
+    hub = Train('train', True)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
