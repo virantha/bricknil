@@ -232,7 +232,7 @@ class PortModeInformationMessage(Message):
                        0x3: self._parse_si_range,
                        0x4: self._parse_symbol,
                        0x5: self._parse_mapping,
-                       0x82: self._parse_format,
+                       0x80: self._parse_format,
                      }
         if mode_type in mode_types:
             mode_types[mode_type](msg_bytes, l, mode_info)
@@ -247,7 +247,6 @@ class PortModeInformationMessage(Message):
         # [1] = Dataset type.  00-byte, 01=16b, 10=32b, 11=float
         # [2] = Total figures
         # [3] = Decimals if any
-        assert False
         mode_info['datasets'] = msg_bytes.pop(0)
         dataset_types = ['8b', '16b', '32b', 'float']
         mode_info['dataset_type'] = dataset_types[msg_bytes.pop(0)]

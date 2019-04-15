@@ -64,7 +64,7 @@ class Train(DuploTrainHub):
         self.message_info("Done")
 
 async def system():
-    hub = Train('train', True)
+    hub = Train('train', False)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

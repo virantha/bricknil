@@ -18,7 +18,7 @@
 import uuid
 from curio import sleep, UniversalQueue, CancelledError
 from .process import Process
-from .peripheral import Peripheral  # for type check
+from .sensor.peripheral import Peripheral  # for type check
 from .const import USE_BLEAK
 
 class UnknownPeripheralMessage(Exception): pass
@@ -207,7 +207,6 @@ class Hub(Process):
                 # Send a message to requeust each type of info 
                 for k,v in info_types.items():
                     b = [0x00, 0x22, port, mode, v]
-                    await sleep(0.2)
                     await self.send_message(f'req info({k}) on mode {mode} {port}', b)
 
 

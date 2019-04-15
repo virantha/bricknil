@@ -41,6 +41,21 @@ Train Motor
 .. include:: train_motor.rst
 
 
+WeDO
+----
+
+External Tilt sensor information
+================================
+.. include:: external_tilt.rst
+
+External Motion sensor information
+==================================
+.. include:: external_motion.rst
+
+External Wedo Motor information
+==================================
+.. include:: wedo_motor.rst
+
 Duplo
 -----
 

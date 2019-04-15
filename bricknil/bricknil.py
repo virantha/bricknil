@@ -23,7 +23,6 @@
 import logging
 import pprint
 from curio import run, spawn,  sleep, Queue, tcp_server
-#from curio.socket import *
 import Adafruit_BluefruitLE
 from functools import partial, wraps
 import uuid
@@ -33,6 +32,8 @@ from .process import Process
 from .ble_queue import BLEventQ
 from .hub import PoweredUpHub, BoostHub, Hub
 from .const import USE_BLEAK
+from .sockets import bricknil_socket_server
+
 if USE_BLEAK:
     from .bleak import Bleak
 
@@ -106,47 +107,6 @@ class attach:
 
 
 
-async def socket_server(web_out_queue, address):
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.setsockopt(SOL_SOCKET, SO_REUSEADDR,1)
-    sock.bind(address)
-    sock.listen(5)
-    print(f'Server listening at {address}')
-    async with sock:
-        while True:
-            client, addr = await sock.accept()
-            wc = WebClient(client, addr, web_out_queue)
-            await spawn(wc.run, daemon=True)
-
-async def my_server(web_out_queue, address):
-    async def web_client_connected(client, addr):
-        print('connection from', addr)
-        wc = WebClient(client, addr, web_out_queue)
-        await wc.run()
-
-    task = await spawn(tcp_server, '', 25000, web_client_connected, daemon=True)
-
-
-class WebClient:
-
-    def __init__(self, client, addr, in_queue):
-        assert in_queue is not None
-        self.in_queue = in_queue
-        self.client = client
-        self.addr = addr
-        print(f'Web client {client} connected from {addr}')
-        
-
-    async def run(self):
-
-        async with self.client:
-            while True:
-                msg = await self.in_queue.get()
-                #print(f'Webclient queue got: {msg}')
-                await self.in_queue.task_done()
-                await self.client.sendall(msg)
-        print('connection closed')
-
 
 
 async def _run_all(ble, system):
@@ -160,7 +120,7 @@ async def _run_all(ble, system):
     web_out_queue = Queue()
     # Instantiate socket listener
     #task_socket = await spawn(socket_server, web_out_queue, ('',25000))
-    task_tcp = await spawn(my_server, web_out_queue, ('',25000))
+    task_tcp = await spawn(bricknil_socket_server, web_out_queue, ('',25000))
     await task_tcp.join()
 
     # Call the user's system routine to instantiate the processes
