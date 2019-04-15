@@ -1,0 +1,305 @@
+<!doctype html>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.2.9/justgage.min.js"></script>
+<script src="//cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
+<style>
+#hub{
+  background-color: white;
+  border: 2px solid black;
+}
+.circle {
+	width: 20px;
+	height: 20px;
+	background: red;
+	border-radius: 50%;
+  text-align: center
+}
+.card{
+    padding-left: 0rem;
+    padding-right: 0rem;
+}
+.btn-circle {
+    width: 70px;
+    height: 70px;
+    padding: 10px 16px;
+    border-radius: 35px;
+    text-align: center;
+    font-size: 24px;
+    line-height: 1.33;
+}
+</style>
+
+<title>Welcome</title>
+<h1>BrickNil</h1>
+{% raw %}
+<div id="app">
+  <div class="container">
+    <div v-for="(hub, hub_name) in hubs" class="row">
+      <div class="card-columns">
+        <div id="hub" class="card text-center">
+          <div class="card-header text-white bg-secondary">{{ hub_name }}</div>
+          <div class="card-body">
+          <div class="card-columns">
+              <template v-for="(peripheral, peripheral_name) in hub.peripherals">
+                <template v-for="(data, mode_name) in peripheral">
+                      <peripheral-led v-if="data.type=='LED'" :name="peripheral_name" :mode="mode_name" :color="data.value">
+                      </peripheral-led>
+                      <peripheral-motor v-if="data.type=='Motor'" :name="peripheral_name" :mode="mode_name" :value="data.value">
+                      </peripheral-motor>
+                </template>
+              </template>
+              <template v-for="(peripheral, peripheral_name) in hub.peripherals">
+                <template v-for="(data, mode_name) in peripheral">
+                      <peripheral-sensor class="bg-primary" v-if="data.type=='Distance'" 
+                          :name="peripheral_name" 
+                          :min="0" :max="100"
+                          :mode="mode_name"
+                          :value="data.value">
+                      </peripheral-sensor>
+                      <peripheral-sensor class="bg-warning" v-if="data.type=='VoltageSensor'"
+                          :name="peripheral_name"
+                          :min="0" :max="10000"
+                          :mode="mode_name"
+                          :value="data.value">
+                      </peripheral-sensor>
+                      <peripheral-sensor class="bg-success" v-if="data.type=='DuploSpeedSensor'"
+                          :name="peripheral_name"
+                          :min="-300" :max="300"
+                          :mode="mode_name"
+                          :value="data.value">
+                      </peripheral-sensor>
+                </template>
+              </template>
+            </div>
+          </div>
+          </div> <!-- HUB -->
+      </div>
+    </div>
+  </div>
+  <ul>
+    <li v-for="msg in messages">
+      {{ msg }}
+    </li>
+  </ul>
+</div>
+
+  <script>
+  Vue.component('peripheral-led', {
+    props: ['name', 'color', 'gauge', 'mode'],
+    template: `
+      <div class="card" style="width: 9rem;">
+        <div class="card-header text-white bg-primary">{{ name }} </div>
+        <div class="card-body">
+          <p class="card-text text-center">{{ color }}
+          <br/>
+          <button type="button" class="btn btn-circle" v-bind:style="{background: color}"> <i class="fa fa-lightbulb text-white"></i> </button>
+          </p>
+        </div>
+      </div>
+    `
+  });
+
+  Vue.component('peripheral-sensor', {
+    props: ['name', 'value', 'min', 'max', 'mode'],
+    template: `
+      <div class="card " style="width: 12rem;">
+        <div class="card-header text-white">{{ name }} </div>
+        <div class="card-body bg-white">
+          <h6 class="card-title text-muted">{{ mode }}</h6>
+          <h5 class="card-subtitle text-center">{{ value }}</h5>
+          <p class="card-text ">
+            <canvas :id="name" data-type="linear-gauge" :data-value="value" ></canvas>
+          </p>
+        </div>
+      </div>
+    `,
+    data: function () {
+      return {
+        gauge: null
+      }
+    },
+
+    mounted: function () {
+        let vm = this;
+        this.$nextTick(function () {
+          console.log('name is '+ vm.name);
+          console.log('min:'+vm.min+' max:'+vm.max);
+          var range = (vm.max - vm.min);
+          var major_ticks = [];
+          if (vm.min < 0 && vm.max >0) {
+            var tick_separation = (-vm.min)/5;
+            for (var i=vm.min; i<0; i+=tick_separation) {
+              major_ticks.push(i);
+            }
+            tick_separation = vm.max/5
+            for (var i=0; i<vm.max; i+=tick_separation) {
+              major_ticks.push(i);
+            }
+          } else {
+            var tick_separation = range/10;
+            for (var i=vm.min; i<vm.max; i+=tick_separation) {
+              major_ticks.push(i);
+            }
+          }
+          major_ticks.push(vm.max);
+
+          console.log ("range = " + range);
+          console.log ("ticks = " + major_ticks);
+          vm.gauge = new RadialGauge({
+                renderTo: vm.name,
+                width: 150,
+                height: 150,
+                minValue: vm.min,
+                maxValue: vm.max,
+                majorTicks: major_ticks,
+                animationDuration: 0,
+                dataValue: vm.max,
+                highlights: [],
+                valueBox: false,
+                borders: false,
+                borderShadowWidth: 0,
+          });
+          vm.gauge.draw();
+
+        });
+    },
+    updated: function() {
+      var n = Number(this.value);
+      if (n > this.max) { n = this.max; }
+      this.gauge.value = n;
+    }
+  });
+
+  Vue.component('peripheral-motor', {
+    props: ['name', 'mode', 'value'],
+    template: `
+      <div class="card" style="width: 12rem;">
+        <div class="card-header text-white bg-success">{{ name }} </div>
+        <div class="card-body">
+          <p class="card-title text-center">{{ value }}</p>
+          <p class="card-text text-center">
+    <canvas :id="name" data-width="100" data-height="100" data-type="radial-gauge" :data-value="value" ></canvas>
+          </p>
+        </div>
+      </div>
+    `,
+    mounted: function() {
+      let vm = this;
+      this.$nextTick(function () {
+          console.log('name is '+ vm.name);
+          vm.gauge = new RadialGauge({
+                renderTo: vm.name,
+                width: 150,
+                height: 150,
+                title: "Speed",
+                minValue: -100,
+                maxValue: 100,
+                majorTicks: [ -100,-80, -60, -40, -20, 0, 20, 40, 60, 80, 100],
+                minorTicks: 5,
+                strokeTicks: true,
+                valueBox: false,
+                borders: false,
+                borderShadowWidth: 0,
+                animationDuration: 0
+          });
+          vm.gauge.draw();
+      });
+    },
+    updated: function() {
+      this.gauge.value = Number(this.value);
+    }
+
+  });
+  </script>
+{% endraw %}
+
+<div id="gauge" class="200x160px"></div>
+
+  <script>
+    var hubs = {};
+
+    const Color = { 
+        0: "black",
+        1: "pink",
+        2: "purple",
+        3: "blue",
+        4: "lightblue",
+        5: "cyan",
+        6: "green",
+        7: "yellow",
+        8: "orange",
+        9: "red",
+       10: "white",
+      255: "none"
+    }
+            
+    var g = new JustGage({
+          id: "gauge",
+          value: 67,
+          min: 0,
+          max: 100,
+          title: "Visitors"
+        });
+
+  var ws = new WebSocket('ws://' + document.domain + ':' + window.location.port + '/ws');
+  ws.onmessage = function(event) {
+        //var messages_dom = document.getElementsByTagName('ul')[0];
+        //var message_dom = document.createElement('li');
+        //var content_dom = document.createTextNode('Received: ' + event.data);
+        //message_dom.appendChild(content_dom);
+        //messages_dom.appendChild(message_dom);
+        //g.refresh(Number(event.data));
+        //gauge.value = Number(event.data);
+        app.messages.push(event.data);
+        if (event.data.startsWith('ADD_HUB')) {
+          [_, hub_name] = event.data.split(" ");
+          app.hubs[hub_name] = { "peripherals": {}};
+        } else if (event.data.startsWith('ADD_PERIPHERAL')) {
+          [_, hub_name, peripheral_type, peripheral_name, mode_name] = event.data.split(" ");
+          console.log(app.hubs);
+          app.hubs[hub_name]["peripherals"][peripheral_name] =
+                    { [mode_name]: 
+                            {"type": peripheral_type, "value": 0}
+                    };
+        } else if (event.data.startsWith('UPDATE_VALUE')) {
+          [_, hub_name, peripheral_type, peripheral_name, mode_name, val] = event.data.split(" ");
+          //console.log('updating value to ' + val);
+          if (peripheral_type == "LED") { 
+            val = Color[val];
+          }
+          app.hubs[hub_name]["peripherals"][peripheral_name][mode_name]["value"] = val
+
+        } else if (event.data.startsWith('RESET')) {
+          console.log('Flusing');
+          app.hubs[hub_name]["peripherals"] = {};
+          Vue.delete(app.hubs, hub_name);
+        }
+
+  }
+  ws.onopen = function() {
+    //send_message();
+    //gauge.draw();
+  }
+
+  function send_message() {
+    ws.send('bob');
+    setTimeout( send_message, 1000);
+  }
+  var app = new Vue({
+    el: '#app',
+    data: {
+      messages: [],
+      hubs: { } 
+    }
+  })
+  </script>
