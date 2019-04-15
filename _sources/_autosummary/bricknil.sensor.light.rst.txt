@@ -1,0 +1,33 @@
+bricknil.sensor.light
+=====================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bricknil.sensor.light
+
+.. automodule:: bricknil.sensor.light
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  LED
+	  
+	  Light
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

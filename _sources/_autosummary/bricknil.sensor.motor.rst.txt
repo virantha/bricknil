@@ -1,0 +1,43 @@
+bricknil.sensor.motor
+=====================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bricknil.sensor.motor
+
+.. automodule:: bricknil.sensor.motor
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  DuploTrainMotor
+	  
+	  ExternalMotor
+	  
+	  InternalMotor
+	  
+	  Motor
+	  
+	  TachoMotor
+	  
+	  TrainMotor
+	  
+	  WedoMotor
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

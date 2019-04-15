@@ -1,0 +1,31 @@
+bricknil.sensor.sound
+=====================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bricknil.sensor.sound
+
+.. automodule:: bricknil.sensor.sound
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  DuploSpeaker
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

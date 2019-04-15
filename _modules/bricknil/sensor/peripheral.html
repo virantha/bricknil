@@ -1,0 +1,391 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>bricknil.sensor.peripheral &#8212; BrickNil 0.9 documentation</title>
+    <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">BrickNil 0.9 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../sensor.html" accesskey="U">bricknil.sensor</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for bricknil.sensor.peripheral</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2019 Virantha N. Ekanayake </span>
+<span class="c1"># </span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1"># </span>
+<span class="c1"># http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1"># </span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Base class for all sensors and motors</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+
+<span class="kn">from</span> <span class="nn">..process</span> <span class="k">import</span> <span class="n">Process</span>
+<span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">spawn</span><span class="p">,</span> <span class="n">current_task</span>
+<span class="kn">from</span> <span class="nn">..const</span> <span class="k">import</span> <span class="n">DEVICES</span>
+
+
+<div class="viewcode-block" id="Peripheral"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral">[docs]</a><span class="k">class</span> <span class="nc">Peripheral</span><span class="p">(</span><span class="n">Process</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract base class for any Lego Boost/PoweredUp/WeDo peripherals</span>
+
+<span class="sd">       A LEGO sensor can provide either a single_ sensing capability, or a combined_  mode where it returns multiple</span>
+<span class="sd">       sensing values.  All the details can be found in the official protocol description.</span>
+
+<span class="sd">       * **Single capability** - This is the easiest to handle:</span>
+<span class="sd">            * Send a 0x41 Port Input Format Setup command to put the sensor port into the respective mode and activate updates</span>
+<span class="sd">            * Read back the 0x45 Port Value(Single) messages with updates from the sensor on the respective mode</span>
+<span class="sd">       * **Multiple capabilities** - This is more complicated because we need to put the sensor port into CombinedMode</span>
+<span class="sd">            * Send a [0x42, port, 0x02] message to lock the port</span>
+<span class="sd">            * Send multiple 0x41 messages to activate each capability/mode we want updates from</span>
+<span class="sd">            * Send a [0x42, port, 0x01, ..] message with the following bytes:</span>
+<span class="sd">                * 0x00 = Row entry 0 in the supported combination mode table</span>
+<span class="sd">                    (hard-coded for simplicity here because LEGO seems to only use this entry most of the time)</span>
+<span class="sd">                * For each mode/capability, send a byte like the following:</span>
+<span class="sd">                    * Upper 4-bits is mode number</span>
+<span class="sd">                    * Lower 4-bits is the dataset number</span>
+<span class="sd">                    * For example, for getting RGB values, it&#39;s mode 6, and we want all three datasets </span>
+<span class="sd">                        (for each color), so we&#39;d add three bytes [0x60, 0x61, 0x62].  </span>
+<span class="sd">                        If you just wanted the Red value, you just append [0x60]</span>
+<span class="sd">            * Send a [0x42, port, 0x03] message to unlock the port</span>
+<span class="sd">            * Now, when the sensor sends back values, it uses 0x46 messages with the following byte sequence:</span>
+<span class="sd">                * Port id</span>
+<span class="sd">                * 16-bit entry where the true bits mark which mode has values included in this message</span>
+<span class="sd">                    (So 0x00 0x05 means values from Modes 2 and 0)</span>
+<span class="sd">                * Then the set of values from the sensor, which are ordered by Mode number </span>
+<span class="sd">                    (so the sensor reading from mode 0 would come before the reading from mode 2)</span>
+<span class="sd">                * Each set of values includes however many bytes are needed to represent each dataset</span>
+<span class="sd">                    (for example, up to 3 for RGB colors), and the byte-width of each value (4 bytes for a 32-bit int)</span>
+
+
+<span class="sd">       .. _single: https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#port-input-format-single</span>
+<span class="sd">       .. _combined: https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#port-input-format-combinedmode</span>
+
+<span class="sd">       Args:</span>
+<span class="sd">          capabilities : can be input in the following formats (where the</span>
+<span class="sd">            number in the tuple can be a threshold to trigger updates)</span>
+
+<span class="sd">               * [&#39;sense_color&#39;, &#39;sense_distannce&#39;] </span>
+<span class="sd">               * [capability.sense_color, capability.sense_distance]</span>
+<span class="sd">               * [(&#39;sense_color&#39;, 1), (&#39;sense_distance&#39;, 2)]</span>
+
+<span class="sd">          name (str) : Human readable name</span>
+<span class="sd">          port (int) : Port to connect to (otherwise will connect to first matching peripheral with defined sensor_id)</span>
+<span class="sd">           </span>
+
+<span class="sd">       Attributes:</span>
+<span class="sd">            port (int) : Physical port on the hub this Peripheral attaches to</span>
+<span class="sd">            sensor_name (str) : Name coming out of `const.DEVICES`</span>
+<span class="sd">            value (dict) : Sensor readings get dumped into this dict</span>
+<span class="sd">            message_handler (func) : Outgoing message queue to `BLEventQ` that&#39;s set by the Hub when an attach message is seen</span>
+<span class="sd">            capabilites (list [ `capability` ]) : Support capabilities </span>
+<span class="sd">            thresholds (list [ int ]) : Integer list of thresholds for updates for each of the sensing capabilities</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DEFAULT_THRESHOLD</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensor_name</span> <span class="o">=</span> <span class="n">DEVICES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sensor_id</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_handler</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_queue_output</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_validated_capabilities</span><span class="p">(</span><span class="n">capabilities</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_validated_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert capabilities in different formats (string, tuple, etc)</span>
+
+<span class="sd">           Returns:</span>
+<span class="sd">                </span>
+<span class="sd">                validated_caps, thresholds  (list[`capability`], list[int]): list of capabilities and list of associated thresholds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">validated_caps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">validated_caps</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="n">caps</span><span class="p">:</span>
+            <span class="c1"># Capability can be a tuple of (cap, threshold)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">cap</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="n">cap</span>
+                <span class="n">thresholds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">thresholds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DEFAULT_THRESHOLD</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="p">):</span>
+                <span class="c1"># Make sure it&#39;s the write type of enumerated capability</span>
+                <span class="n">validated_caps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cap</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">cap</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="c1"># Make sure we can convert this string capability into a defined enum</span>
+                <span class="n">enum_cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="p">[</span><span class="n">cap</span><span class="p">]</span>
+                <span class="n">validated_caps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">enum_cap</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">validated_caps</span><span class="p">,</span> <span class="n">thresholds</span>
+
+    <span class="k">def</span> <span class="nf">_convert_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">:</span><span class="nb">bytearray</span><span class="p">,</span> <span class="n">byte_count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert bytearry into a set of values based on byte_count per value</span>
+
+<span class="sd">           Args:</span>
+<span class="sd">                msg_bytes (bytearray): Bytes to convert</span>
+<span class="sd">                byte_count (int): How many bytes per value to use when computer (can be 1, 2, or 4)</span>
+
+<span class="sd">           Returns:</span>
+<span class="sd">                If a single value, then just that value</span>
+<span class="sd">                If multiple values, then a list of those values</span>
+<span class="sd">                Value can be either uint8, uint16, or uint32 depending on value of `byte_count`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">byte_count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>   <span class="c1"># just a uint8</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">msg_bytes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">byte_count</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c1"># uint16 little-endian</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;H&#39;</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">byte_count</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span> <span class="c1"># uint32 little-endian</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Cannot convert array of </span><span class="si">{msg_bytes}</span><span class="s1"> length {len(msg_bytes)} to python datatype&#39;</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_parse_combined_sensor_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Byte sequence is as follows:</span>
+<span class="sd">                # uint16 where each set bit indicates data value from that mode is present </span>
+<span class="sd">                  (e.g. 0x00 0x05 means Mode 2 and Mode 0 data is present</span>
+<span class="sd">                # The data from the lowest Mode number comes first in the subsequent bytes</span>
+<span class="sd">                # Each Mode has a number of datasets associated with it (RGB for example is 3 datasets), and</span>
+<span class="sd">                  a byte-width per dataset (RGB dataset is each a uint8)</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                msg (bytearray) : the sensor message</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Side-effects:</span>
+<span class="sd">                self.value</span>
+<span class="sd">          </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Remove the leading 0 (since we never have more than 7 datasets even with all the combo modes activated</span>
+        <span class="c1"># The next byte is a bit mask of the mode/dataset entries present in this value</span>
+        <span class="n">modes</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dataset_i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">:</span>  <span class="c1"># This is the order we prgogramed the sensor</span>
+            <span class="n">n_datasets</span><span class="p">,</span> <span class="n">byte_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">cap</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_datasets</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">modes</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">dataset_i</span><span class="p">):</span>  <span class="c1"># Check if i&#39;th bit of mode is set</span>
+                    <span class="c1"># Data corresponding to this dataset is present!</span>
+                    <span class="c1"># Now, pop off however many bytes are associated with this</span>
+                    <span class="c1"># dataset</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">byte_count</span><span class="p">]</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">byte_count</span><span class="p">:]</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">byte_count</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">n_datasets</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="p">][</span><span class="n">dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="n">dataset_i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+
+
+<div class="viewcode-block" id="Peripheral.send_message"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral.send_message">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Send outgoing message to BLEventQ &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_handler</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_handler</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">peripheral</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_convert_speed_to_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Map speed of -100 to 100 to a byte range</span>
+
+<span class="sd">            * -100 to 100 (negative means reverse)</span>
+<span class="sd">            * 0 is floating</span>
+<span class="sd">            * 127 is brake</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                byte</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">speed</span> <span class="o">==</span> <span class="mi">127</span><span class="p">:</span> <span class="k">return</span> <span class="mi">127</span>
+        <span class="k">if</span> <span class="n">speed</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span> <span class="n">speed</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">speed</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> 
+            <span class="c1"># Now, truncate to 8-bits</span>
+            <span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span> <span class="o">&amp;</span> <span class="mi">255</span> <span class="c1"># Or I guess I could do 256-abs(s)</span>
+        <span class="k">return</span> <span class="n">speed</span>
+
+
+<div class="viewcode-block" id="Peripheral.set_output"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral.set_output">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Don&#39;t change this unless you&#39;re changing the way you do a Port Output command</span>
+<span class="sd">        </span>
+<span class="sd">           Outputs the following sequence to the sensor</span>
+<span class="sd">            * 0x00 = hub id from common header</span>
+<span class="sd">            * 0x81 = Port Output Command</span>
+<span class="sd">            * port</span>
+<span class="sd">            * 0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</span>
+<span class="sd">            * 0x51 = WriteDirectModeData</span>
+<span class="sd">            * mode</span>
+<span class="sd">            * value(s)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x51</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">value</span> <span class="p">]</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;set output port:</span><span class="si">{self.port}</span><span class="s1"> mode: </span><span class="si">{mode}</span><span class="s1"> = </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+    <span class="c1"># Use these for sensor readings</span>
+<div class="viewcode-block" id="Peripheral.update_value"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral.update_value">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">update_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Message from message_dispatch will trigger Hub to call this to update a value from a sensor incoming message</span>
+<span class="sd">            Depending on the number of capabilities enabled, we end up with different processing:</span>
+
+<span class="sd">            If zero, then just set the `self.value` field to the raw message.</span>
+
+<span class="sd">            If one, then:</span>
+<span class="sd">                * Parse the single sensor message which may have multiple data items (like an RGB color value)</span>
+<span class="sd">                * `self.value` dict entry for this capability becomes a list of these values</span>
+
+<span class="sd">            If multiple, then:</span>
+<span class="sd">                * Parse multiple sensor messages (could be any combination of the enabled modes)</span>
+<span class="sd">                * Set each dict entry to `self.value` to either a list of multiple values or a single value</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">capability</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">datasets</span><span class="p">,</span> <span class="n">bytes_per_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">capability</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datasets</span><span class="p">):</span>
+                <span class="n">msg_ptr</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="n">bytes_per_dataset</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">msg_ptr</span><span class="p">:</span> <span class="n">msg_ptr</span><span class="o">+</span><span class="n">bytes_per_dataset</span><span class="p">],</span> <span class="n">bytes_per_dataset</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">datasets</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">capability</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">capability</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_combined_sensor_values</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Peripheral.activate_updates"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral.activate_updates">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">activate_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Send a message to the sensor to activate updates</span>
+
+<span class="sd">            Called via an &#39;attach&#39; message from</span>
+<span class="sd">            :func:`bricknil.messages.Message.parse_attached_io` that triggers</span>
+<span class="sd">            this call from :func:`bricknil.hub.Hub.peripheral_message_loop`</span>
+
+<span class="sd">            See class description for explanation on how Combined Mode updates are done.</span>
+<span class="sd">            </span>
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;Cannot activate updates on sensor before it&#39;s been attached to </span><span class="si">{self.name}</span><span class="s2">!&quot;</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+            <span class="c1"># Nothing to do since no capabilities defined</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">cap</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>  <span class="c1"># Just a normal single sensor</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x41</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Activate SENSOR: port </span><span class="si">{self.port}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Combo mode.  Need to make sure only allowed combinations are preset</span>
+            <span class="c1"># Lock sensor</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x42</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Lock port </span><span class="si">{self.port}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">cap</span><span class="p">,</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_combo</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{cap}</span><span class="s1"> is not allowed to be sensed in combination with others&#39;</span>
+                <span class="c1"># Enable each capability</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x41</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">cap</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;enable mode </span><span class="si">{cap.value}</span><span class="s1"> on </span><span class="si">{self.port}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+            <span class="c1"># Now, set the combination mode/dataset report order</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x42</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">:</span>
+                <span class="c1"># RGB requires 3 datasets</span>
+                <span class="n">datasets</span><span class="p">,</span> <span class="n">byte_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">cap</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datasets</span><span class="p">):</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">16</span><span class="o">*</span><span class="n">cap</span><span class="o">.</span><span class="n">value</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>  <span class="c1"># Mode is higher order nibble, dataset is lower order nibble</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Set combo port </span><span class="si">{self.port}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+            <span class="c1"># Unlock and start</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x42</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="mh">0x03</span><span class="p">]</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Activate SENSOR multi-update </span><span class="si">{self.port}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div></div>
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation index</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../sensor.html">bricknil.sensor</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>

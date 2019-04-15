@@ -1,0 +1,609 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>bricknil.sensor.sensor &#8212; BrickNil 0.9 documentation</title>
+    <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">BrickNil 0.9 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../sensor.html" accesskey="U">bricknil.sensor</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for bricknil.sensor.sensor</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2019 Virantha N. Ekanayake </span>
+<span class="c1"># </span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1"># </span>
+<span class="c1"># http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1"># </span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Actual sensor and motor peripheral definitions from Boost and PoweredUp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">curio</span> <span class="k">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">current_task</span><span class="p">,</span> <span class="n">spawn</span>  <span class="c1"># Needed for motor speed ramp</span>
+
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">pack</span>
+
+<span class="kn">from</span> <span class="nn">..const</span> <span class="k">import</span> <span class="n">Color</span>
+<span class="kn">from</span> <span class="nn">.peripheral</span> <span class="k">import</span> <span class="n">Peripheral</span>
+
+<div class="viewcode-block" id="VisionSensor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.VisionSensor">[docs]</a><span class="k">class</span> <span class="nc">VisionSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Access the Boost Vision/Distance Sensor</span>
+
+<span class="sd">        Only the sensing capabilities of this sensor is supported right now.</span>
+
+<span class="sd">        - *sense_color*: Returns one of the 10 predefined colors</span>
+<span class="sd">        - *sense_distance*: Distance from 0-7 in roughly inches</span>
+<span class="sd">        - *sense_count*: Running count of waving your hand/item over the sensor (32-bit)</span>
+<span class="sd">        - *sense_reflectivity*: Under distances of one inch, the inverse of the distance</span>
+<span class="sd">        - *sense_ambient*: Distance under one inch (so inverse of the preceeding)</span>
+<span class="sd">        - *sense_rgb*: R, G, B values (3 sets of uint16)</span>
+
+<span class="sd">        Any combination of sense_color, sense_distance, sense_count, sense_reflectivity, </span>
+<span class="sd">        and sense_rgb is supported.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Basic distance sensor</span>
+<span class="sd">            @attach(VisionSensor, name=&#39;vision&#39;, capabilities=[&#39;sense_color&#39;])</span>
+<span class="sd">            # Or use the capability Enum</span>
+<span class="sd">            @attach(VisionSensor, name=&#39;vision&#39;, capabilities=[VisionSensor.capability.sense_color])</span>
+
+<span class="sd">            # Distance and color sensor</span>
+<span class="sd">            @attach(VisionSensor, name=&#39;vision&#39;, capabilities=[&#39;sense_color&#39;, &#39;sense_distance&#39;])</span>
+
+<span class="sd">            # Distance and rgb sensor with different thresholds to trigger updates</span>
+<span class="sd">            @attach(VisionSensor, name=&#39;vision&#39;, capabilities=[(&#39;sense_color&#39;, 1), (&#39;sense_rgb&#39;, 5)])</span>
+
+<span class="sd">        The values returned by the sensor will always be available in the instance variable</span>
+<span class="sd">        `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are </span>
+<span class="sd">        enabled, the following values will be stored and updated::</span>
+
+<span class="sd">            self.value = { VisionSensor.capability.sense_color:  uint8,</span>
+<span class="sd">                           VisionSensor.capability.sense_rgb: </span>
+<span class="sd">                                            [ uint16, uint16, uint16 ]</span>
+<span class="sd">                         }</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            The actual modes supported by the sensor are as follows:</span>
+
+<span class="sd">            -  0 = color (0-10)</span>
+<span class="sd">            -  1 = IR proximity (0-7)</span>
+<span class="sd">            -  2 = count (32-bit int)</span>
+<span class="sd">            -  3 = Reflt   (inverse of distance when closer than 1&quot;)</span>
+<span class="sd">            -  4 = Amb  (distance when closer than 1&quot;)</span>
+<span class="sd">            -  5 = COL (output) ?</span>
+<span class="sd">            -  6 = RGB I</span>
+<span class="sd">            -  7 = IR tx (output) ?</span>
+<span class="sd">            -  8 = combined:  Color byte, Distance byte, 0xFF, Reflected light</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0025</span>
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> 
+                      <span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_distance&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_ambient&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+                       <span class="p">])</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_distance</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>  <span class="c1"># 4-bytes (32-bit)</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_reflectivity</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_ambient</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_rgb</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>   <span class="c1"># 3 16-bit values</span>
+                <span class="p">}</span>
+
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_distance</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_reflectivity</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_rgb</span><span class="p">,</span>
+                    <span class="p">]</span></div>
+
+<div class="viewcode-block" id="InternalTiltSensor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.InternalTiltSensor">[docs]</a><span class="k">class</span> <span class="nc">InternalTiltSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Access the internal tilt sensor in the Boost Move Hub.</span>
+<span class="sd">        </span>
+<span class="sd">        The various modes are:</span>
+
+<span class="sd">        - **sense_angle** - X, Y angles.  Both are 0 if hub is lying flat with button up</span>
+<span class="sd">        - **sense_tilt** - value from 0-9 if hub is tilted around any of its axis. Seems to be</span>
+<span class="sd">          a rough mesaure of how much the hub is tilted away from lying flat.</span>
+<span class="sd">          There is no update for just a translation along an axis</span>
+<span class="sd">        - **sense_orientation** - returns one of the nine orientations below (0-9)</span>
+<span class="sd">            - `InternalTiltSensor.orientation`.up = flat with button on top</span>
+<span class="sd">            - `InternalTiltSensor.orientation`.right - standing up on side closest to button</span>
+<span class="sd">            - `InternalTiltSensor.orientation`.left - standing up on side furthest from button</span>
+<span class="sd">            - `InternalTiltSensor.orientation`.far_side - on long face facing away</span>
+<span class="sd">            - `InternalTiltSensor.orientation`.near_side -  on long face facing you</span>
+<span class="sd">            - `InternalTiltSensor.orientation`.down - upside down</span>
+<span class="sd">        - **sense_impact** - 32-bit count of impacts to sensor</span>
+<span class="sd">        - **sense_acceleration_3_axis** - 3 bytes of raw accelerometer data.</span>
+
+<span class="sd">        Any combination of the above modes are allowed.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Basic tilt sensor</span>
+<span class="sd">            @attach(InternalTiltSensor, name=&#39;tilt&#39;, capabilities=[&#39;sense_tilt&#39;])</span>
+<span class="sd">            # Or use the capability Enum</span>
+<span class="sd">            @attach(InternalTiltSensor, name=&#39;tilt&#39;, capabilities=[InternalTiltSensor.sense_tilt])</span>
+
+<span class="sd">            # Tilt and orientation sensor</span>
+<span class="sd">            @attach(InternalTiltSensor, name=&#39;tilt&#39;, capabilities=[&#39;sense_tilt, sense_orientation&#39;])</span>
+
+<span class="sd">        The values returned by the sensor will always be available in the</span>
+<span class="sd">        instance variable `self.value`.  For example, when the `sense_angle`</span>
+<span class="sd">        and `sense_orientation` capabilities are enabled, the following values</span>
+<span class="sd">        will be stored and updated::</span>
+
+<span class="sd">            self.value = { InternalTiltSensor.capability.sense_angle:  [uint8, uint8],</span>
+<span class="sd">                           InternalTiltSensor.capability.sense_orientation: </span>
+<span class="sd">                                            Enum(InternalTiltSensor.orientation)</span>
+<span class="sd">                         }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0028</span>
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> 
+                      <span class="p">[(</span><span class="s1">&#39;sense_angle&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_tilt&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_orientation&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_impact&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_acceleration_3_axis&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                       <span class="p">])</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_angle</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_tilt</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_orientation</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_impact</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_acceleration_3_axis</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">}</span>
+
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_angle</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_tilt</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_orientation</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_impact</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_acceleration_3_axis</span><span class="p">,</span>
+                    <span class="p">]</span>
+
+    <span class="n">orientation</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> 
+                        <span class="p">{</span>   <span class="s1">&#39;up&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                            <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> 
+                            <span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> 
+                            <span class="s1">&#39;far_side&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span>
+                            <span class="s1">&#39;near_side&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span>
+                            <span class="s1">&#39;down&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span>
+                        <span class="p">})</span>
+
+
+<div class="viewcode-block" id="InternalTiltSensor.update_value"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.InternalTiltSensor.update_value">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">update_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If sense_orientation, then substitute the `IntenalTiltSensor.orientation`</span>
+<span class="sd">           enumeration value into the self.value dict.  Otherwise, don&#39;t do anything</span>
+<span class="sd">           special to the self.value dict.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
+        <span class="n">so</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_orientation</span>
+        <span class="k">if</span> <span class="n">so</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">so</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">so</span><span class="p">])</span></div></div>
+
+
+
+<div class="viewcode-block" id="ExternalMotionSensor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.ExternalMotionSensor">[docs]</a><span class="k">class</span> <span class="nc">ExternalMotionSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Access the external motion sensor (IR) provided in the Wedo sets</span>
+
+<span class="sd">       Measures distance to object, or if an object is moving (distance varying). </span>
+
+<span class="sd">       - **sense_distance** - distance in inches from 0-10</span>
+<span class="sd">       - **sense_count**  - Increments every time it detects motion (32-bit value)</span>
+
+<span class="sd">       These are mutually exclusive (non-combinable)</span>
+
+<span class="sd">       Examples::</span>
+
+<span class="sd">            # Distance measurement</span>
+<span class="sd">            @attach(ExternalMotionSensor, name=&#39;motion_sensor&#39;, capabilities=[&#39;sense_distance&#39;])</span>
+
+
+<span class="sd">            # Motion detection</span>
+<span class="sd">            @attach(ExternalMotionSensor, name=&#39;motion_sensor&#39;, capabilities=[&#39;sense_count&#39;])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0023</span>
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> 
+                      <span class="p">[(</span><span class="s1">&#39;sense_distance&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                       <span class="p">])</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_distance</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                <span class="p">}</span>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span></div>
+
+<div class="viewcode-block" id="ExternalTiltSensor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.ExternalTiltSensor">[docs]</a><span class="k">class</span> <span class="nc">ExternalTiltSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Access the External tilt sensor provided in the Wedo sets</span>
+
+<span class="sd">       Three modes are supported (non-combinable):</span>
+
+<span class="sd">       - **sense_angle** - X (around long axis), Y (around short axis) angles.  -45 to 45 degrees</span>
+<span class="sd">       - **sense_orientation** - returns one of the orientations below (wrt looking at the sensor from the side opposite the wiring harness)</span>
+<span class="sd">            - `ExternalTiltSensor.orientation`.up = flat with studs on top</span>
+<span class="sd">            - `ExternalTiltSensor.orientation`.right = studs facing rigth</span>
+<span class="sd">            - `ExternalTiltSensor.orientation`.left = studs facing left</span>
+<span class="sd">            - `ExternalTiltSensor.orientation`.far_side = studs facing away from you</span>
+<span class="sd">            - `ExternalTiltSensor.orientation`.near_side = studs facing towards you</span>
+<span class="sd">       - **sense_impact** - Keeps a count of impacts, but sends three bytes (direction of hit?)</span>
+
+<span class="sd">       These are mutually exclusive (non-combinable).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0022</span>
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> 
+                      <span class="p">[(</span><span class="s1">&#39;sense_angle&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_orientation&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_impact&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                       <span class="p">])</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_angle</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_orientation</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_impact</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">}</span>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+
+    <span class="n">orientation</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> 
+                        <span class="p">{</span>   <span class="s1">&#39;up&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                            <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> 
+                            <span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> 
+                            <span class="s1">&#39;far_side&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span>
+                            <span class="s1">&#39;near_side&#39;</span><span class="p">:</span><span class="mi">9</span><span class="p">,</span>
+                        <span class="p">})</span>
+
+<div class="viewcode-block" id="ExternalTiltSensor.update_value"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.ExternalTiltSensor.update_value">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">update_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If angle, convert the bytes being returned to twos complement ints</span>
+<span class="sd">           If orientation, then convert to the `orientation` enumeration.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_value</span><span class="p">(</span><span class="n">msg_bytes</span><span class="p">)</span>
+        <span class="c1"># No combinations possible, so only one capability with len(self.capabilities[])==1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_angle</span><span class="p">:</span>
+            <span class="n">sa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_angle</span>
+            <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">sa</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">sx</span> <span class="o">&amp;</span> <span class="mi">128</span><span class="p">:</span>  <span class="c1"># negative sign bit</span>
+                <span class="n">sx</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">256</span><span class="o">-</span><span class="n">sx</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sy</span> <span class="o">&amp;</span> <span class="mi">128</span><span class="p">:</span>
+                <span class="n">sy</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">256</span><span class="o">-</span><span class="n">sy</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">sa</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_orientation</span><span class="p">:</span>
+            <span class="n">so</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_orientation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">so</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">so</span><span class="p">])</span></div></div>
+
+
+
+
+<div class="viewcode-block" id="RemoteButtons"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.RemoteButtons">[docs]</a><span class="k">class</span> <span class="nc">RemoteButtons</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents one set of &#39;+&#39;, &#39;-&#39;, &#39;red&#39; buttons on the PoweredHub Remote</span>
+
+<span class="sd">       Each remote has two sets of buttons, on the left and right side.  Pick the one</span>
+<span class="sd">       your want to attach to by using the port argument with either Port.L or Port.R.</span>
+
+<span class="sd">       There are actually a few different modes that the hardware supports, but we are</span>
+<span class="sd">       only going to use one of them called &#39;KEYSD&#39; (see the notes in the documentation on the</span>
+<span class="sd">       raw values reported by the hub).  This mode makes the remote send three values back</span>
+<span class="sd">       in a list.  To access each button state, there are three helper methods provided </span>
+<span class="sd">       (see below)</span>
+
+<span class="sd">       Examples::</span>
+
+<span class="sd">            # Basic connection to the left buttons</span>
+<span class="sd">            @attach(RemoteButtons, name=&#39;left_buttons&#39;, port=RemoteButtons.Port.L)</span>
+
+<span class="sd">            # Getting values back in the handler</span>
+<span class="sd">            async def left_buttons_change(self):</span>
+
+<span class="sd">                is_plus_pressed = self.left_buttons.plus_pressed()</span>
+<span class="sd">                is_minus_pressed = self.left_buttons.minus_pressed()</span>
+<span class="sd">                is_red_pressed = self.left_buttons.red_pressed()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0037</span>
+    <span class="n">Port</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;Port&#39;</span><span class="p">,</span> <span class="s1">&#39;L R&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">Button</span> <span class="o">=</span> <span class="n">IntEnum</span><span class="p">(</span><span class="s1">&#39;Button&#39;</span><span class="p">,</span> <span class="s1">&#39;PLUS RED MINUS&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;The button index in the value list returned by the sensor&quot;&quot;&quot;</span>
+
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;capability&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sense_press&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">},)</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Maps the port names `L`, `R`&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">port</span><span class="p">:</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="n">value</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">capabilities</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RemoteButtons.plus_pressed"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.RemoteButtons.plus_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">plus_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether `value` reflects that the PLUS button is pressed&quot;&quot;&quot;</span>
+        <span class="n">button_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">button_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">PLUS</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="RemoteButtons.minus_pressed"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.RemoteButtons.minus_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">minus_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether `value` reflects that the MINUS button is pressed&quot;&quot;&quot;</span>
+        <span class="n">button_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">button_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">MINUS</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="RemoteButtons.red_pressed"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.RemoteButtons.red_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">red_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether `value` reflects that the RED button is pressed&quot;&quot;&quot;</span>
+        <span class="n">button_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">button_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Button</span><span class="o">.</span><span class="n">RED</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span></div></div>
+
+<div class="viewcode-block" id="Button"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.Button">[docs]</a><span class="k">class</span> <span class="nc">Button</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Register to be notified of button presses on the Hub (Boost or PoweredUp)</span>
+
+<span class="sd">        This is actually a slight hack, since the Hub button is not a peripheral that is </span>
+<span class="sd">        attached like other sensors in the Lego protocol.  Instead, the buttons are accessed</span>
+<span class="sd">        through Hub property messages.  We abstract away these special messages to make the</span>
+<span class="sd">        button appear to be like any other peripheral sensor.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            @attach(Button, name=&#39;hub_btn&#39;)</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            Since there is no attach I/O message from the hub to trigger the</span>
+<span class="sd">            :func:`activate_updates` method, we instead insert a fake</span>
+<span class="sd">            &quot;attaach&quot; message from this fake sensor on port 255 in the</span>
+<span class="sd">            `BLEventQ.get_messages` method that is used to register for updates</span>
+<span class="sd">            from a given sensor.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x0005</span>
+    <span class="sd">&quot;&quot;&quot;Piggy back the hub button off the normal peripheral button id 0x0005.</span>
+<span class="sd">       Might need to change this in the future&quot;&quot;&quot;</span>
+
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;capability&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sense_press&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+               <span class="p">}</span>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_press</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Call super-class with port set to 255 &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">capabilities</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Button.activate_updates"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.Button.activate_updates">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">activate_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Use a special Hub Properties button message updates activation message&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">cap</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>  <span class="c1"># Button reports from &quot;Hub Properties Message Type&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Activate button reports: port </span><span class="si">{self.port}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> </div></div>
+
+
+<div class="viewcode-block" id="DuploVisionSensor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.DuploVisionSensor">[docs]</a><span class="k">class</span> <span class="nc">DuploVisionSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Access the Duplo Vision/Distance Sensor</span>
+
+<span class="sd">        - *sense_color*: Returns one of the 10 predefined colors</span>
+<span class="sd">        - *sense_ctag*: Returns one of the 10 predefined tags</span>
+<span class="sd">        - *sense_reflectivity*: Under distances of one inch, the inverse of the distance</span>
+<span class="sd">        - *sense_rgb*: R, G, B values (3 sets of uint16)</span>
+
+<span class="sd">        Any combination of sense_color, sense_ctag, sense_reflectivity, </span>
+<span class="sd">        and sense_rgb is supported.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Basic color sensor</span>
+<span class="sd">            @attach(DuploVisionSensor, name=&#39;vision&#39;, capabilities=[&#39;sense_color&#39;])</span>
+<span class="sd">            # Or use the capability Enum</span>
+<span class="sd">            @attach(DuploVisionSensor, name=&#39;vision&#39;, capabilities=[DuploVisionSensor.capability.sense_color])</span>
+
+<span class="sd">            # Ctag and reflectivity sensor</span>
+<span class="sd">            @attach(DuploVisionSensor, name=&#39;vision&#39;, capabilities=[&#39;sense_ctag&#39;, &#39;sense_reflectivity&#39;])</span>
+
+<span class="sd">            # Distance and rgb sensor with different thresholds to trigger updates</span>
+<span class="sd">            @attach(DuploVisionSensor, name=&#39;vision&#39;, capabilities=[(&#39;sense_color&#39;, 1), (&#39;sense_rgb&#39;, 5)])</span>
+
+<span class="sd">        The values returned by the sensor will always be available in the instance variable</span>
+<span class="sd">        `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are </span>
+<span class="sd">        enabled, the following values will be stored and updated::</span>
+
+<span class="sd">            self.value = { DuploVisionSensor.capability.sense_color:  uint8,</span>
+<span class="sd">                           DuploVisionSensor.capability.sense_rgb: </span>
+<span class="sd">                                            [ uint16, uint16, uint16 ]</span>
+<span class="sd">                         }</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            The actual modes supported by the sensor are as follows:</span>
+
+<span class="sd">            -  0 = color (0-10)</span>
+<span class="sd">            -  1 = ctag (32-bit int)</span>
+<span class="sd">            -  2 = Reflt   (inverse of distance when closer than 1&quot;)</span>
+<span class="sd">            -  3 = RGB I</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x002B</span>
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> 
+                      <span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_ctag&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                       <span class="p">])</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_ctag</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># 4-bytes (32-bit)</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_reflectivity</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_rgb</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>   <span class="c1"># 3 16-bit values</span>
+                <span class="p">}</span>
+
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_ctag</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_reflectivity</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_rgb</span><span class="p">,</span>
+                    <span class="p">]</span></div>
+
+<div class="viewcode-block" id="VoltageSensor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.VoltageSensor">[docs]</a><span class="k">class</span> <span class="nc">VoltageSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Voltage sensor</span>
+
+<span class="sd">       Returns the raw mV value (0-3893) which probably needs to be scaled to 0-9600.</span>
+
+<span class="sd">       It contains two capabilities, although they both appear to do the same thing:</span>
+<span class="sd">       * sense_l</span>
+<span class="sd">       * sense_s</span>
+
+<span class="sd">       Examples::</span>
+
+<span class="sd">            @attach(VoltageSensor, name=&#39;volts&#39;, capabilities=[&#39;sense_l&#39;])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x14</span>
+
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sense_s&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;sense_l&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_s</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>   <span class="c1"># 2-bytes (16-bit)</span>
+                <span class="n">capability</span><span class="o">.</span><span class="n">sense_l</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> 
+               <span class="p">}</span>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span></div>
+
+<div class="viewcode-block" id="CurrentSensor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.CurrentSensor">[docs]</a><span class="k">class</span> <span class="nc">CurrentSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Voltage sensor</span>
+
+<span class="sd">       Returns the raw mA value (0-4095) which probably needs to be scaled to 0-2444.</span>
+
+<span class="sd">       It contains two capabilities, although they both appear to do the same thing:</span>
+<span class="sd">       * sense_l</span>
+<span class="sd">       * sense_s</span>
+
+<span class="sd">       Examples::</span>
+
+<span class="sd">            @attach(CurrentSensor, name=&#39;cur&#39;, capabilities=[&#39;sense_l&#39;])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x15</span>
+
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sense_s&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;sense_l&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_s</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>   <span class="c1"># 2-bytes (16-bit)</span>
+                <span class="n">capability</span><span class="o">.</span><span class="n">sense_l</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> 
+               <span class="p">}</span>
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span></div>
+
+<div class="viewcode-block" id="DuploSpeedSensor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.DuploSpeedSensor">[docs]</a><span class="k">class</span> <span class="nc">DuploSpeedSensor</span><span class="p">(</span><span class="n">Peripheral</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Speedometer on Duplo train base that measures front wheel speed.</span>
+
+<span class="sd">       This can measure the following values:</span>
+
+<span class="sd">       - *sense_speed*: Returns the speed of the front wheels</span>
+<span class="sd">       - *sense_count*: Keeps count of the number of revolutions the front wheels have spun</span>
+
+<span class="sd">       Either or both can be enabled for measurement. </span>
+
+<span class="sd">       Examples::</span>
+
+<span class="sd">            # Report speed changes</span>
+<span class="sd">            @attach(DuploSpeedSensor, name=&#39;speed_sensor&#39;, capabilities=[&#39;sense_speed&#39;])</span>
+
+<span class="sd">            # Report all</span>
+<span class="sd">            @attach(DuploSpeedSensor, name=&#39;speed_sensor&#39;, capabilities=[&#39;sense_speed&#39;, &#39;sense_count&#39;])</span>
+
+<span class="sd">       The values returned by the sensor will be in `self.value`.  For the first example, get the</span>
+<span class="sd">       current speed by::</span>
+
+<span class="sd">            speed = self.speed_sensor.value</span>
+<span class="sd">        </span>
+<span class="sd">       For the second example, the two values will be in a dict::</span>
+
+<span class="sd">            speed = self.speed_sensor.value[DuploSpeedSensor.sense_speed]</span>
+<span class="sd">            revs  = self.speed_sensor.value[DuploSpeedSensor.sense_count]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x002C</span>
+    <span class="n">capability</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;capability&quot;</span><span class="p">,</span> 
+                      <span class="p">[(</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                       <span class="p">])</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                 <span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                <span class="p">}</span>
+
+    <span class="n">allowed_combo</span> <span class="o">=</span> <span class="p">[</span> <span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">,</span>
+                      <span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">,</span>
+                    <span class="p">]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation index</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../sensor.html">bricknil.sensor</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>

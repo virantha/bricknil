@@ -1,0 +1,31 @@
+bricknil.sensor.peripheral
+==========================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bricknil.sensor.peripheral
+
+.. automodule:: bricknil.sensor.peripheral
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  Peripheral
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>BrickNil - Control LEGO Bluetooth Sensors and Motors with Python &#8212; BrickNil 0.8.2 documentation</title>
+    <title>BrickNil - Control LEGO Bluetooth Sensors and Motors with Python &#8212; BrickNil 0.9 documentation</title>
     <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Setting up a Raspberry Pi with Python 3.7+ using Ansible" href="pi_setup.html" />
-    <link rel="prev" title="BrickNil Docs (version 0.8.2)" href="index.html" />
+    <link rel="prev" title="BrickNil Docs (version 0.9)" href="index.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -39,9 +39,9 @@
           <a href="pi_setup.html" title="Setting up a Raspberry Pi with Python 3.7+ using Ansible"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="BrickNil Docs (version 0.8.2)"
+          <a href="index.html" title="BrickNil Docs (version 0.9)"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">BrickNil 0.8.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">BrickNil 0.9 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -57,7 +57,9 @@
 Bluetooth hubs (including the PoweredUp Passenger Train <a class="reference external" href="https://www.amazon.com/gp/product/B07CC37F63/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07CC37F63">60197</a> and Cargo Train <a class="reference external" href="https://www.amazon.com/gp/product/B07C39LCZ9/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07C39LCZ9">60198</a> sets, and the Lego
 Duplo Steam Train <a class="reference external" href="https://www.amazon.com/gp/product/B07BK6M2WC/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07BK6M2WC">10874</a> and Cargo Train <a class="reference external" href="https://www.amazon.com/gp/product/B07BK6KQR6/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07BK6KQR6">10875</a> ) using Python on OS X and
 Linux.  This work was inspired by this <a class="reference external" href="https://www.eurobricks.com/forum/index.php?/forums/topic/162288-powered-up-a-tear-down/">EuroBricks</a> thread, and the NodeJS <a class="reference external" href="https://github.com/nathankellenicki/node-poweredup">Powered-Up</a>
-library.  It requires modern Python (designed and tested for 3.7) and uses asynchronous
+library. Unlike the official apps available from LEGO, BrickNil allows you to control multiple
+hubs with a single program, which lets you easily scale to programming large interactive systems.</p>
+<p>BrickNil requires modern Python (designed and tested for 3.7) and uses asynchronous
 event programming built on top of the <a class="reference external" href="http://curio.readthedocs.io">Curio</a> async library.  As an aside, the choice of
 async library is fairly arbitrary; and enabling another library such as asyncio or Trio
 should be straightforward.</p>
@@ -116,10 +118,12 @@ should be straightforward.</p>
 <li>Train motors</li>
 <li>Hub LED color</li>
 <li>Boost vision sensor (color, distance)</li>
-<li>Internal tilt/orientation/accelerometer</li>
+<li>Boost internal tilt/orientation/accelerometer</li>
 <li>Boost external motor</li>
 <li>External light</li>
 <li>Hub buttons</li>
+<li>Wedo external motor</li>
+<li>Wedo tiltand motion sensors</li>
 </ul>
 </dd>
 </dl>
@@ -186,7 +190,7 @@ numbers are reverse speeds):</p>
 </div>
 <p>Notice that we’re using the <cite>await</cite> keyword in front of all the calls, because
 those are also asynchronous coroutines that will get run in the event loop.
-At some point, the <a class="reference internal" href="_autosummary/bricknil.peripheral.html#bricknil.peripheral.Motor.set_speed" title="bricknil.peripheral.Motor.set_speed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bricknil.peripheral.Motor.set_speed()</span></code></a> coroutine
+At some point, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">bricknil.peripheral.Motor.set_speed()</span></code> coroutine
 will finish executing and control will return back to the statement after it.
 The next statement is a call to the <cite>sleep</cite> coroutine from the <cite>curio</cite>
 library. It’s important to use this, instead of the regular <em>function</em>
@@ -204,7 +208,7 @@ the <cite>run</cite> logic as:</p>
         <span class="n">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="_autosummary/bricknil.peripheral.html#bricknil.peripheral.Motor.ramp_speed" title="bricknil.peripheral.Motor.ramp_speed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bricknil.peripheral.Motor.ramp_speed()</span></code></a> function will ramp the speed from
+<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">bricknil.peripheral.Motor.ramp_speed()</span></code> function will ramp the speed from
 whatever it is currently to the target speed over the millisecond duration given (internally, it will
 change the train speed every 100ms).  Here, you can see how things are running concurrently:  we issue
 the ramp_speed command, that will take 5 seconds to complete in the background,
@@ -311,7 +315,7 @@ but for this example, we’re just going to use the <cite>sense_count</cite> and
 something pass in front of it at a distance of ~2 inches, while the latter
 measures roughly how many inches something is from the sensor (from 1-10
 inches).  For a full list of the supported capabilities, please see the API
-documentation at <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.VisionSensor</span></code></a>.</p>
+documentation at <code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.VisionSensor</span></code>.</p>
 <p>The full program is listed at the end of this section, but let’s just go through
 it bit by bit.  The first thing we’ll do is attach the sensor to the Train class:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
@@ -622,9 +626,9 @@ button is pressed.</p>
 <h3>Using the Duplo Train and Playing Sounds<a class="headerlink" href="#using-the-duplo-train-and-playing-sounds" title="Permalink to this headline">¶</a></h3>
 <p>The Duplo trains <a class="reference external" href="https://www.amazon.com/gp/product/B07BK6M2WC/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07BK6M2WC">10874</a> and <a class="reference external" href="https://www.amazon.com/gp/product/B07BK6KQR6/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2&amp;creativeASIN=B07BK6KQR6">10875</a> have the ability to play a set of 5
 predetermined sounds through their built-in speakers
-(<a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploSpeaker" title="bricknil.sensor.DuploSpeaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploSpeaker</span></code></a>).  In addition, there is a
-speedometer(<a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploSpeedSensor" title="bricknil.sensor.DuploSpeedSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploSpeedSensor</span></code></a>) built-in to the front
-wheels, and a vision sensor(<a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploVisionSensor" title="bricknil.sensor.DuploVisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploVisionSensor</span></code></a>) in the
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploSpeaker</span></code>).  In addition, there is a
+speedometer(<code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploSpeedSensor</span></code>) built-in to the front
+wheels, and a vision sensor(<code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.DuploVisionSensor</span></code>) in the
 undercarriage pointing straight down.  This vision sensor is slightly less
 capable than the stand-alone Boost Vision Sensor discussed above, but it can
 still recognize colors, distance, and the special blocks that Lego provides in
@@ -634,14 +638,15 @@ those sets.  Here’s an example that puts everything together:</p>
 <span class="kn">from</span> <span class="nn">curio</span> <span class="kn">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">bricknil</span> <span class="kn">import</span> <span class="n">attach</span><span class="p">,</span> <span class="n">start</span>
 <span class="kn">from</span> <span class="nn">bricknil.hub</span> <span class="kn">import</span> <span class="n">DuploTrainHub</span>
-<span class="kn">from</span> <span class="nn">bricknil.sensor</span> <span class="kn">import</span> <span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">LED</span><span class="p">,</span> <span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">DuploSpeaker</span><span class="p">,</span> <span class="n">Button</span>
+<span class="kn">from</span> <span class="nn">bricknil.sensor</span> <span class="kn">import</span> <span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">LED</span><span class="p">,</span> <span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">DuploSpeaker</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">VoltageSensor</span>
 <span class="kn">from</span> <span class="nn">bricknil.const</span> <span class="kn">import</span> <span class="n">Color</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeaker</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speaker&#39;</span><span class="p">)</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_ctag&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
 <span class="nd">@attach</span><span class="p">(</span><span class="n">LED</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;led&#39;</span><span class="p">)</span>
-<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speed_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_count&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speed_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">])</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VoltageSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;voltage&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_l&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)])</span>
 <span class="nd">@attach</span><span class="p">(</span><span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Train</span><span class="p">(</span><span class="n">DuploTrainHub</span><span class="p">):</span>
 
@@ -649,22 +654,26 @@ those sets.  Here’s an example that puts everything together:</p>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="bp">False</span>     <span class="c1"># Only becomes true with hub button is pressed</span>
 
+    <span class="n">async</span> <span class="k">def</span> <span class="nf">voltage_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
     <span class="n">async</span> <span class="k">def</span> <span class="nf">speed_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="ow">and</span> <span class="n">speed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s1">&#39;Movement detected: starting...&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">go</span><span class="p">:</span>
-            <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Speed sensor changed speed: {speed} count: {count}&#39;</span><span class="p">)</span>
+            <span class="c1">#count = self.speed_sensor.value[DuploSpeedSensor.capability.sense_count]</span>
+            <span class="c1">#self.message_info(f&#39;Speed sensor changed speed: {speed} count: {count}&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Speed sensor changed speed: {speed}&#39;</span><span class="p">)</span>
 
     <span class="n">async</span> <span class="k">def</span> <span class="nf">vision_sensor_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">cap</span> <span class="o">=</span> <span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span>
-        <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_color</span><span class="p">]</span>
-        <span class="n">ctag</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_ctag</span><span class="p">]</span>
+        <span class="c1">#color = self.vision_sensor.value[cap.sense_color]</span>
+        <span class="c1">#ctag  = self.vision_sensor.value[cap.sense_ctag]</span>
         <span class="n">reflt</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">sense_reflectivity</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">go</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}&#39;</span><span class="p">)</span>
+            <span class="c1">#self.message_info(f&#39;Vision sensor changed color: {color} ctag: {ctag} reflt: {reflt}&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Vision sensor changed color: reflt: {reflt}&#39;</span><span class="p">)</span>
 
     <span class="n">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
@@ -690,7 +699,7 @@ those sets.  Here’s an example that puts everything together:</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">message_info</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
 
 <span class="n">async</span> <span class="k">def</span> <span class="nf">system</span><span class="p">():</span>
-    <span class="n">hub</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;train&#39;</span><span class="p">)</span>
+    <span class="n">hub</span> <span class="o">=</span> <span class="n">Train</span><span class="p">(</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
@@ -713,7 +722,7 @@ execution loop is running the Curio event library, which provides the async
 event loop that executes our user code. Thus, we need to be careful about
 maintaining thread safety between the Curio async event loop and the background
 Bluetooth event processing.</p>
-<div class="figure align-center" id="id15">
+<div class="figure align-center" id="id18">
 <img alt="_images/run_loops.svg" src="_images/run_loops.svg" /><p class="caption"><span class="caption-text">BrickNil running inside Curio’s event loop, which in turn is run by the
 Adafruit_BluefruitLE library run loop</span></p>
 </div>
@@ -735,8 +744,8 @@ working.</p>
 </div>
 <div class="section" id="supported-devices">
 <h2>Supported Devices<a class="headerlink" href="#supported-devices" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="colwidths-given docutils" id="id16">
-<caption><span class="caption-text">BrickNil supported Lego® devices</span><a class="headerlink" href="#id16" title="Permalink to this table">¶</a></caption>
+<table border="1" class="colwidths-given docutils" id="id19">
+<caption><span class="caption-text">BrickNil supported Lego® devices</span><a class="headerlink" href="#id19" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col width="35%" />
 <col width="25%" />
@@ -754,10 +763,10 @@ working.</p>
 <td><dl class="first last docutils">
 <dt><a class="reference internal" href="_autosummary/bricknil.hub.html#bricknil.hub.PoweredUpHub" title="bricknil.hub.PoweredUpHub"><code class="xref py py-class docutils literal notranslate"><span class="pre">PoweredUpHub</span></code></a></dt>
 <dd><ul class="first last simple">
-<li>LED: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-class docutils literal notranslate"><span class="pre">LED</span></code></a></li>
-<li>Button: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.Button" title="bricknil.sensor.Button"><code class="xref py py-class docutils literal notranslate"><span class="pre">Button</span></code></a></li>
-<li>Current: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.CurrentSensor" title="bricknil.sensor.CurrentSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CurrentSensor</span></code></a></li>
-<li>Voltage: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.VoltageSensor" title="bricknil.sensor.VoltageSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a></li>
+<li>LED: <a class="reference internal" href="_autosummary/bricknil.sensor.light.html#bricknil.sensor.light.LED" title="bricknil.sensor.light.LED"><code class="xref py py-class docutils literal notranslate"><span class="pre">LED</span></code></a></li>
+<li>Button: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.Button" title="bricknil.sensor.sensor.Button"><code class="xref py py-class docutils literal notranslate"><span class="pre">Button</span></code></a></li>
+<li>Current: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.CurrentSensor" title="bricknil.sensor.sensor.CurrentSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CurrentSensor</span></code></a></li>
+<li>Voltage: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.VoltageSensor" title="bricknil.sensor.sensor.VoltageSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a></li>
 </ul>
 </dd>
 </dl>
@@ -765,14 +774,14 @@ working.</p>
 </tr>
 <tr class="row-odd"><td>PoweredUp Train Motor (<a class="reference external" href="https://click.linksynergy.com/deeplink?id=seuBib7H7fY&amp;mid=13923&amp;murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FTrain-Motor-88011">88011</a>)</td>
 <td><a class="reference external" href="https://www.amazon.com/gp/product/B07CC37F63/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">60197</a>, <a class="reference external" href="https://www.amazon.com/gp/product/B07C39LCZ9/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">60198</a></td>
-<td><a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.TrainMotor" title="bricknil.sensor.TrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainMotor</span></code></a></td>
+<td><a class="reference internal" href="_autosummary/bricknil.sensor.motor.html#bricknil.sensor.motor.TrainMotor" title="bricknil.sensor.motor.TrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainMotor</span></code></a></td>
 </tr>
 <tr class="row-even"><td>PoweredUp Remote (<a class="reference external" href="https://click.linksynergy.com/deeplink?id=seuBib7H7fY&amp;mid=13923&amp;murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FRemote-Control-88010">88010</a>)</td>
 <td><a class="reference external" href="https://www.amazon.com/gp/product/B07CC37F63/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">60197</a>, <a class="reference external" href="https://www.amazon.com/gp/product/B07C39LCZ9/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">60198</a></td>
 <td><dl class="first last docutils">
 <dt><a class="reference internal" href="_autosummary/bricknil.hub.html#bricknil.hub.PoweredUpRemote" title="bricknil.hub.PoweredUpRemote"><code class="xref py py-class docutils literal notranslate"><span class="pre">PoweredUpRemote</span></code></a></dt>
 <dd><ul class="first last simple">
-<li><a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.RemoteButtons" title="bricknil.sensor.RemoteButtons"><code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a></li>
+<li><a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.RemoteButtons" title="bricknil.sensor.sensor.RemoteButtons"><code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a></li>
 </ul>
 </dd>
 </dl>
@@ -780,19 +789,19 @@ working.</p>
 </tr>
 <tr class="row-odd"><td>PoweredUp Light (<a class="reference external" href="https://click.linksynergy.com/deeplink?id=seuBib7H7fY&amp;mid=13923&amp;murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FLight-88005">88005</a>)</td>
 <td><a class="reference external" href="https://click.linksynergy.com/deeplink?id=seuBib7H7fY&amp;mid=13923&amp;murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FLight-88005">88005</a></td>
-<td><a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.Light" title="bricknil.sensor.Light"><code class="xref py py-class docutils literal notranslate"><span class="pre">Light</span></code></a></td>
+<td><a class="reference internal" href="_autosummary/bricknil.sensor.light.html#bricknil.sensor.light.Light" title="bricknil.sensor.light.Light"><code class="xref py py-class docutils literal notranslate"><span class="pre">Light</span></code></a></td>
 </tr>
 <tr class="row-even"><td>Boost Hub (<a class="reference external" href="https://click.linksynergy.com/deeplink?id=seuBib7H7fY&amp;mid=13923&amp;murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FMove-Hub-88006">88006</a>)</td>
 <td><a class="reference external" href="https://www.amazon.com/gp/product/B06Y6JCTKH/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">17101</a></td>
 <td><dl class="first last docutils">
 <dt><a class="reference internal" href="_autosummary/bricknil.hub.html#bricknil.hub.BoostHub" title="bricknil.hub.BoostHub"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoostHub</span></code></a></dt>
 <dd><ul class="first last simple">
-<li>Motors: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.InternalMotor" title="bricknil.sensor.InternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalMotor</span></code></a></li>
-<li>Tilt: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.InternalTiltSensor" title="bricknil.sensor.InternalTiltSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a></li>
-<li>LED: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.LED" title="bricknil.sensor.LED"><code class="xref py py-class docutils literal notranslate"><span class="pre">LED</span></code></a></li>
-<li>Button: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.Button" title="bricknil.sensor.Button"><code class="xref py py-class docutils literal notranslate"><span class="pre">Button</span></code></a></li>
-<li>Current: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.CurrentSensor" title="bricknil.sensor.CurrentSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CurrentSensor</span></code></a></li>
-<li>Voltage: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.VoltageSensor" title="bricknil.sensor.VoltageSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a></li>
+<li>Motors: <a class="reference internal" href="_autosummary/bricknil.sensor.motor.html#bricknil.sensor.motor.InternalMotor" title="bricknil.sensor.motor.InternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalMotor</span></code></a></li>
+<li>Tilt: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.InternalTiltSensor" title="bricknil.sensor.sensor.InternalTiltSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a></li>
+<li>LED: <a class="reference internal" href="_autosummary/bricknil.sensor.light.html#bricknil.sensor.light.LED" title="bricknil.sensor.light.LED"><code class="xref py py-class docutils literal notranslate"><span class="pre">LED</span></code></a></li>
+<li>Button: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.Button" title="bricknil.sensor.sensor.Button"><code class="xref py py-class docutils literal notranslate"><span class="pre">Button</span></code></a></li>
+<li>Current: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.CurrentSensor" title="bricknil.sensor.sensor.CurrentSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CurrentSensor</span></code></a></li>
+<li>Voltage: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.VoltageSensor" title="bricknil.sensor.sensor.VoltageSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a></li>
 </ul>
 </dd>
 </dl>
@@ -800,22 +809,34 @@ working.</p>
 </tr>
 <tr class="row-odd"><td>Boost Vision Sensor (<a class="reference external" href="https://click.linksynergy.com/deeplink?id=seuBib7H7fY&amp;mid=13923&amp;murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FColor-Distance-Sensor-88007">88007</a>)</td>
 <td><a class="reference external" href="https://www.amazon.com/gp/product/B06Y6JCTKH/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">17101</a></td>
-<td><a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VisionSensor</span></code></a></td>
+<td><a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.VisionSensor" title="bricknil.sensor.sensor.VisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VisionSensor</span></code></a></td>
 </tr>
 <tr class="row-even"><td>Boost External Motor (<a class="reference external" href="https://click.linksynergy.com/deeplink?id=seuBib7H7fY&amp;mid=13923&amp;murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FMedium-Linear-Motor-88008">88008</a>)</td>
 <td><a class="reference external" href="https://www.amazon.com/gp/product/B06Y6JCTKH/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">17101</a></td>
-<td><a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.ExternalMotor" title="bricknil.sensor.ExternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalMotor</span></code></a></td>
+<td><a class="reference internal" href="_autosummary/bricknil.sensor.motor.html#bricknil.sensor.motor.ExternalMotor" title="bricknil.sensor.motor.ExternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalMotor</span></code></a></td>
 </tr>
-<tr class="row-odd"><td>Duplo Train Base</td>
+<tr class="row-odd"><td>Wedo External Motor (<a class="reference external" href="https://click.linksynergy.com/deeplink?id=seuBib7H7fY&amp;mid=13923&amp;murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FSimple-Medium-Linear-Motor-45303">45303</a>)</td>
+<td><a class="reference external" href="https://www.amazon.com/gp/product/B01A9A9XLW/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">45300</a></td>
+<td><a class="reference internal" href="_autosummary/bricknil.sensor.motor.html#bricknil.sensor.motor.WedoMotor" title="bricknil.sensor.motor.WedoMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">WedoMotor</span></code></a></td>
+</tr>
+<tr class="row-even"><td>Wedo Tilt Sensor (<a class="reference external" href="https://education.lego.com/en-us/products/wedo-2-0-tilt-sensor/45305">45305</a>)</td>
+<td><a class="reference external" href="https://www.amazon.com/gp/product/B01A9A9XLW/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">45300</a></td>
+<td><a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.ExternalTiltSensor" title="bricknil.sensor.sensor.ExternalTiltSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalTiltSensor</span></code></a></td>
+</tr>
+<tr class="row-odd"><td>Wedo Motion Sensor (<a class="reference external" href="https://education.lego.com/en-us/products/wedo-2-0-motion-sensor/45304">45304</a>)</td>
+<td><a class="reference external" href="https://www.amazon.com/gp/product/B01A9A9XLW/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">45300</a></td>
+<td><a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.ExternalMotionSensor" title="bricknil.sensor.sensor.ExternalMotionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalMotionSensor</span></code></a></td>
+</tr>
+<tr class="row-even"><td>Duplo Train Base</td>
 <td><a class="reference external" href="https://www.amazon.com/gp/product/B07BK6M2WC/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">10874</a>, <a class="reference external" href="https://www.amazon.com/gp/product/B07BK6KQR6/ref=as_li_tl?ie=UTF8&amp;tag=virantha-20&amp;camp=1789&amp;creative=9325&amp;linkCode=as2">10875</a></td>
 <td><dl class="first last docutils">
 <dt><a class="reference internal" href="_autosummary/bricknil.hub.html#bricknil.hub.DuploTrainHub" title="bricknil.hub.DuploTrainHub"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuploTrainHub</span></code></a></dt>
 <dd><ul class="first last simple">
-<li>Motor: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploTrainMotor" title="bricknil.sensor.DuploTrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuploTrainMotor</span></code></a></li>
-<li>Speedometer: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploSpeedSensor" title="bricknil.sensor.DuploSpeedSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuploSpeedSensor</span></code></a></li>
-<li>Vision: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.VisionSensor" title="bricknil.sensor.VisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VisionSensor</span></code></a></li>
-<li>Speaker: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.DuploSpeaker" title="bricknil.sensor.DuploSpeaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuploSpeaker</span></code></a></li>
-<li>Voltage: <a class="reference internal" href="_autosummary/bricknil.sensor.html#bricknil.sensor.VoltageSensor" title="bricknil.sensor.VoltageSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a></li>
+<li>Motor: <a class="reference internal" href="_autosummary/bricknil.sensor.motor.html#bricknil.sensor.motor.DuploTrainMotor" title="bricknil.sensor.motor.DuploTrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuploTrainMotor</span></code></a></li>
+<li>Speedometer: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.DuploSpeedSensor" title="bricknil.sensor.sensor.DuploSpeedSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuploSpeedSensor</span></code></a></li>
+<li>Vision: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.VisionSensor" title="bricknil.sensor.sensor.VisionSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VisionSensor</span></code></a></li>
+<li>Speaker: <a class="reference internal" href="_autosummary/bricknil.sensor.sound.html#bricknil.sensor.sound.DuploSpeaker" title="bricknil.sensor.sound.DuploSpeaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuploSpeaker</span></code></a></li>
+<li>Voltage: <a class="reference internal" href="_autosummary/bricknil.sensor.sensor.html#bricknil.sensor.sensor.VoltageSensor" title="bricknil.sensor.sensor.VoltageSensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a></li>
 </ul>
 </dd>
 </dl>
@@ -885,7 +906,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  Licensed under
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">BrickNil Docs (version 0.8.2)</a></li>
+      <li>Previous: <a href="index.html" title="previous chapter">BrickNil Docs (version 0.9)</a></li>
       <li>Next: <a href="pi_setup.html" title="next chapter">Setting up a Raspberry Pi with Python 3.7+ using Ansible</a></li>
   </ul></li>
 </ul>

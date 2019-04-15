@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bricknil.hub &#8212; BrickNil 0.8.2 documentation</title>
+    <title>bricknil.hub &#8212; BrickNil 0.9 documentation</title>
     <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="bricknil.process.html" title="bricknil.process"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -243,7 +243,7 @@
 
 <dl class="method">
 <dt id="bricknil.hub.Hub.attach_sensor">
-<code class="descname">attach_sensor</code><span class="sig-paren">(</span><em>sensor: bricknil.peripheral.Peripheral</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#Hub.attach_sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.Hub.attach_sensor" title="Permalink to this definition">¶</a></dt>
+<code class="descname">attach_sensor</code><span class="sig-paren">(</span><em>sensor: bricknil.sensor.peripheral.Peripheral</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#Hub.attach_sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.Hub.attach_sensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add instance variable for this decorated sensor</p>
 <p>Called by the class decorator <a class="reference internal" href="bricknil.bricknil.html#bricknil.bricknil.attach" title="bricknil.bricknil.attach"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.bricknil.attach</span></code></a> when decorating the sensor</p>
 </dd></dl>
@@ -268,7 +268,7 @@ that just attached itself to the hub on that port.</p>
 
 <dl class="method">
 <dt id="bricknil.hub.Hub.send_message">
-<code class="descname">send_message</code><span class="sig-paren">(</span><em>msg_name</em>, <em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#Hub.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.Hub.send_message" title="Permalink to this definition">¶</a></dt>
+<code class="descname">send_message</code><span class="sig-paren">(</span><em>msg_name</em>, <em>msg_bytes</em>, <em>peripheral=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/hub.html#Hub.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.hub.Hub.send_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert a message to the hub into the queue(<a class="reference internal" href="#bricknil.hub.Hub.message_queue" title="bricknil.hub.Hub.message_queue"><code class="xref py py-func docutils literal notranslate"><span class="pre">bricknil.hub.Hub.message_queue()</span></code></a>) connected to our BLE
 interface</p>
 </dd></dl>

@@ -1,0 +1,31 @@
+bricknil.const
+==============
+
+.. contents::
+    :local:
+
+.. currentmodule:: bricknil.const
+
+.. automodule:: bricknil.const
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  Color
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

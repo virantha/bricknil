@@ -1,0 +1,49 @@
+bricknil.sensor.sensor
+======================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bricknil.sensor.sensor
+
+.. automodule:: bricknil.sensor.sensor
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  Button
+	  
+	  CurrentSensor
+	  
+	  DuploSpeedSensor
+	  
+	  DuploVisionSensor
+	  
+	  ExternalMotionSensor
+	  
+	  ExternalTiltSensor
+	  
+	  InternalTiltSensor
+	  
+	  RemoteButtons
+	  
+	  VisionSensor
+	  
+	  VoltageSensor
+	  
+
+      
+
+      
+
+      Members
+      =======
+
+
+
+
+

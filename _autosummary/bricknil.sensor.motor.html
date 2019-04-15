@@ -1,0 +1,523 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>bricknil.sensor.motor &#8212; BrickNil 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="bricknil.sensor.sensor" href="bricknil.sensor.sensor.html" />
+    <link rel="prev" title="bricknil.sensor.peripheral" href="bricknil.sensor.peripheral.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bricknil.sensor.sensor.html" title="bricknil.sensor.sensor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bricknil.sensor.peripheral.html" title="bricknil.sensor.peripheral"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.9 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bricknil-sensor-motor">
+<h1>bricknil.sensor.motor<a class="headerlink" href="#bricknil-sensor-motor" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#classes" id="id1">Classes</a></li>
+<li><a class="reference internal" href="#members" id="id2">Members</a></li>
+</ul>
+</div>
+<span class="target" id="module-bricknil.sensor.motor"></span><p>All motor related peripherals including base motor classes</p>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id1">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.motor.DuploTrainMotor" title="bricknil.sensor.motor.DuploTrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploTrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Train Motor on Duplo Trains</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.motor.ExternalMotor" title="bricknil.sensor.motor.ExternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Access the stand-alone Boost motors</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.motor.InternalMotor" title="bricknil.sensor.motor.InternalMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Access the internal motor(s) in the Boost Move Hub.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.motor.Motor" title="bricknil.sensor.motor.Motor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Motor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Utility class for common functions shared between Train Motors, Internal Motors, and External Motors</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.motor.TachoMotor" title="bricknil.sensor.motor.TachoMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TachoMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.motor.TrainMotor" title="bricknil.sensor.motor.TrainMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Connects to the train motors.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.motor.WedoMotor" title="bricknil.sensor.motor.WedoMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WedoMotor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Connects to the Wedo motors.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="members">
+<h2><a class="toc-backref" href="#id2">Members</a><a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bricknil.sensor.motor.Motor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.motor.</code><code class="descname">Motor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#Motor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.Motor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Utility class for common functions shared between Train Motors, Internal Motors, and External Motors</p>
+<dl class="method">
+<dt id="bricknil.sensor.motor.Motor.ramp_speed">
+<code class="descname">ramp_speed</code><span class="sig-paren">(</span><em>target_speed</em>, <em>ramp_time_ms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#Motor.ramp_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.Motor.ramp_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ramp the speed by 10 units in the time given in milliseconds</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.motor.Motor.set_speed">
+<code class="descname">set_speed</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#Motor.set_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.Motor.set_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate and set the train speed</p>
+<p>If there is an in-progress ramp, and this command is not part of that ramp,
+then cancel that in-progress ramp first, before issuing this set_speed command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Range -100 to 100 where negative numbers are reverse.
+Use 0 to put the motor into neutral.
+255 will do a hard brake</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.motor.TachoMotor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.motor.</code><code class="descname">TachoMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#TachoMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bricknil.sensor.motor.Motor" title="bricknil.sensor.motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.motor.Motor</span></code></a></p>
+<dl class="class">
+<dt id="bricknil.sensor.motor.TachoMotor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.TachoMotor.capability.sense_pos">
+<code class="descname">sense_pos</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor.capability.sense_pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.TachoMotor.capability.sense_speed">
+<code class="descname">sense_speed</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor.capability.sense_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.TachoMotor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_speed: 1&gt;: (1, 1), &lt;capability.sense_pos: 2&gt;: (1, 4)}</em><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dict of (num_datasets, bytes_per_dataset).
+<cite>sense_speed</cite> (1-byte), and <cite>sense_pos</cite> (uint32)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.TachoMotor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_speed: 1&gt;, &lt;capability.sense_pos: 2&gt;]</em><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.motor.TachoMotor.ramp_speed2">
+<code class="descname">ramp_speed2</code><span class="sig-paren">(</span><em>target_speed</em>, <em>ramp_time_ms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#TachoMotor.ramp_speed2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor.ramp_speed2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Experimental function, not implemented yet DO NOT USE</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.motor.TachoMotor.rotate">
+<code class="descname">rotate</code><span class="sig-paren">(</span><em>degrees</em>, <em>speed</em>, <em>max_power=50</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#TachoMotor.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the given number of degrees from current position, with direction given by sign of speed</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>   <span class="c1"># Rotate 90 degrees clockwise (looking from end of shaft towards motor)</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">speed</span><span class="o">=-</span><span class="mi">50</span><span class="p">)</span>  <span class="c1"># Rotate conter-clockwise 90 degrees</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">720</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>  <span class="c1"># Rotate two full circles clockwise</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>degrees</strong> (<em>uint</em>) – Relative number of degrees to rotate</li>
+<li><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – -100 to 100</li>
+<li><strong>max_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Max percentage power that will be applied (0-100%)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>Use command StartSpeedForDegrees</dt>
+<dd><ul class="first last simple">
+<li>0x00 = hub id</li>
+<li>0x81 = Port Output command</li>
+<li>port</li>
+<li>0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</li>
+<li>0x0b = Subcommand</li>
+<li>degrees (int32) 0..1000000</li>
+<li>speed -100 - 100%</li>
+<li>max_power abs(0-100%)</li>
+<li>endstate = 0 (float), 126 (hold), 127 (brake)</li>
+<li>Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)</li>
+<li></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.motor.TachoMotor.set_pos">
+<code class="descname">set_pos</code><span class="sig-paren">(</span><em>pos</em>, <em>speed=50</em>, <em>max_power=50</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#TachoMotor.set_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.TachoMotor.set_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the absolute position of the motor</p>
+<p>Everytime the hub is powered up, the zero-angle reference will be reset to the
+motor’s current position. When you issue this command, the motor will rotate to
+the position given in degrees.  The sign of the pos tells you which direction to rotate:
+(1) a positive number will rotate clockwise as looking from end of shaft towards the motor,
+(2) a negative number will rotate counter-clockwise</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>   <span class="c1"># Rotate 90 degrees clockwise (looking from end of shaft towards motor)</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">)</span>  <span class="c1"># Rotate conter-clockwise 90 degrees</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">720</span><span class="p">)</span>  <span class="c1"># Rotate two full circles clockwise</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pos</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Absolute position in degrees.</li>
+<li><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Absolute value from 0-100</li>
+<li><strong>max_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Max percentage power that will be applied (0-100%)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>Use command GotoAbsolutePosition</dt>
+<dd><ul class="first last simple">
+<li>0x00 = hub id</li>
+<li>0x81 = Port Output command</li>
+<li>port</li>
+<li>0x11 = Upper nibble (0=buffer, 1=immediate execution), Lower nibble (0=No ack, 1=command feedback)</li>
+<li>0x0d = Subcommand</li>
+<li>abs_pos (int32)</li>
+<li>speed -100 - 100</li>
+<li>max_power abs(0-100%)</li>
+<li>endstate = 0 (float), 126 (hold), 127 (brake)</li>
+<li>Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)</li>
+<li></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.motor.InternalMotor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.motor.</code><code class="descname">InternalMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#InternalMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.InternalMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bricknil.sensor.motor.TachoMotor" title="bricknil.sensor.motor.TachoMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.motor.TachoMotor</span></code></a></p>
+<p>Access the internal motor(s) in the Boost Move Hub.</p>
+<p>Unlike the train motors, these motors (as well as the stand-alone Boost
+motors <a class="reference internal" href="#bricknil.sensor.motor.ExternalMotor" title="bricknil.sensor.motor.ExternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalMotor</span></code></a>) have a built-in sensor/tachometer for sending back
+the motor’s current speed and position.  However, you don’t need to use the
+sensors, and can treat this motor strictly as an output device.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the motor on Port A</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;left_motor&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># Basic connection to both motors at the same time (virtual I/O port).</span>
+<span class="c1"># Any speed command will cause both motors to rotate at the same speed</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">AB</span><span class="p">)</span>
+
+<span class="c1"># Report back when motor speed changes. You must have a motor_change method defined</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">])</span>
+
+<span class="c1"># Only report back when speed change exceeds 5 units</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">InternalMotor</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>And within the run body you can control the motor output::</dt>
+<dd>await self.motor.set_speed(50)   # Setting the speed
+await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
+await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o’clock position
+await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position</dd>
+</dl>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#bricknil.sensor.motor.TrainMotor" title="bricknil.sensor.motor.TrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainMotor</span></code></a> for connecting to a train motor</li>
+<li><a class="reference internal" href="#bricknil.sensor.motor.ExternalMotor" title="bricknil.sensor.motor.ExternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalMotor</span></code></a> for connecting to a Boost tacho motor</li>
+</ul>
+</div>
+<p>Maps the port names <cite>A</cite>, <cite>B</cite>, <cite>AB</cite> to hard-coded port numbers</p>
+<dl class="class">
+<dt id="bricknil.sensor.motor.InternalMotor.Port">
+<em class="property">class </em><code class="descname">Port</code><a class="headerlink" href="#bricknil.sensor.motor.InternalMotor.Port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>Address either motor A or Motor B, or both AB at the same time</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.InternalMotor.Port.A">
+<code class="descname">A</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.motor.InternalMotor.Port.A" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.InternalMotor.Port.AB">
+<code class="descname">AB</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.motor.InternalMotor.Port.AB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.InternalMotor.Port.B">
+<code class="descname">B</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.motor.InternalMotor.Port.B" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.motor.ExternalMotor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.motor.</code><code class="descname">ExternalMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#ExternalMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.ExternalMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bricknil.sensor.motor.TachoMotor" title="bricknil.sensor.motor.TachoMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.motor.TachoMotor</span></code></a></p>
+<p>Access the stand-alone Boost motors</p>
+<p>These are similar to the <a class="reference internal" href="#bricknil.sensor.motor.InternalMotor" title="bricknil.sensor.motor.InternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalMotor</span></code></a> with build-in tachometer and
+sensor for sending back the motor’s current speed and position.  You
+don’t need to use the sensors, and can treat this as strictly an
+output.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the motor on Port A</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">ExternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+
+<span class="c1"># Report back when motor speed changes. You must have a motor_change method defined</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">ExternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">])</span>
+
+<span class="c1"># Only report back when speed change exceeds 5 units, and position changes (degrees)</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">ExternalMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="s1">&#39;sense_pos&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>And then within the run body:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>   <span class="c1"># Setting the speed</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">ramp_speed</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>  <span class="c1"># Ramp speed to 80 over 2 seconds</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_pos</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span> <span class="c1"># Turn clockwise to 3 o&#39;clock position</span>
+<span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="n">speed</span><span class="o">=-</span><span class="mi">50</span><span class="p">)</span> <span class="c1"># Turn 60 degrees counter-clockwise from current position</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#bricknil.sensor.motor.TrainMotor" title="bricknil.sensor.motor.TrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainMotor</span></code></a> for connecting to a train motor</li>
+<li><a class="reference internal" href="#bricknil.sensor.motor.InternalMotor" title="bricknil.sensor.motor.InternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalMotor</span></code></a> for connecting to the Boost hub built-in motors</li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.motor.TrainMotor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.motor.</code><code class="descname">TrainMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#TrainMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.TrainMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bricknil.sensor.motor.Motor" title="bricknil.sensor.motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.motor.Motor</span></code></a></p>
+<p>Connects to the train motors.</p>
+<p>TrainMotor has no sensing capabilities and only supports a single output mode that
+sets the speed.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">TrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And then within the run body, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.TrainMotor.speed">
+<code class="descname">speed</code><a class="headerlink" href="#bricknil.sensor.motor.TrainMotor.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep track of the current speed in order to ramp it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#bricknil.sensor.motor.InternalMotor" title="bricknil.sensor.motor.InternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalMotor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.motor.WedoMotor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.motor.</code><code class="descname">WedoMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#WedoMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.WedoMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bricknil.sensor.motor.Motor" title="bricknil.sensor.motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.motor.Motor</span></code></a></p>
+<p>Connects to the Wedo motors.</p>
+<p>WedoMotor has no sensing capabilities and only supports a single output mode that
+sets the speed.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">WedoMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And then within the run body, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.WedoMotor.speed">
+<code class="descname">speed</code><a class="headerlink" href="#bricknil.sensor.motor.WedoMotor.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep track of the current speed in order to ramp it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#bricknil.sensor.motor.InternalMotor" title="bricknil.sensor.motor.InternalMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalMotor</span></code></a></li>
+<li><a class="reference internal" href="#bricknil.sensor.motor.TrainMotor" title="bricknil.sensor.motor.TrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainMotor</span></code></a></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.motor.DuploTrainMotor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.motor.</code><code class="descname">DuploTrainMotor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/motor.html#DuploTrainMotor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.motor.DuploTrainMotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bricknil.sensor.motor.Motor" title="bricknil.sensor.motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.motor.Motor</span></code></a></p>
+<p>Train Motor on Duplo Trains</p>
+<p>Make sure that the train is sitting on the ground (the front wheels need to keep rotating) in
+order to keep the train motor powered.  If you pick up the train, the motor will stop operating
+withina few seconds.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">DuploTrainMotor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motor&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And then within the run body, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">set_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="bricknil.sensor.motor.DuploTrainMotor.speed">
+<code class="descname">speed</code><a class="headerlink" href="#bricknil.sensor.motor.DuploTrainMotor.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep track of the current speed in order to ramp it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#bricknil.sensor.motor.TrainMotor" title="bricknil.sensor.motor.TrainMotor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainMotor</span></code></a> for connecting to a PoweredUp train motor</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">bricknil.sensor.motor</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#members">Members</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation index</a><ul>
+  <li><a href="../api.html">API Documentation</a><ul>
+      <li>Previous: <a href="bricknil.sensor.peripheral.html" title="previous chapter">bricknil.sensor.peripheral</a></li>
+      <li>Next: <a href="bricknil.sensor.sensor.html" title="next chapter">bricknil.sensor.sensor</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/bricknil.sensor.motor.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>

@@ -1,0 +1,923 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>bricknil.sensor.sensor &#8212; BrickNil 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="bricknil.sensor.light" href="bricknil.sensor.light.html" />
+    <link rel="prev" title="bricknil.sensor.motor" href="bricknil.sensor.motor.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bricknil.sensor.light.html" title="bricknil.sensor.light"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bricknil.sensor.motor.html" title="bricknil.sensor.motor"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">BrickNil 0.9 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bricknil-sensor-sensor">
+<h1>bricknil.sensor.sensor<a class="headerlink" href="#bricknil-sensor-sensor" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#classes" id="id1">Classes</a></li>
+<li><a class="reference internal" href="#members" id="id2">Members</a></li>
+</ul>
+</div>
+<span class="target" id="module-bricknil.sensor.sensor"></span><p>Actual sensor and motor peripheral definitions from Boost and PoweredUp</p>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id1">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.sensor.Button" title="bricknil.sensor.sensor.Button"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Button</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Register to be notified of button presses on the Hub (Boost or PoweredUp)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.sensor.CurrentSensor" title="bricknil.sensor.sensor.CurrentSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CurrentSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Voltage sensor</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.sensor.DuploSpeedSensor" title="bricknil.sensor.sensor.DuploSpeedSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploSpeedSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Speedometer on Duplo train base that measures front wheel speed.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.sensor.DuploVisionSensor" title="bricknil.sensor.sensor.DuploVisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuploVisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Access the Duplo Vision/Distance Sensor</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.sensor.ExternalMotionSensor" title="bricknil.sensor.sensor.ExternalMotionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExternalMotionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Access the external motion sensor (IR) provided in the Wedo sets</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.sensor.ExternalTiltSensor" title="bricknil.sensor.sensor.ExternalTiltSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExternalTiltSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Access the External tilt sensor provided in the Wedo sets</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.sensor.InternalTiltSensor" title="bricknil.sensor.sensor.InternalTiltSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalTiltSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Access the internal tilt sensor in the Boost Move Hub.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.sensor.RemoteButtons" title="bricknil.sensor.sensor.RemoteButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteButtons</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Represents one set of ‘+’, ‘-‘, ‘red’ buttons on the PoweredHub Remote</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bricknil.sensor.sensor.VisionSensor" title="bricknil.sensor.sensor.VisionSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisionSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Access the Boost Vision/Distance Sensor</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bricknil.sensor.sensor.VoltageSensor" title="bricknil.sensor.sensor.VoltageSensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VoltageSensor</span></code></a>(name[,&nbsp;port,&nbsp;capabilities])</td>
+<td>Voltage sensor</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="members">
+<h2><a class="toc-backref" href="#id2">Members</a><a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.VisionSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">VisionSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#VisionSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Access the Boost Vision/Distance Sensor</p>
+<p>Only the sensing capabilities of this sensor is supported right now.</p>
+<ul class="simple">
+<li><em>sense_color</em>: Returns one of the 10 predefined colors</li>
+<li><em>sense_distance</em>: Distance from 0-7 in roughly inches</li>
+<li><em>sense_count</em>: Running count of waving your hand/item over the sensor (32-bit)</li>
+<li><em>sense_reflectivity</em>: Under distances of one inch, the inverse of the distance</li>
+<li><em>sense_ambient</em>: Distance under one inch (so inverse of the preceeding)</li>
+<li><em>sense_rgb</em>: R, G, B values (3 sets of uint16)</li>
+</ul>
+<p>Any combination of sense_color, sense_distance, sense_count, sense_reflectivity,
+and sense_rgb is supported.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic distance sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">])</span>
+<span class="c1"># Or use the capability Enum</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">])</span>
+
+<span class="c1"># Distance and color sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+
+<span class="c1"># Distance and rgb sensor with different thresholds to trigger updates</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">VisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>The values returned by the sensor will always be available in the instance variable
+<cite>self.value</cite>.  For example, when the <cite>sense_color</cite> and <cite>sense_rgb</cite> capabilities are
+enabled, the following values will be stored and updated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{</span> <span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">:</span>  <span class="n">uint8</span><span class="p">,</span>
+               <span class="n">VisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_rgb</span><span class="p">:</span>
+                                <span class="p">[</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint16</span> <span class="p">]</span>
+             <span class="p">}</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>The actual modes supported by the sensor are as follows:</p>
+<ul class="simple">
+<li>0 = color (0-10)</li>
+<li>1 = IR proximity (0-7)</li>
+<li>2 = count (32-bit int)</li>
+<li>3 = Reflt   (inverse of distance when closer than 1”)</li>
+<li>4 = Amb  (distance when closer than 1”)</li>
+<li>5 = COL (output) ?</li>
+<li>6 = RGB I</li>
+<li>7 = IR tx (output) ?</li>
+<li>8 = combined:  Color byte, Distance byte, 0xFF, Reflected light</li>
+</ul>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.VisionSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VisionSensor.capability.sense_ambient">
+<code class="descname">sense_ambient</code><em class="property"> = 4</em><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.capability.sense_ambient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VisionSensor.capability.sense_color">
+<code class="descname">sense_color</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.capability.sense_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VisionSensor.capability.sense_count">
+<code class="descname">sense_count</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.capability.sense_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VisionSensor.capability.sense_distance">
+<code class="descname">sense_distance</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.capability.sense_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VisionSensor.capability.sense_reflectivity">
+<code class="descname">sense_reflectivity</code><em class="property"> = 3</em><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.capability.sense_reflectivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VisionSensor.capability.sense_rgb">
+<code class="descname">sense_rgb</code><em class="property"> = 6</em><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.capability.sense_rgb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VisionSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_color: 0&gt;: (1, 1), &lt;capability.sense_distance: 1&gt;: (1, 1), &lt;capability.sense_count: 2&gt;: (1, 4), &lt;capability.sense_reflectivity: 3&gt;: (1, 1), &lt;capability.sense_ambient: 4&gt;: (1, 1), &lt;capability.sense_rgb: 6&gt;: (3, 2)}</em><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VisionSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_color: 0&gt;, &lt;capability.sense_distance: 1&gt;, &lt;capability.sense_count: 2&gt;, &lt;capability.sense_reflectivity: 3&gt;, &lt;capability.sense_rgb: 6&gt;]</em><a class="headerlink" href="#bricknil.sensor.sensor.VisionSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">InternalTiltSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#InternalTiltSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Access the internal tilt sensor in the Boost Move Hub.</p>
+<p>The various modes are:</p>
+<ul class="simple">
+<li><strong>sense_angle</strong> - X, Y angles.  Both are 0 if hub is lying flat with button up</li>
+<li><strong>sense_tilt</strong> - value from 0-9 if hub is tilted around any of its axis. Seems to be
+a rough mesaure of how much the hub is tilted away from lying flat.
+There is no update for just a translation along an axis</li>
+<li><dl class="first docutils">
+<dt><strong>sense_orientation</strong> - returns one of the nine orientations below (0-9)</dt>
+<dd><ul class="first last">
+<li><cite>InternalTiltSensor.orientation</cite>.up = flat with button on top</li>
+<li><cite>InternalTiltSensor.orientation</cite>.right - standing up on side closest to button</li>
+<li><cite>InternalTiltSensor.orientation</cite>.left - standing up on side furthest from button</li>
+<li><cite>InternalTiltSensor.orientation</cite>.far_side - on long face facing away</li>
+<li><cite>InternalTiltSensor.orientation</cite>.near_side -  on long face facing you</li>
+<li><cite>InternalTiltSensor.orientation</cite>.down - upside down</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>sense_impact</strong> - 32-bit count of impacts to sensor</li>
+<li><strong>sense_acceleration_3_axis</strong> - 3 bytes of raw accelerometer data.</li>
+</ul>
+<p>Any combination of the above modes are allowed.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic tilt sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_tilt&#39;</span><span class="p">])</span>
+<span class="c1"># Or use the capability Enum</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">sense_tilt</span><span class="p">])</span>
+
+<span class="c1"># Tilt and orientation sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tilt&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_tilt, sense_orientation&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The values returned by the sensor will always be available in the
+instance variable <cite>self.value</cite>.  For example, when the <cite>sense_angle</cite>
+and <cite>sense_orientation</cite> capabilities are enabled, the following values
+will be stored and updated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{</span> <span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_angle</span><span class="p">:</span>  <span class="p">[</span><span class="n">uint8</span><span class="p">,</span> <span class="n">uint8</span><span class="p">],</span>
+               <span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_orientation</span><span class="p">:</span>
+                                <span class="n">Enum</span><span class="p">(</span><span class="n">InternalTiltSensor</span><span class="o">.</span><span class="n">orientation</span><span class="p">)</span>
+             <span class="p">}</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.capability.sense_acceleration_3_axis">
+<code class="descname">sense_acceleration_3_axis</code><em class="property"> = 4</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.capability.sense_acceleration_3_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.capability.sense_angle">
+<code class="descname">sense_angle</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.capability.sense_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.capability.sense_impact">
+<code class="descname">sense_impact</code><em class="property"> = 3</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.capability.sense_impact" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.capability.sense_orientation">
+<code class="descname">sense_orientation</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.capability.sense_orientation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.capability.sense_tilt">
+<code class="descname">sense_tilt</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.capability.sense_tilt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_angle: 0&gt;: (2, 1), &lt;capability.sense_tilt: 1&gt;: (1, 1), &lt;capability.sense_orientation: 2&gt;: (1, 1), &lt;capability.sense_impact: 3&gt;: (1, 4), &lt;capability.sense_acceleration_3_axis: 4&gt;: (3, 1)}</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_angle: 0&gt;, &lt;capability.sense_tilt: 1&gt;, &lt;capability.sense_orientation: 2&gt;, &lt;capability.sense_impact: 3&gt;, &lt;capability.sense_acceleration_3_axis: 4&gt;]</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.orientation">
+<em class="property">class </em><code class="descname">orientation</code><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.orientation.down">
+<code class="descname">down</code><em class="property"> = 5</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.orientation.down" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.orientation.far_side">
+<code class="descname">far_side</code><em class="property"> = 3</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.orientation.far_side" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.orientation.left">
+<code class="descname">left</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.orientation.left" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.orientation.near_side">
+<code class="descname">near_side</code><em class="property"> = 4</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.orientation.near_side" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.orientation.right">
+<code class="descname">right</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.orientation.right" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.orientation.up">
+<code class="descname">up</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.orientation.up" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.sensor.InternalTiltSensor.update_value">
+<code class="descname">update_value</code><span class="sig-paren">(</span><em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#InternalTiltSensor.update_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.InternalTiltSensor.update_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>If sense_orientation, then substitute the <cite>IntenalTiltSensor.orientation</cite>
+enumeration value into the self.value dict.  Otherwise, don’t do anything
+special to the self.value dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.ExternalMotionSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">ExternalMotionSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#ExternalMotionSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.ExternalMotionSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Access the external motion sensor (IR) provided in the Wedo sets</p>
+<p>Measures distance to object, or if an object is moving (distance varying).</p>
+<ul class="simple">
+<li><strong>sense_distance</strong> - distance in inches from 0-10</li>
+<li><strong>sense_count</strong>  - Increments every time it detects motion (32-bit value)</li>
+</ul>
+<p>These are mutually exclusive (non-combinable)</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Distance measurement</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">ExternalMotionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motion_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_distance&#39;</span><span class="p">])</span>
+
+
+<span class="c1"># Motion detection</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">ExternalMotionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;motion_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_count&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.ExternalMotionSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.ExternalMotionSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalMotionSensor.capability.sense_count">
+<code class="descname">sense_count</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalMotionSensor.capability.sense_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalMotionSensor.capability.sense_distance">
+<code class="descname">sense_distance</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalMotionSensor.capability.sense_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalMotionSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_distance: 0&gt;: (1, 1), &lt;capability.sense_count: 1&gt;: (1, 4)}</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalMotionSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalMotionSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = []</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalMotionSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">ExternalTiltSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#ExternalTiltSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Access the External tilt sensor provided in the Wedo sets</p>
+<p>Three modes are supported (non-combinable):</p>
+<ul class="simple">
+<li><strong>sense_angle</strong> - X (around long axis), Y (around short axis) angles.  -45 to 45 degrees</li>
+<li><dl class="first docutils">
+<dt><strong>sense_orientation</strong> - returns one of the orientations below (wrt looking at the sensor from the side opposite the wiring harness)</dt>
+<dd><ul class="first last">
+<li><cite>ExternalTiltSensor.orientation</cite>.up = flat with studs on top</li>
+<li><cite>ExternalTiltSensor.orientation</cite>.right = studs facing rigth</li>
+<li><cite>ExternalTiltSensor.orientation</cite>.left = studs facing left</li>
+<li><cite>ExternalTiltSensor.orientation</cite>.far_side = studs facing away from you</li>
+<li><cite>ExternalTiltSensor.orientation</cite>.near_side = studs facing towards you</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>sense_impact</strong> - Keeps a count of impacts, but sends three bytes (direction of hit?)</li>
+</ul>
+<p>These are mutually exclusive (non-combinable).</p>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.capability.sense_angle">
+<code class="descname">sense_angle</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.capability.sense_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.capability.sense_impact">
+<code class="descname">sense_impact</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.capability.sense_impact" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.capability.sense_orientation">
+<code class="descname">sense_orientation</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.capability.sense_orientation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_angle: 0&gt;: (2, 1), &lt;capability.sense_orientation: 1&gt;: (1, 1), &lt;capability.sense_impact: 2&gt;: (3, 1)}</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = []</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.orientation">
+<em class="property">class </em><code class="descname">orientation</code><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.orientation.far_side">
+<code class="descname">far_side</code><em class="property"> = 3</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.orientation.far_side" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.orientation.left">
+<code class="descname">left</code><em class="property"> = 5</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.orientation.left" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.orientation.near_side">
+<code class="descname">near_side</code><em class="property"> = 9</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.orientation.near_side" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.orientation.right">
+<code class="descname">right</code><em class="property"> = 7</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.orientation.right" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.orientation.up">
+<code class="descname">up</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.orientation.up" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.sensor.ExternalTiltSensor.update_value">
+<code class="descname">update_value</code><span class="sig-paren">(</span><em>msg_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#ExternalTiltSensor.update_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.ExternalTiltSensor.update_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>If angle, convert the bytes being returned to twos complement ints
+If orientation, then convert to the <cite>orientation</cite> enumeration.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.RemoteButtons">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">RemoteButtons</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#RemoteButtons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Represents one set of ‘+’, ‘-‘, ‘red’ buttons on the PoweredHub Remote</p>
+<p>Each remote has two sets of buttons, on the left and right side.  Pick the one
+your want to attach to by using the port argument with either Port.L or Port.R.</p>
+<p>There are actually a few different modes that the hardware supports, but we are
+only going to use one of them called ‘KEYSD’ (see the notes in the documentation on the
+raw values reported by the hub).  This mode makes the remote send three values back
+in a list.  To access each button state, there are three helper methods provided
+(see below)</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic connection to the left buttons</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">RemoteButtons</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;left_buttons&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">RemoteButtons</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+
+<span class="c1"># Getting values back in the handler</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">left_buttons_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="n">is_plus_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_buttons</span><span class="o">.</span><span class="n">plus_pressed</span><span class="p">()</span>
+    <span class="n">is_minus_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_buttons</span><span class="o">.</span><span class="n">minus_pressed</span><span class="p">()</span>
+    <span class="n">is_red_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_buttons</span><span class="o">.</span><span class="n">red_pressed</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Maps the port names <cite>L</cite>, <cite>R</cite></p>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.RemoteButtons.Port">
+<em class="property">class </em><code class="descname">Port</code><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.Port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.RemoteButtons.Port.L">
+<code class="descname">L</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.Port.L" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.RemoteButtons.Port.R">
+<code class="descname">R</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.Port.R" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.RemoteButtons.Button">
+<em class="property">class </em><code class="descname">Button</code><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.Button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a></p>
+<p>The button index in the value list returned by the sensor</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.RemoteButtons.Button.MINUS">
+<code class="descname">MINUS</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.Button.MINUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.RemoteButtons.Button.PLUS">
+<code class="descname">PLUS</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.Button.PLUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.RemoteButtons.Button.RED">
+<code class="descname">RED</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.Button.RED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.RemoteButtons.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.RemoteButtons.capability.sense_press">
+<code class="descname">sense_press</code><em class="property"> = 4</em><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.capability.sense_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.RemoteButtons.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_press: 4&gt;: (3, 1)}</em><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.RemoteButtons.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = []</em><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.sensor.RemoteButtons.plus_pressed">
+<code class="descname">plus_pressed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#RemoteButtons.plus_pressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.plus_pressed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether <cite>value</cite> reflects that the PLUS button is pressed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.sensor.RemoteButtons.minus_pressed">
+<code class="descname">minus_pressed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#RemoteButtons.minus_pressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.minus_pressed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether <cite>value</cite> reflects that the MINUS button is pressed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.sensor.RemoteButtons.red_pressed">
+<code class="descname">red_pressed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#RemoteButtons.red_pressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.RemoteButtons.red_pressed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether <cite>value</cite> reflects that the RED button is pressed</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.Button">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">Button</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#Button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.Button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Register to be notified of button presses on the Hub (Boost or PoweredUp)</p>
+<p>This is actually a slight hack, since the Hub button is not a peripheral that is
+attached like other sensors in the Lego protocol.  Instead, the buttons are accessed
+through Hub property messages.  We abstract away these special messages to make the
+button appear to be like any other peripheral sensor.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">Button</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;hub_btn&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>Since there is no attach I/O message from the hub to trigger the
+<a class="reference internal" href="#bricknil.sensor.sensor.Button.activate_updates" title="bricknil.sensor.sensor.Button.activate_updates"><code class="xref py py-func docutils literal notranslate"><span class="pre">activate_updates()</span></code></a> method, we instead insert a fake
+“attaach” message from this fake sensor on port 255 in the
+<cite>BLEventQ.get_messages</cite> method that is used to register for updates
+from a given sensor.</p>
+<p>Call super-class with port set to 255</p>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.Button.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.Button.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.Button.capability.sense_press">
+<code class="descname">sense_press</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.Button.capability.sense_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.Button.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_press: 0&gt;: (1, 1)}</em><a class="headerlink" href="#bricknil.sensor.sensor.Button.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.Button.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_press: 0&gt;]</em><a class="headerlink" href="#bricknil.sensor.sensor.Button.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bricknil.sensor.sensor.Button.activate_updates">
+<code class="descname">activate_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#Button.activate_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.Button.activate_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use a special Hub Properties button message updates activation message</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.DuploVisionSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">DuploVisionSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#DuploVisionSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.DuploVisionSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Access the Duplo Vision/Distance Sensor</p>
+<ul class="simple">
+<li><em>sense_color</em>: Returns one of the 10 predefined colors</li>
+<li><em>sense_ctag</em>: Returns one of the 10 predefined tags</li>
+<li><em>sense_reflectivity</em>: Under distances of one inch, the inverse of the distance</li>
+<li><em>sense_rgb</em>: R, G, B values (3 sets of uint16)</li>
+</ul>
+<p>Any combination of sense_color, sense_ctag, sense_reflectivity,
+and sense_rgb is supported.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic color sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_color&#39;</span><span class="p">])</span>
+<span class="c1"># Or use the capability Enum</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">])</span>
+
+<span class="c1"># Ctag and reflectivity sensor</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_ctag&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_reflectivity&#39;</span><span class="p">])</span>
+
+<span class="c1"># Distance and rgb sensor with different thresholds to trigger updates</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploVisionSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vision&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;sense_color&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;sense_rgb&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>The values returned by the sensor will always be available in the instance variable
+<cite>self.value</cite>.  For example, when the <cite>sense_color</cite> and <cite>sense_rgb</cite> capabilities are
+enabled, the following values will be stored and updated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{</span> <span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_color</span><span class="p">:</span>  <span class="n">uint8</span><span class="p">,</span>
+               <span class="n">DuploVisionSensor</span><span class="o">.</span><span class="n">capability</span><span class="o">.</span><span class="n">sense_rgb</span><span class="p">:</span>
+                                <span class="p">[</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint16</span> <span class="p">]</span>
+             <span class="p">}</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>The actual modes supported by the sensor are as follows:</p>
+<ul class="simple">
+<li>0 = color (0-10)</li>
+<li>1 = ctag (32-bit int)</li>
+<li>2 = Reflt   (inverse of distance when closer than 1”)</li>
+<li>3 = RGB I</li>
+</ul>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.DuploVisionSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.DuploVisionSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploVisionSensor.capability.sense_color">
+<code class="descname">sense_color</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploVisionSensor.capability.sense_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploVisionSensor.capability.sense_ctag">
+<code class="descname">sense_ctag</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploVisionSensor.capability.sense_ctag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploVisionSensor.capability.sense_reflectivity">
+<code class="descname">sense_reflectivity</code><em class="property"> = 2</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploVisionSensor.capability.sense_reflectivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploVisionSensor.capability.sense_rgb">
+<code class="descname">sense_rgb</code><em class="property"> = 3</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploVisionSensor.capability.sense_rgb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploVisionSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_color: 0&gt;: (1, 1), &lt;capability.sense_ctag: 1&gt;: (1, 1), &lt;capability.sense_reflectivity: 2&gt;: (1, 1), &lt;capability.sense_rgb: 3&gt;: (3, 2)}</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploVisionSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploVisionSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_color: 0&gt;, &lt;capability.sense_ctag: 1&gt;, &lt;capability.sense_reflectivity: 2&gt;, &lt;capability.sense_rgb: 3&gt;]</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploVisionSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.VoltageSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">VoltageSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#VoltageSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.VoltageSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Voltage sensor</p>
+<p>Returns the raw mV value (0-3893) which probably needs to be scaled to 0-9600.</p>
+<p>It contains two capabilities, although they both appear to do the same thing:
+* sense_l
+* sense_s</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">VoltageSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;volts&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_l&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.VoltageSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.VoltageSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VoltageSensor.capability.sense_l">
+<code class="descname">sense_l</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.VoltageSensor.capability.sense_l" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VoltageSensor.capability.sense_s">
+<code class="descname">sense_s</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.VoltageSensor.capability.sense_s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VoltageSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_s: 0&gt;: (1, 2), &lt;capability.sense_l: 1&gt;: (1, 2)}</em><a class="headerlink" href="#bricknil.sensor.sensor.VoltageSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.VoltageSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = []</em><a class="headerlink" href="#bricknil.sensor.sensor.VoltageSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.CurrentSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">CurrentSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#CurrentSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.CurrentSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Voltage sensor</p>
+<p>Returns the raw mA value (0-4095) which probably needs to be scaled to 0-2444.</p>
+<p>It contains two capabilities, although they both appear to do the same thing:
+* sense_l
+* sense_s</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@attach</span><span class="p">(</span><span class="n">CurrentSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;cur&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_l&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.CurrentSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.CurrentSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.CurrentSensor.capability.sense_l">
+<code class="descname">sense_l</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.CurrentSensor.capability.sense_l" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.CurrentSensor.capability.sense_s">
+<code class="descname">sense_s</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.CurrentSensor.capability.sense_s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.CurrentSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_s: 0&gt;: (1, 2), &lt;capability.sense_l: 1&gt;: (1, 2)}</em><a class="headerlink" href="#bricknil.sensor.sensor.CurrentSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.CurrentSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = []</em><a class="headerlink" href="#bricknil.sensor.sensor.CurrentSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bricknil.sensor.sensor.DuploSpeedSensor">
+<em class="property">class </em><code class="descclassname">bricknil.sensor.sensor.</code><code class="descname">DuploSpeedSensor</code><span class="sig-paren">(</span><em>name</em>, <em>port=None</em>, <em>capabilities=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bricknil/sensor/sensor.html#DuploSpeedSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bricknil.sensor.sensor.DuploSpeedSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bricknil.sensor.peripheral.html#bricknil.sensor.peripheral.Peripheral" title="bricknil.sensor.peripheral.Peripheral"><code class="xref py py-class docutils literal notranslate"><span class="pre">bricknil.sensor.peripheral.Peripheral</span></code></a></p>
+<p>Speedometer on Duplo train base that measures front wheel speed.</p>
+<p>This can measure the following values:</p>
+<ul class="simple">
+<li><em>sense_speed</em>: Returns the speed of the front wheels</li>
+<li><em>sense_count</em>: Keeps count of the number of revolutions the front wheels have spun</li>
+</ul>
+<p>Either or both can be enabled for measurement.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Report speed changes</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speed_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">])</span>
+
+<span class="c1"># Report all</span>
+<span class="nd">@attach</span><span class="p">(</span><span class="n">DuploSpeedSensor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;speed_sensor&#39;</span><span class="p">,</span> <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sense_speed&#39;</span><span class="p">,</span> <span class="s1">&#39;sense_count&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The values returned by the sensor will be in <cite>self.value</cite>.  For the first example, get the
+current speed by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+<p>For the second example, the two values will be in a dict:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">sense_speed</span><span class="p">]</span>
+<span class="n">revs</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed_sensor</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">DuploSpeedSensor</span><span class="o">.</span><span class="n">sense_count</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="bricknil.sensor.sensor.DuploSpeedSensor.capability">
+<em class="property">class </em><code class="descname">capability</code><a class="headerlink" href="#bricknil.sensor.sensor.DuploSpeedSensor.capability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploSpeedSensor.capability.sense_count">
+<code class="descname">sense_count</code><em class="property"> = 1</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploSpeedSensor.capability.sense_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploSpeedSensor.capability.sense_speed">
+<code class="descname">sense_speed</code><em class="property"> = 0</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploSpeedSensor.capability.sense_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploSpeedSensor.datasets">
+<code class="descname">datasets</code><em class="property"> = {&lt;capability.sense_speed: 0&gt;: (1, 2), &lt;capability.sense_count: 1&gt;: (1, 4)}</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploSpeedSensor.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bricknil.sensor.sensor.DuploSpeedSensor.allowed_combo">
+<code class="descname">allowed_combo</code><em class="property"> = [&lt;capability.sense_speed: 0&gt;, &lt;capability.sense_count: 1&gt;]</em><a class="headerlink" href="#bricknil.sensor.sensor.DuploSpeedSensor.allowed_combo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">bricknil.sensor.sensor</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#members">Members</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation index</a><ul>
+  <li><a href="../api.html">API Documentation</a><ul>
+      <li>Previous: <a href="bricknil.sensor.motor.html" title="previous chapter">bricknil.sensor.motor</a></li>
+      <li>Next: <a href="bricknil.sensor.light.html" title="next chapter">bricknil.sensor.light</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/bricknil.sensor.sensor.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2019, Virantha N. Ekanayake.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+  </div>
+  
+  </body>
+</html>

@@ -1,0 +1,41 @@
+bricknil.sockets
+================
+
+.. contents::
+    :local:
+
+.. currentmodule:: bricknil.sockets
+
+.. automodule:: bricknil.sockets
+
+      
+      Classes
+      =======
+
+      .. autosummary::
+
+	  
+	  WebClient
+	  
+
+      
+
+      
+      Functions
+      =========
+
+      .. autosummary::
+
+	  
+	  bricknil_socket_server
+	  
+
+      
+
+      Members
+      =======
+
+
+
+
+
