@@ -80,10 +80,12 @@ Features
    * Train motors
    * Hub LED color
    * Boost vision sensor (color, distance)
-   * Internal tilt/orientation/accelerometer 
+   * Boost internal tilt/orientation/accelerometer 
    * Boost external motor 
    * External light
    * Hub buttons
+   * Wedo external motor
+   * Wedo tiltand motion sensors
 * Fully supports Python asynchronous keywords and coroutines
    * Allows expressive concurrent programming using async/await syntax
    * The current implementation uses the async library Curio_ by David Beazley 
@@ -539,43 +541,52 @@ Supported Devices
    * - PoweredUp Hub (88009_)
      - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`, :amzn:`76112 <B07BMGR1FN>`
      - :class:`~bricknil.hub.PoweredUpHub` 
-         - LED: :class:`~bricknil.sensor.LED`
-         - Button: :class:`~bricknil.sensor.Button`
-         - Current: :class:`~bricknil.sensor.CurrentSensor`
-         - Voltage: :class:`~bricknil.sensor.VoltageSensor`
+         - LED: :class:`~bricknil.sensor.light.LED`
+         - Button: :class:`~bricknil.sensor.sensor.Button`
+         - Current: :class:`~bricknil.sensor.sensor.CurrentSensor`
+         - Voltage: :class:`~bricknil.sensor.sensor.VoltageSensor`
    * - PoweredUp Train Motor (88011_)
      - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`
-     - :class:`~bricknil.sensor.TrainMotor`
+     - :class:`~bricknil.sensor.motor.TrainMotor`
    * - PoweredUp Remote (88010_)
      - :amzn:`60197 <B07CC37F63>`, :amzn:`60198 <B07C39LCZ9>`
      - :class:`~bricknil.hub.PoweredUpRemote`
-         - :class:`~bricknil.sensor.RemoteButtons`
+         - :class:`~bricknil.sensor.sensor.RemoteButtons`
    * - PoweredUp Light (88005_)
      - 88005_
-     - :class:`~bricknil.sensor.Light`
+     - :class:`~bricknil.sensor.light.Light`
    * - Boost Hub (88006_)
      - :amzn:`17101 <B06Y6JCTKH>`
      - :class:`~bricknil.hub.BoostHub` 
-         - Motors: :class:`~bricknil.sensor.InternalMotor`
-         - Tilt: :class:`~bricknil.sensor.InternalTiltSensor` 
-         - LED: :class:`~bricknil.sensor.LED`
-         - Button: :class:`~bricknil.sensor.Button`
-         - Current: :class:`~bricknil.sensor.CurrentSensor`
-         - Voltage: :class:`~bricknil.sensor.VoltageSensor`
+         - Motors: :class:`~bricknil.sensor.motor.InternalMotor`
+         - Tilt: :class:`~bricknil.sensor.sensor.InternalTiltSensor` 
+         - LED: :class:`~bricknil.sensor.light.LED`
+         - Button: :class:`~bricknil.sensor.sensor.Button`
+         - Current: :class:`~bricknil.sensor.sensor.CurrentSensor`
+         - Voltage: :class:`~bricknil.sensor.sensor.VoltageSensor`
    * - Boost Vision Sensor (88007_)
      - :amzn:`17101 <B06Y6JCTKH>`
-     - :class:`~bricknil.sensor.VisionSensor`
+     - :class:`~bricknil.sensor.sensor.VisionSensor`
    * - Boost External Motor (88008_)
      - :amzn:`17101 <B06Y6JCTKH>`
-     - :class:`~bricknil.sensor.ExternalMotor`
+     - :class:`~bricknil.sensor.motor.ExternalMotor`
+   * - Wedo External Motor (45303_)
+     - :amzn:`45300 <B01A9A9XLW>`
+     - :class:`~bricknil.sensor.motor.WedoMotor`
+   * - Wedo Tilt Sensor (45305_)
+     - :amzn:`45300 <B01A9A9XLW>`
+     - :class:`~bricknil.sensor.sensor.ExternalTiltSensor`
+   * - Wedo Motion Sensor (45304_)
+     - :amzn:`45300 <B01A9A9XLW>`
+     - :class:`~bricknil.sensor.sensor.ExternalMotionSensor`
    * - Duplo Train Base
      - :amzn:`10874 <B07BK6M2WC>`, :amzn:`10875 <B07BK6KQR6>`
      - :class:`~bricknil.hub.DuploTrainHub`
-         - Motor: :class:`~bricknil.sensor.DuploTrainMotor`
-         - Speedometer: :class:`~bricknil.sensor.DuploSpeedSensor`
-         - Vision: :class:`~bricknil.sensor.VisionSensor`
-         - Speaker: :class:`~bricknil.sensor.DuploSpeaker`
-         - Voltage: :class:`~bricknil.sensor.VoltageSensor`
+         - Motor: :class:`~bricknil.sensor.motor.DuploTrainMotor`
+         - Speedometer: :class:`~bricknil.sensor.sensor.DuploSpeedSensor`
+         - Vision: :class:`~bricknil.sensor.sensor.VisionSensor`
+         - Speaker: :class:`~bricknil.sensor.sound.DuploSpeaker`
+         - Voltage: :class:`~bricknil.sensor.sensor.VoltageSensor`
 
 
 .. _88005: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FLight-88005
@@ -585,7 +596,9 @@ Supported Devices
 .. _88009: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FHub-88009
 .. _88010: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FRemote-Control-88010
 .. _88011: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FTrain-Motor-88011
-
+.. _45303: https://click.linksynergy.com/deeplink?id=seuBib7H7fY&mid=13923&murl=http%3A%2F%2Fshop.lego.com%2Fen-US%2Fproduct%2FSimple-Medium-Linear-Motor-45303
+.. _45305: https://education.lego.com/en-us/products/wedo-2-0-tilt-sensor/45305
+.. _45304: https://education.lego.com/en-us/products/wedo-2-0-motion-sensor/45304
 
 .. |lego|  replace:: Lego\ |reg|
    

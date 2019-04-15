@@ -1,3 +1,12 @@
+0.9 - 4/5/19
+------------
+- Added support for Wedo sensors 
+   - :class:`~bricknil.sensor.sensor.ExternalTiltSensor`
+   - :class:`~bricknil.sensor.sensor.ExternalMotionSensor`
+   - :class:`~bricknil.sensor.motor.WedoMotor`
+- Refactored peripheral code into multiple files in `sensor/`
+- Fixed a regression in port information querying
+
 0.8.2 - 4/3/19
 --------------
 - Added support for Boost external motors (:class:`~bricknil.sensor.ExternalMotor`)

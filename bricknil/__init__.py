@@ -21,13 +21,18 @@ Submodules
     :toctree: _autosummary
 
     bricknil
+    const
     process
     hub
     ble_queue
     message_dispatch
     messages
-    peripheral
-    sensor
+    sensor.peripheral
+    sensor.motor
+    sensor.sensor
+    sensor.light
+    sensor.sound
+    sockets
 
 """
 

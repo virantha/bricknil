@@ -7,5 +7,5 @@ High-level todos:
 - Look into internal accel/decel profiles for the internal motors in the Boost Hub (since these have tacho/speed sensors)
 - Document the system architecture
 - Add in cleaner exit and hub shutdown code
-- Add support for Wedo hubs/sensors/motors
-
+- Add support for Wedo hubs
+- Add ability to specify range of values when specifying capabilities (so we can handle negative numbers from sensor)

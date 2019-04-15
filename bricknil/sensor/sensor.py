@@ -186,7 +186,7 @@ class InternalTiltSensor(Peripheral):
 
 
 
-class MotionSensor(Peripheral):
+class ExternalMotionSensor(Peripheral):
     """Access the external motion sensor (IR) provided in the Wedo sets
 
        Measures distance to object, or if an object is moving (distance varying). 
@@ -199,11 +199,11 @@ class MotionSensor(Peripheral):
        Examples::
 
             # Distance measurement
-            @attach(MotionSensor, name='motion_sensor', capabilities=['sense_distance'])
+            @attach(ExternalMotionSensor, name='motion_sensor', capabilities=['sense_distance'])
 
 
             # Motion detection
-            @attach(MotionSensor, name='motion_sensor', capabilities=['sense_count'])
+            @attach(ExternalMotionSensor, name='motion_sensor', capabilities=['sense_count'])
     """
     _sensor_id = 0x0023
     capability = Enum("capability", 
@@ -256,6 +256,7 @@ class ExternalTiltSensor(Peripheral):
 
     async def update_value(self, msg_bytes):
         """If angle, convert the bytes being returned to twos complement ints
+           If orientation, then convert to the `orientation` enumeration.
 
         """
         await super().update_value(msg_bytes)

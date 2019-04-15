@@ -3,18 +3,18 @@ import logging, struct
 from curio import sleep, Queue
 from bricknil import attach, start
 from bricknil.hub import BoostHub
-from bricknil.sensor import LED, MotionSensor, ExternalTiltSensor, WedoMotor
+from bricknil.sensor import LED, ExternalMotionSensor, ExternalTiltSensor, WedoMotor
 from bricknil.process import Process
 from bricknil.const import Color
 
 
 tilt_cap = ExternalTiltSensor.capability.sense_impact
-motion_cap = MotionSensor.capability.sense_distance
+motion_cap = ExternalMotionSensor.capability.sense_distance
 
 @attach(LED, name='led') 
 @attach(ExternalTiltSensor, name='tilt_sensor', capabilities=[tilt_cap])
 @attach(WedoMotor, name='motor')
-#@attach(MotionSensor, name='motion_sensor', capabilities=[motion_cap])
+#@attach(ExternalMotionSensor, name='motion_sensor', capabilities=[motion_cap])
 #@@attach(ExternalMotor, name='motor')
 class Robot(BoostHub):
     """ Rotate the external motor connected to a boost hub by degrees

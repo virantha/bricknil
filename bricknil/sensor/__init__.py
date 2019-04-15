@@ -1,6 +1,6 @@
 
 from .sensor import \
-        VisionSensor, InternalTiltSensor, MotionSensor, \
+        VisionSensor, InternalTiltSensor, ExternalMotionSensor, \
         ExternalTiltSensor, RemoteButtons, Button, \
         CurrentSensor, VoltageSensor,  \
         DuploSpeedSensor, DuploVisionSensor
