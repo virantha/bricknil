@@ -18,7 +18,7 @@
 import uuid
 from curio import sleep, UniversalQueue, CancelledError
 from .process import Process
-from .peripheral import Peripheral  # for type check
+from .sensor.peripheral import Peripheral  # for type check
 from .const import USE_BLEAK
 
 class UnknownPeripheralMessage(Exception): pass
@@ -68,7 +68,12 @@ class Hub(Process):
         # Register this hub
         Hub.hubs.append(self)
 
-    async def send_message(self, msg_name, msg_bytes):
+        # Outgoing messages to web client
+        # Assigned during system instantiaion before ble connect
+        self.web_queue_out = None
+
+
+    async def send_message(self, msg_name, msg_bytes, peripheral=None):
         """Insert a message to the hub into the queue(:func:`bricknil.hub.Hub.message_queue`) connected to our BLE
            interface
 
@@ -77,6 +82,9 @@ class Hub(Process):
         while not self.tx:  # Need to make sure we have a handle to the uart
             await sleep(1)
         await self.message_queue.put((msg_name, self, msg_bytes))
+        if self.web_queue_out and peripheral:
+            cls_name = peripheral.__class__.__name__
+            await self.web_queue_out.put( f'{self.name}|{cls_name}|{peripheral.name}|{peripheral.port}|{msg_name}\r\n'.encode('utf-8') )
 
     async def peripheral_message_loop(self):
         """The main loop that receives messages from the :class:`bricknil.messages.Message` parser.
@@ -98,6 +106,11 @@ class Hub(Process):
                     peripheral = self.port_to_peripheral[port]
                     await peripheral.update_value(msg_bytes)
                     self.message_debug(f'peripheral msg: {peripheral} {msg}')
+                    if self.web_queue_out:
+                        cls_name = peripheral.__class__.__name__
+                        if len(peripheral.capabilities) > 0:
+                            for cap in peripheral.value:
+                                await self.web_queue_out.put( f'{self.name}|{cls_name}|{peripheral.name}|{peripheral.port}|value change mode: {cap.value} = {peripheral.value[cap]}\r\n'.encode('utf-8') )
                     handler_name = f'{peripheral.name}_change'
                     handler = getattr(self, handler_name)
                     await handler()

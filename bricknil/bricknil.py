@@ -22,7 +22,7 @@
 
 import logging
 import pprint
-from curio import run, spawn,  sleep
+from curio import run, spawn,  sleep, Queue, tcp_server
 import Adafruit_BluefruitLE
 from functools import partial, wraps
 import uuid
@@ -32,6 +32,8 @@ from .process import Process
 from .ble_queue import BLEventQ
 from .hub import PoweredUpHub, BoostHub, Hub
 from .const import USE_BLEAK
+from .sockets import bricknil_socket_server
+
 if USE_BLEAK:
     from .bleak import Bleak
 
@@ -105,12 +107,21 @@ class attach:
 
 
 
+
+
 async def _run_all(ble, system):
     """Curio run loop 
     """
     print('inside curio run loop')
     # Instantiate the Bluetooth LE handler/queue
     ble_q = BLEventQ(ble)
+
+    # The web client out_going queue
+    web_out_queue = Queue()
+    # Instantiate socket listener
+    #task_socket = await spawn(socket_server, web_out_queue, ('',25000))
+    task_tcp = await spawn(bricknil_socket_server, web_out_queue, ('',25000))
+    await task_tcp.join()
 
     # Call the user's system routine to instantiate the processes
     await system()
@@ -123,6 +134,7 @@ async def _run_all(ble, system):
 
     # Connect all the hubs first before enabling any of them
     for hub in Hub.hubs:
+        hub.web_queue_out = web_out_queue
         task_connect = await spawn(ble_q.connect(hub))
         await task_connect.join()
 

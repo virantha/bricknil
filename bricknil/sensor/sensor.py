@@ -18,95 +18,9 @@ from curio import sleep, current_task, spawn  # Needed for motor speed ramp
 
 from enum import Enum, IntEnum
 from struct import pack
-from .const import Color
 
-from .peripheral import Peripheral, Motor, TachoMotor
-
-
-class InternalMotor(TachoMotor):
-    """ Access the internal motor(s) in the Boost Move Hub.
-
-        Unlike the train motors, these motors (as well as the stand-alone Boost
-        motors :class:`ExternalMotor`) have a built-in sensor/tachometer for sending back
-        the motor's current speed and position.  However, you don't need to use the
-        sensors, and can treat this motor strictly as an output device.
-
-        Examples::
-
-            # Basic connection to the motor on Port A
-            @attach(InternalMotor, name='left_motor', port=InternalMotor.Port.A)
-
-            # Basic connection to both motors at the same time (virtual I/O port).
-            # Any speed command will cause both motors to rotate at the same speed
-            @attach(InternalMotor, name='motors', port=InternalMotor.Port.AB)
-
-            # Report back when motor speed changes. You must have a motor_change method defined 
-            @attach(InternalMotor, name='motor', port=InternalMotor.Port.A, capabilities=['sense_speed'])
-
-            # Only report back when speed change exceeds 5 units
-            @attach(InternalMotor, name='motors', port=InternalMotor.Port.A, capabilities=[('sense_speed', 5)])
-
-        And within the run body you can control the motor output::
-            await self.motor.set_speed(50)   # Setting the speed
-            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
-            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o'clock position
-            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position
-
-        See Also:
-            * :class:`TrainMotor` for connecting to a train motor
-            * :class:`ExternalMotor` for connecting to a train motor
-
-    """
-    _sensor_id = 0x0027
-    _DEFAULT_THRESHOLD=2
-    """Set to 2 to avoid a lot of updates since the speed seems to oscillate a lot"""
-
-    Port = Enum('Port', 'A B AB', start=0)
-    """Address either motor A or Motor B, or both AB at the same time"""
-
-    def __init__(self, name, port=None, capabilities=[]):
-        """Maps the port names `A`, `B`, `AB` to hard-coded port numbers"""
-        if port:
-            port_map = [55, 56, 57]
-            port = port_map[port.value]
-        self.speed = 0
-        super().__init__(name, port, capabilities)
-    
-        
-class ExternalMotor(TachoMotor):
-    """ Access the stand-alone Boost motors
-
-        These are similar to the :class:`InternalMotor` with build-in tachometer and
-        sensor for sending back the motor's current speed and position.  You
-        don't need to use the sensors, and can treat this as strictly an
-        output.
-
-        Examples::
-
-            # Basic connection to the motor on Port A
-            @attach(ExternalMotor, name='motor')
-
-            # Report back when motor speed changes. You must have a motor_change method defined 
-            @attach(ExternalMotor, name='motor', capabilities=['sense_speed'])
-
-            # Only report back when speed change exceeds 5 units, and position changes (degrees)
-            @attach(ExternalMotor, name='motor', capabilities=[('sense_speed', 5), 'sense_pos'])
-
-        And then within the run body::
-
-            await self.motor.set_speed(50)   # Setting the speed
-            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
-            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o'clock position
-            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position
-
-        See Also:
-            * :class:`TrainMotor` for connecting to a train motor
-            * :class:`InternalMotor` for connecting to the Boost hub built-in motors
-
-    """
-
-    _sensor_id = 0x26
-
+from ..const import Color
+from .peripheral import Peripheral
 
 class VisionSensor(Peripheral):
     """ Access the Boost Vision/Distance Sensor
@@ -271,76 +185,93 @@ class InternalTiltSensor(Peripheral):
             self.value[so] = self.orientation(self.value[so])
 
 
-class LED(Peripheral):
-    """ Changes the LED color on the Hubs::
 
-            @attach(LED, name='hub_led')
+class MotionSensor(Peripheral):
+    """Access the external motion sensor (IR) provided in the Wedo sets
 
-            self.hub_led.set_output(Color.red)
+       Measures distance to object, or if an object is moving (distance varying). 
+
+       - **sense_distance** - distance in inches from 0-10
+       - **sense_count**  - Increments every time it detects motion (32-bit value)
+
+       These are mutually exclusive (non-combinable)
+
+       Examples::
+
+            # Distance measurement
+            @attach(MotionSensor, name='motion_sensor', capabilities=['sense_distance'])
+
+
+            # Motion detection
+            @attach(MotionSensor, name='motion_sensor', capabilities=['sense_count'])
     """
-    _sensor_id = 0x0017
+    _sensor_id = 0x0023
+    capability = Enum("capability", 
+                      [('sense_distance', 0),
+                       ('sense_count', 1),
+                       ])
 
-    async def set_color(self, color: Color):
-        """ Converts a Color enumeration to a color value"""
+    datasets = { capability.sense_distance: (1, 1),  
+                 capability.sense_count: (1, 4),
+                }
+    allowed_combo = [ ]
 
-        # For now, only support preset colors
-        assert isinstance(color, Color)
-        col = color.value
-        assert col < 11
-        mode = 0
-        await self.set_output(mode, col)
-        #b = [0x00, 0x81, self.port, 0x11, 0x51, mode, col ]
-        #await self.message_info(f'set color to {color}')
+class ExternalTiltSensor(Peripheral):
+    """Access the External tilt sensor provided in the Wedo sets
 
+       Three modes are supported (non-combinable):
 
-class Light(Peripheral):
+       - **sense_angle** - X (around long axis), Y (around short axis) angles.  -45 to 45 degrees
+       - **sense_orientation** - returns one of the orientations below (wrt looking at the sensor from the side opposite the wiring harness)
+            - `ExternalTiltSensor.orientation`.up = flat with studs on top
+            - `ExternalTiltSensor.orientation`.right = studs facing rigth
+            - `ExternalTiltSensor.orientation`.left = studs facing left
+            - `ExternalTiltSensor.orientation`.far_side = studs facing away from you
+            - `ExternalTiltSensor.orientation`.near_side = studs facing towards you
+       - **sense_impact** - Keeps a count of impacts, but sends three bytes (direction of hit?)
+
+       These are mutually exclusive (non-combinable).
+
     """
-        Connects to the external light.
+    _sensor_id = 0x0022
+    capability = Enum("capability", 
+                      [('sense_angle', 0),
+                       ('sense_orientation', 1),
+                       ('sense_impact', 2),
+                       ])
 
-        Example::
+    datasets = { capability.sense_angle: (2, 1),  
+                 capability.sense_orientation: (1, 1),
+                 capability.sense_impact: (3, 1),
+                }
+    allowed_combo = [ ]
 
-             @attach(Light, name='light')
+    orientation = Enum('orientation', 
+                        {   'up': 0,
+                            'right': 7, 
+                            'left': 5, 
+                            'far_side':3,
+                            'near_side':9,
+                        })
 
-        And then within the run body, use::
+    async def update_value(self, msg_bytes):
+        """If angle, convert the bytes being returned to twos complement ints
 
-            await self.light.set_brightness(brightness)
-    """
-    _sensor_id = 0x0008
-
-    async def set_brightness(self, brightness: int):
-        """Sets the brightness of the light.
-
-        Args:
-            brightness (int) : A value between -100 and 100 where 0 is off and
-                -100 or 100 are both maximum brightness.
         """
-        mode = 0
-        brightness, = pack('b', int(brightness))
-        await self.set_output(mode, brightness)
+        await super().update_value(msg_bytes)
+        # No combinations possible, so only one capability with len(self.capabilities[])==1
+        if self.capabilities[0] == self.capability.sense_angle:
+            sa = self.capability.sense_angle
+            sx, sy = self.value[sa]
+            if sx & 128:  # negative sign bit
+                sx = -(256-sx)
+            if sy & 128:
+                sy = -(256-sy)
+            self.value[sa] = [sx, sy]
+        elif self.capabilities[0] == self.capability.sense_orientation:
+            so = self.capability.sense_orientation
+            self.value[so] = self.orientation(self.value[so])
 
-
-class TrainMotor(Motor):
-    """
-        Connects to the train motors.
-
-        TrainMotor has no sensing capabilities and only supports a single output mode that
-        sets the speed.
-
-        Examples::
-
-             @attach(TrainMotor, name='train')
-
-        And then within the run body, use::
-
-            await self.train.set_speed(speed)
-
-        Attributes:
-            speed (int) : Keep track of the current speed in order to ramp it
-
-        See Also:
-            :class:`InternalMotor`
-    """
-    _sensor_id = 0x0002
 
 
 
@@ -442,71 +373,6 @@ class Button(Peripheral):
         b = [0x00, 0x01, 0x02, 0x02]  # Button reports from "Hub Properties Message Type"
         await self.send_message(f'Activate button reports: port {self.port}', b) 
 
-class DuploTrainMotor(Motor):
-    """Train Motor on Duplo Trains
-
-       Make sure that the train is sitting on the ground (the front wheels need to keep rotating) in 
-       order to keep the train motor powered.  If you pick up the train, the motor will stop operating
-       withina few seconds.
-
-       Examples::
-
-            @attach(DuploTrainMotor, name='motor')
-
-       And then within the run body, use::
-
-            await self.train.set_speed(speed)
-
-       Attributes:
-            speed (int): Keep track of the current speed in order to ramp it
-
-       See Also:
-            :class:`TrainMotor` for connecting to a PoweredUp train motor
-    """
-    _sensor_id = 0x0029
-
-class DuploSpeedSensor(Peripheral):
-    """Speedometer on Duplo train base that measures front wheel speed.
-
-       This can measure the following values:
-
-       - *sense_speed*: Returns the speed of the front wheels
-       - *sense_count*: Keeps count of the number of revolutions the front wheels have spun
-
-       Either or both can be enabled for measurement. 
-
-       Examples::
-
-            # Report speed changes
-            @attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed'])
-
-            # Report all
-            @attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed', 'sense_count'])
-
-       The values returned by the sensor will be in `self.value`.  For the first example, get the
-       current speed by::
-
-            speed = self.speed_sensor.value
-        
-       For the second example, the two values will be in a dict::
-
-            speed = self.speed_sensor.value[DuploSpeedSensor.sense_speed]
-            revs  = self.speed_sensor.value[DuploSpeedSensor.sense_count]
-
-    """
-    _sensor_id = 0x002C
-    capability = Enum("capability", 
-                      [('sense_speed', 0),
-                       ('sense_count', 1),
-                       ])
-
-    datasets = { capability.sense_speed: (1, 2),
-                 capability.sense_count: (1, 4),
-                }
-
-    allowed_combo = [ capability.sense_speed,
-                      capability.sense_count,
-                    ]
 
 class DuploVisionSensor(Peripheral):
     """ Access the Duplo Vision/Distance Sensor
@@ -569,46 +435,6 @@ class DuploVisionSensor(Peripheral):
                       capability.sense_rgb,
                     ]
 
-class DuploSpeaker(Peripheral):
-    """Plays one of five preset sounds through the Duplo built-in speaker
-
-       See :class:`sounds` for the list.
-
-       Examples::
-
-            @attach(DuploSpeaker, name='speaker')
-            ...
-            await self.speaker.play_sound(DuploSpeaker.sounds.brake)
-           
-       Notes:
-            Uses Mode 1 to play the presets
-
-    """
-    _sensor_id = 0x002A
-    sounds = Enum('sounds', { 'brake': 3,
-                              'station': 5,
-                              'water': 7,
-                              'horn': 9,
-                              'steam': 10,
-                              })
-
-    async def activate_updates(self):
-        """For some reason, even though the speaker is an output device
-           we need to send a Port Input Format Setup command (0x41) to enable
-           notifications.  Otherwise, none of the sound output commands will play.  This function
-           is called automatically after this sensor is attached.
-        """
-        mode = 1
-        b = [0x00, 0x41, self.port, mode, 0x01, 0x00, 0x00, 0x00, 0x01]
-        await self.send_message('Activate DUPLO Speaker: port {self.port}', b)
-
-    async def play_sound(self, sound):
-        assert isinstance(sound, self.sounds), 'Can only play sounds that are enums (DuploSpeaker.sounds.brake, etc)'
-        mode = 1
-        self.message_info(f'Playing sound {sound.name}:{sound.value}')
-        await self.set_output(mode, sound.value)
-
-
 class VoltageSensor(Peripheral):
     """Voltage sensor
 
@@ -653,4 +479,45 @@ class CurrentSensor(Peripheral):
                }
     allowed_combo = [ ]
 
+class DuploSpeedSensor(Peripheral):
+    """Speedometer on Duplo train base that measures front wheel speed.
 
+       This can measure the following values:
+
+       - *sense_speed*: Returns the speed of the front wheels
+       - *sense_count*: Keeps count of the number of revolutions the front wheels have spun
+
+       Either or both can be enabled for measurement. 
+
+       Examples::
+
+            # Report speed changes
+            @attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed'])
+
+            # Report all
+            @attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed', 'sense_count'])
+
+       The values returned by the sensor will be in `self.value`.  For the first example, get the
+       current speed by::
+
+            speed = self.speed_sensor.value
+        
+       For the second example, the two values will be in a dict::
+
+            speed = self.speed_sensor.value[DuploSpeedSensor.sense_speed]
+            revs  = self.speed_sensor.value[DuploSpeedSensor.sense_count]
+
+    """
+    _sensor_id = 0x002C
+    capability = Enum("capability", 
+                      [('sense_speed', 0),
+                       ('sense_count', 1),
+                       ])
+
+    datasets = { capability.sense_speed: (1, 2),
+                 capability.sense_count: (1, 4),
+                }
+
+    allowed_combo = [ capability.sense_speed,
+                      capability.sense_count,
+                    ]
