@@ -17,6 +17,8 @@ bricknil.sockets
 	  
 	  WebClient
 	  
+	  WebMessage
+	  
 
       
 

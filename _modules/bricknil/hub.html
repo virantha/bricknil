@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bricknil.hub &#8212; BrickNil 0.9 documentation</title>
+    <title>bricknil.hub &#8212; BrickNil 0.9.1 documentation</title>
     <link rel="stylesheet" href="../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">BrickNil 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">BrickNil 0.9.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -66,6 +66,7 @@
 <span class="kn">from</span> <span class="nn">.process</span> <span class="k">import</span> <span class="n">Process</span>
 <span class="kn">from</span> <span class="nn">.sensor.peripheral</span> <span class="k">import</span> <span class="n">Peripheral</span>  <span class="c1"># for type check</span>
 <span class="kn">from</span> <span class="nn">.const</span> <span class="k">import</span> <span class="n">USE_BLEAK</span>
+<span class="kn">from</span> <span class="nn">.sockets</span> <span class="k">import</span> <span class="n">WebMessage</span>
 
 <div class="viewcode-block" id="UnknownPeripheralMessage"><a class="viewcode-back" href="../../_autosummary/bricknil.hub.html#bricknil.hub.UnknownPeripheralMessage">[docs]</a><span class="k">class</span> <span class="nc">UnknownPeripheralMessage</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span></div>
 <div class="viewcode-block" id="DifferentPeripheralOnPortError"><a class="viewcode-back" href="../../_autosummary/bricknil.hub.html#bricknil.hub.DifferentPeripheralOnPortError">[docs]</a><span class="k">class</span> <span class="nc">DifferentPeripheralOnPortError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span></div>
@@ -118,6 +119,8 @@
         <span class="c1"># Assigned during system instantiaion before ble connect</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">web_queue_out</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_message</span> <span class="o">=</span> <span class="n">WebMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="Hub.send_message"><a class="viewcode-back" href="../../_autosummary/bricknil.hub.html#bricknil.hub.Hub.send_message">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_name</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">,</span> <span class="n">peripheral</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Insert a message to the hub into the queue(:func:`bricknil.hub.Hub.message_queue`) connected to our BLE</span>
@@ -130,7 +133,8 @@
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">msg_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_queue_out</span> <span class="ow">and</span> <span class="n">peripheral</span><span class="p">:</span>
             <span class="n">cls_name</span> <span class="o">=</span> <span class="n">peripheral</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_queue_out</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.name}</span><span class="s1">|</span><span class="si">{cls_name}</span><span class="s1">|</span><span class="si">{peripheral.name}</span><span class="s1">|</span><span class="si">{peripheral.port}</span><span class="s1">|</span><span class="si">{msg_name}</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span></div>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_message</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">peripheral</span><span class="p">,</span> <span class="n">msg_name</span><span class="p">)</span></div>
+            <span class="c1">#await self.web_queue_out.put( f&#39;{self.name}|{cls_name}|{peripheral.name}|{peripheral.port}|{msg_name}\r\n&#39;.encode(&#39;utf-8&#39;) )</span>
 
 <div class="viewcode-block" id="Hub.peripheral_message_loop"><a class="viewcode-back" href="../../_autosummary/bricknil.hub.html#bricknil.hub.Hub.peripheral_message_loop">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">peripheral_message_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;The main loop that receives messages from the :class:`bricknil.messages.Message` parser.</span>
@@ -156,7 +160,8 @@
                         <span class="n">cls_name</span> <span class="o">=</span> <span class="n">peripheral</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
                         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">peripheral</span><span class="o">.</span><span class="n">capabilities</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_queue_out</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.name}</span><span class="s1">|</span><span class="si">{cls_name}</span><span class="s1">|</span><span class="si">{peripheral.name}</span><span class="s1">|</span><span class="si">{peripheral.port}</span><span class="s1">|value change mode: </span><span class="si">{cap.value}</span><span class="s1"> = </span><span class="si">{peripheral.value[cap]}</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+                                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_message</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">peripheral</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;value change mode: </span><span class="si">{cap.value}</span><span class="s1"> = </span><span class="si">{peripheral.value[cap]}</span><span class="s1">&#39;</span><span class="p">)</span>
+                                <span class="c1">#await self.web_queue_out.put( f&#39;{self.name}|{cls_name}|{peripheral.name}|{peripheral.port}|value change mode: {cap.value} = {peripheral.value[cap]}\r\n&#39;.encode(&#39;utf-8&#39;) )</span>
                     <span class="n">handler_name</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{peripheral.name}</span><span class="s1">_change&#39;</span>
                     <span class="n">handler</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler_name</span><span class="p">)</span>
                     <span class="k">await</span> <span class="n">handler</span><span class="p">()</span>
