@@ -67,5 +67,5 @@ async def system():
     hub = Train('train', False)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     start(system)

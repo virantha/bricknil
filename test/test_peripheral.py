@@ -14,6 +14,7 @@ from hypothesis import strategies as st
 
 from bricknil.sensor.light import *
 from bricknil.sensor.motor import *
+from bricknil.sensor.sound import *
 from bricknil.const import Color
 
 class AsyncMock(MagicMock):
@@ -68,6 +69,35 @@ class TestLight:
         self.l.send_message.ask_called_once()
         args, kwargs = self.l.send_message.call_args
         assert args[1] == self.write.get_bytes(port, 0, brightness)
+
+class TestSpeaker:
+
+    def setup(self):
+        self.l = DuploSpeaker(name='light')
+        self.l.send_message = Mock(side_effect=coroutine(lambda x,y: "the awaitable should return this"))
+        self.write = DirectWrite()
+
+    @given( sound = st.sampled_from(DuploSpeaker.sounds),
+            port = st.integers(0,255)
+    )
+    def test_play_sound(self, port, sound):
+        self.l.port = port
+
+        async def child():
+            await self.l.play_sound(sound)
+        kernel.run(child)
+
+        self.l.send_message.ask_called_once()
+        args, kwargs = self.l.send_message.call_args
+        assert args[1] == self.write.get_bytes(port, 1, sound.value)
+
+    @given( port = st.integers(0,255)
+    )
+    def test_activate_updates(self, port):
+        self.l.port = port
+        async def child():
+            await self.l.activate_updates()
+        kernel.run(child)
 
 class TestMotor:
 
@@ -176,3 +206,6 @@ class TestMotor:
 
         args, kwargs = self.m.send_message.call_args
         assert args[1] == self.write.get_bytes_for_rotate(port, angle, self.m._convert_speed_to_val(speed), max_power)
+
+    def test_port(self):
+        t = InternalMotor('motor', port=InternalMotor.Port.A)

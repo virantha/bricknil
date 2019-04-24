@@ -13,3 +13,4 @@ pytest-cov
 pytest-curio
 coveralls
 pyyaml
+hypothesis

@@ -1,3 +1,7 @@
+0.9.1 - 4/24/19
+--------------
+- Fixed regression in tachomotor position/rotation setting
+
 0.9 - 4/5/19
 ------------
 - Added support for Wedo sensors 
