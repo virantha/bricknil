@@ -1,6 +1,7 @@
 import pytest
 import os, sys
 import logging
+from asyncio import coroutine
 
 import smtplib
 from mock import Mock
@@ -10,6 +11,12 @@ from mock import PropertyMock
 
 sys.modules['bleak'] = MagicMock()
 from  bricknil.process import Process
+from bricknil.sensor import TrainMotor
+
+class AsyncMock(MagicMock):
+    async def __call__(self, *args, **kwargs):
+        return super(AsyncMock, self).__call__(*args, **kwargs)
+
 
 class Testbricknil:
 
@@ -31,4 +38,12 @@ class Testbricknil:
         self.p.message_info('hello')
         self.p.message_debug('hello')
         self.p.message_error('hello')
+
+    @pytest.mark.curio
+    #@patch('test_bricknil.TrainMotor.set_output', new_callable=AsyncMock)
+    async def test_motor(self):
+        m = TrainMotor('motor')
+        m.set_output = Mock(side_effect=coroutine(lambda x,y :'the awaitable should return this'))
+        await m.set_speed(10)
+        assert m.set_output.call_args == call(0, 10)
 

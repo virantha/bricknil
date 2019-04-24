@@ -515,10 +515,24 @@ class DuploSpeedSensor(Peripheral):
                        ('sense_count', 1),
                        ])
 
-    datasets = { capability.sense_speed: (1, 2),
-                 capability.sense_count: (1, 4),
+    datasets = { capability.sense_speed: Peripheral.Dataset(n=1, w=2, min=-300, max=300),
+                 capability.sense_count: Peripheral.Dataset(n=1, w=4, min=-(1<<31), max=(1<<31-1)),
                 }
 
     allowed_combo = [ capability.sense_speed,
                       capability.sense_count,
                     ]
+
+    async def update_value(self, msg_bytes):
+        """Hack to negate reverse speeds.  This should really be specified elsewehre
+        """
+        await super().update_value(msg_bytes)
+        ss = self.capability.sense_speed
+        sc = self.capability.sense_count
+        if ss in self.value:
+            if self.value[ss] & (1<<15):  # negative sign bit
+                self.value[ss] = -((1<<16) - self.value[ss])
+        if sc in self.value:
+            if self.value[sc] & (1<<31):  # negative sign bit
+                self.value[sc] = -((1<<32) - self.value[sc])
+

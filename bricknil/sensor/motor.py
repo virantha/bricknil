@@ -90,6 +90,7 @@ class Motor(Peripheral):
                     next_speed = target_speed
                 await self.set_speed(next_speed)
                 await sleep(TIME_STEP_MS/1000)
+            await self.set_speed(target_speed)
             self.ramp_in_progress_task = None
 
         self.message_debug(f'Starting ramp of speed: {start_speed} -> {target_speed} ({ramp_time_ms/1000}s)')
@@ -146,7 +147,7 @@ class TachoMotor(Motor):
                 * Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)
                 *
         """
-        abs_pos = list(struct.pack('i', pos))
+        abs_pos = list(pack('i', pos))
         speed = self._convert_speed_to_val(speed)
 
         b = [0x00, 0x81, self.port, 0x01, 0x0d] + abs_pos + [speed, max_power, 126, 3]
@@ -182,14 +183,14 @@ class TachoMotor(Motor):
                 * Use Accel profile = (bit 0 = acc profile, bit 1 = decc profile)
                 *
         """
-        degrees = list(struct.pack('i', degrees))
+        degrees = list(pack('i', degrees))
         speed = self._convert_speed_to_val(speed)
 
         b = [0x00, 0x81, self.port, 0x01, 0x0b] + degrees + [speed, max_power, 126, 3]
         await self.send_message(f'rotate {degrees} deg with speed {speed}', b)
 
 
-    async def ramp_speed2(self, target_speed, ramp_time_ms):
+    async def ramp_speed2(self, target_speed, ramp_time_ms): # pragma: no cover
         """Experimental function, not implemented yet DO NOT USE
         """
         # Set acceleration profile

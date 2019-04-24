@@ -15,7 +15,7 @@
 """Experimental socket updates of devices and hubs"""
 
 import logging
-import pprint
+import json
 from curio import run, spawn,  sleep, Queue, tcp_server
 
 #async def socket_server(web_out_queue, address):
@@ -31,6 +31,11 @@ from curio import run, spawn,  sleep, Queue, tcp_server
             #await spawn(wc.run, daemon=True)
 
 async def bricknil_socket_server(web_out_queue, address):
+    """Listen for client connections on port 25000 and spawn
+       `WebClient` instance.
+       This fuction is spawned as a task during system instantiation
+       in :func:`bricknil.bricknil._run_all``
+    """
     async def web_client_connected(client, addr):
         print('connection from', addr)
         wc = WebClient(client, addr, web_out_queue)
@@ -40,7 +45,13 @@ async def bricknil_socket_server(web_out_queue, address):
 
 
 class WebClient:
+    """ Represents a client that has connected to BrickNil's server
 
+        Each client has a connection to the global BrickNil `curio.Queue`
+        that handles broadcast messages about peripherals.  Peripherals
+        insert the messages into the queue, and clients can read from 
+        it (hence why it's called in_queue in this class).
+    """
     def __init__(self, client, addr, in_queue):
         assert in_queue is not None
         self.in_queue = in_queue
@@ -58,3 +69,21 @@ class WebClient:
                 await self.in_queue.task_done()
                 await self.client.sendall(msg)
         print('connection closed')
+
+class WebMessage:
+    """Handles message conversion into JSON and transmission
+    """
+
+    def __init__(self, hub):
+        self.hub = hub
+    
+    async def send(self, peripheral, msg):
+        obj = { 'hub': self.hub.name,
+                'peripheral_type': peripheral.__class__.__name__,
+                'peripheral_name': peripheral.name,
+                'peripheral_port': peripheral.port,
+                'message': msg ,
+        }
+        obj_string = json.dumps(obj)
+        print(obj_string)
+        await self.hub.web_queue_out.put(f'{obj_string}\n'.encode('utf-8'))

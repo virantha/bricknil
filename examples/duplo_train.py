@@ -7,11 +7,11 @@ from bricknil.sensor import DuploTrainMotor, DuploSpeedSensor, LED, DuploVisionS
 from bricknil.const import Color
 import logging
 
-@attach(DuploSpeaker, name='speaker')
+#@attach(DuploSpeaker, name='speaker')
 @attach(DuploVisionSensor, name='vision_sensor', capabilities=[('sense_reflectivity', 5)])
 @attach(LED, name='led')
-@attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed'])
-@attach(VoltageSensor, name='voltage', capabilities=[('sense_l', 50)])
+@attach(DuploSpeedSensor, name='speed_sensor', capabilities=['sense_speed', 'sense_count'])
+#@attach(VoltageSensor, name='voltage', capabilities=[('sense_l', 50)])
 @attach(DuploTrainMotor, name='motor')
 class Train(DuploTrainHub):
 
@@ -51,11 +51,11 @@ class Train(DuploTrainHub):
         self.message_info('Please move the train to start the program')
         while not self.go:
             await self.led.set_color(next(colors))
-            await sleep(0.1)
+            await sleep(0.3)
 
         for i in range(5):
             await self.led.set_color(next(colors))       # Cycle through the colors
-            await self.speaker.play_sound(next(sounds))  # cycle through the sounds
+            #await self.speaker.play_sound(next(sounds))  # cycle through the sounds
             tgt_speed = 20 + i*15                        # Keep increasing the speed
             await self.motor.ramp_speed(tgt_speed, 2000)
             self.message_info(f"Set speed to {i}")

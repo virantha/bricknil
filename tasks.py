@@ -14,8 +14,8 @@ def pypi(c):
 @task
 def tests(c):
     test_dir = 'test'
-    c.run('pytest test')
-    c.run('pytest --cov-config .coveragerc --cov=bricknil --cov-report=term --cov-report=html')
+    #c.run('pytest test')
+    c.run('pytest test --cov-config .coveragerc --cov=bricknil --cov-report=term --cov-report=html')
     c.run('coveralls')
 
 

@@ -17,6 +17,7 @@
 """
 import struct
 from enum import Enum
+from collections import namedtuple
 
 from ..process import Process
 from curio import sleep, spawn, current_task
@@ -80,6 +81,8 @@ class Peripheral(Process):
 
     """
     _DEFAULT_THRESHOLD = 1
+    Dataset = namedtuple('Dataset', ['n', 'w', 'min', 'max'])
+
     def __init__(self, name, port=None, capabilities=[]):
         super().__init__(name)
         self.port = port
@@ -162,7 +165,7 @@ class Peripheral(Process):
         modes = msg.pop(0)
         dataset_i = 0
         for cap in self.capabilities:  # This is the order we prgogramed the sensor
-            n_datasets, byte_count = self.datasets[cap]
+            n_datasets, byte_count = self.datasets[cap][0:2]
             for dataset in range(n_datasets):
                 if modes & (1<<dataset_i):  # Check if i'th bit of mode is set
                     # Data corresponding to this dataset is present!
@@ -239,7 +242,7 @@ class Peripheral(Process):
             self.value = msg
         if len(self.capabilities)==1:
             capability = self.capabilities[0]
-            datasets, bytes_per_dataset = self.datasets[capability]
+            datasets, bytes_per_dataset = self.datasets[capability][0:2]
             for i in range(datasets):
                 msg_ptr = i*bytes_per_dataset
                 val = self._convert_bytes(msg[msg_ptr: msg_ptr+bytes_per_dataset], bytes_per_dataset)
@@ -294,7 +297,7 @@ class Peripheral(Process):
             b = [0x00, 0x42, self.port, 0x01, 0x00]
             for cap in self.capabilities:
                 # RGB requires 3 datasets
-                datasets, byte_width = self.datasets[cap]
+                datasets, byte_width = self.datasets[cap][0:2]
                 for i in range(datasets):
                     b.append(16*cap.value+i)  # Mode is higher order nibble, dataset is lower order nibble
             await self.send_message(f'Set combo port {self.port}', b)

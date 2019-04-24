@@ -53,3 +53,8 @@ docs/_autosummary
 *.retry
 wpa_supplicant.conf
 
+# coveralls
+.coveralls.yml
+
+.hypothesis/
+.vscode/
