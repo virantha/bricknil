@@ -115,7 +115,6 @@ async def _run_all(ble, system):
     print('inside curio run loop')
     # Instantiate the Bluetooth LE handler/queue
     ble_q = BLEventQ(ble)
-
     # The web client out_going queue
     web_out_queue = Queue()
     # Instantiate socket listener
@@ -138,16 +137,23 @@ async def _run_all(ble, system):
         task_connect = await spawn(ble_q.connect(hub))
         await task_connect.join()
 
+
     for hub in Hub.hubs:
         # Start the peripheral listening loop in each hub
         task_listen = await spawn(hub.peripheral_message_loop())
         hub_peripheral_listen_tasks.append(task_listen)
 
         # Need to wait here until all the ports are set
+        # Use a faster timeout the first time (for speeding up testing)
+        first_delay = True
         for name, peripheral in hub.peripherals.items():
             while peripheral.port is None:
                 hub.message_info(f"Waiting for peripheral {name} to attach to a port")
-                await sleep(1)
+                if first_delay:
+                    first_delay = False
+                    await sleep(0.1)
+                else:
+                    await sleep(1)
 
         # Start each hub
         task_run = await spawn(hub.run())

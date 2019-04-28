@@ -254,6 +254,7 @@ class ExternalTiltSensor(Peripheral):
                             'near_side':9,
                         })
 
+
     async def update_value(self, msg_bytes):
         """If angle, convert the bytes being returned to twos complement ints
            If orientation, then convert to the `orientation` enumeration.
