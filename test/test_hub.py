@@ -2,7 +2,7 @@ import pytest
 import os, struct, copy
 import logging
 from asyncio import coroutine
-from curio import kernel, sleep, spawn
+from curio import kernel, sleep, spawn, Event
 
 from mock import Mock
 from mock import patch, call, create_autospec
@@ -17,8 +17,10 @@ from bricknil.messages import UnknownMessageError, HubPropertiesMessage
 from bricknil.sensor import *
 from bricknil.const import DEVICES
 from bricknil import attach, start
-from bricknil.hub import PoweredUpHub, Hub
+from bricknil.hub import PoweredUpHub, Hub, BoostHub, DuploTrainHub
 import bricknil
+import bricknil.const
+
 
 class TestSensors:
 
@@ -37,6 +39,7 @@ class TestSensors:
                              DuploVisionSensor,
                              VoltageSensor,
         ]
+        self.hub_list = [ PoweredUpHub, BoostHub, DuploTrainHub]
     
     def _with_header(self, msg:bytearray):
         l = len(msg)+2
@@ -59,14 +62,17 @@ class TestSensors:
         return capabilities
 
 
-    def _get_hub_class(self, sensor, sensor_name, capabilities):
+    def _get_hub_class(self, hub_type, sensor, sensor_name, capabilities):
+        stop_evt = Event()
         @attach(sensor, name=sensor_name, capabilities=capabilities)
-        class TestHub(PoweredUpHub):
+        class TestHub(hub_type):
             async def sensor_change(self):
                 pass
             async def run(self):
                 pass
-        return TestHub
+                await stop_evt.wait()
+
+        return TestHub, stop_evt
 
     #@patch('bricknil.hub.PoweredUpHub', autospec=True, create=True)
     @given(data = st.data())
@@ -76,7 +82,8 @@ class TestSensors:
         sensor = data.draw(st.sampled_from(self.sensor_list))
         capabilities = self._draw_capabilities(data, sensor)
 
-        TestHub = self._get_hub_class(sensor, sensor_name, capabilities)
+        hub_type = data.draw(st.sampled_from(self.hub_list))
+        TestHub, stop_evt = self._get_hub_class(hub_type, sensor, sensor_name, capabilities)
         hub = TestHub('testhub')
         # Check to make sure we have the peripheral attached
         # and the sensor inserted as an attribute
@@ -91,28 +98,74 @@ class TestSensors:
         sensor = data.draw(st.sampled_from(self.sensor_list))
         capabilities = self._draw_capabilities(data, sensor)
 
-        TestHub = self._get_hub_class(sensor, sensor_name, capabilities)('testhub')
+        hub_type = data.draw(st.sampled_from(self.hub_list))
+        TestHub, stop_evt = self._get_hub_class(hub_type, sensor, sensor_name, capabilities)
+        hub = TestHub('test_hub')
 
         # Start the hub
         #kernel.run(self._emit_control(TestHub))
-
-        with patch('Adafruit_BluefruitLE.get_provider') as ble:
-            ble.return_value = MockBLE()
-            sensor_obj = getattr(TestHub, sensor_name)
-            kernel.run(self._emit_control, TestHub, ble(), sensor_obj)
+        with patch('Adafruit_BluefruitLE.get_provider') as ble,\
+             patch('bricknil.ble_queue.USE_BLEAK', False) as use_bleak:
+            ble.return_value = MockBLE(hub)
+            sensor_obj = getattr(hub, sensor_name)
+            sensor_obj.send_message = Mock(side_effect=coroutine(lambda x,y: "the awaitable should return this"))
+            kernel.run(self._emit_control, data, hub, stop_evt, ble(), sensor_obj)
             #start(system)
 
-    async def _emit_control(self, hub, ble, sensor):
+    async def _wait_send_message(self, mock_call, msg):
+        print("in mock")
+        while not mock_call.call_args:
+            await sleep(0.01)
+        while not msg in mock_call.call_args[0][0]:
+            print(mock_call.call_args)
+            await sleep(0.01)
+
+    async def _emit_control(self, data, hub, hub_stop_evt, ble, sensor):
         async def dummy():
             pass
         system = await spawn(bricknil.bricknil._run_all(ble, dummy))
         while not hub.peripheral_queue:
             await sleep(0.1)
         #await sleep(3)
-        await hub.peripheral_queue.put( ('attach', (1, sensor.sensor_name)) )
+        port = data.draw(st.integers(0,254))
+        await hub.peripheral_queue.put( ('attach', (port, sensor.sensor_name)) )
+
+        # Now, make sure the sensor sent an activate updates message
+        if sensor.sensor_name == "Button":
+            await self._wait_send_message(sensor.send_message, 'Activate button')
+        else:
+            await self._wait_send_message(sensor.send_message, 'Activate SENSOR')
+        # Need to generate a value on the port
+        # if False:
+        msg = []
+        if len(sensor.capabilities) == 1:
+            # Handle single capability
+            for cap in sensor.capabilities:
+                n_datasets, byte_count = sensor.datasets[cap][0:2]
+                for i in range(n_datasets):
+                    for b in range(byte_count):
+                        msg.append(data.draw(st.integers(0,255)))
+            msg = bytearray(msg)
+            await hub.peripheral_queue.put( ('value_change', (port, msg)))
+        elif len(sensor.capabilities) > 1:
+            modes = 1
+            msg.append(modes)
+            for cap_i, cap in enumerate(sensor.capabilities):
+                if modes & (1<<cap_i): 
+                    n_datasets, byte_count = sensor.datasets[cap][0:2]
+                    for i in range(n_datasets):
+                        for b in range(byte_count):
+                            msg.append(data.draw(st.integers(0,255)))
+            msg = bytearray(msg)
+            await hub.peripheral_queue.put( ('value_change', (port, msg)))
+        
+        await hub_stop_evt.set()
         await system.join()
 
 class MockBLE:
+    def __init__(self, hub):
+        self.hub = hub
+
     def initialize(self):
         print("initialized")
     
@@ -124,7 +177,7 @@ class MockBLE:
         return self.mock_adapter
 
     def find_devices(self, service_uuids):
-        self.device = MockDevice()
+        self.device = MockDevice(hub_name = self.hub.ble_name, hub_id = self.hub.manufacturer_id)
         return [self.device]
 
     def run_mainloop_with(self, func):
@@ -144,10 +197,10 @@ class MockAdapter:
         print("stop scan called")
 
 class MockDevice:
-    def __init__(self):
-        self.advertised = [-1, -1, -1, -1, 65]
+    def __init__(self, hub_name, hub_id):
+        self.advertised = [-1, -1, -1, -1, hub_id]
         self.id = 'XX:XX:XX:XX:XX:XX'
-        self.name = 'HUB No.4'
+        self.name = hub_name
 
     def connect(self):
         print("device connect called")
