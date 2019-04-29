@@ -3,7 +3,7 @@ build:
         python: 3.7.1
 
         variables:
-            PYTHON_VERSIONS: '3.7.1 3.6.8'
+            PYTHON_VERSIONS: '3.7.1 3.6.3'
 
     tests:
         override:
