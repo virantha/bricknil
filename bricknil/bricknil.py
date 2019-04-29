@@ -34,8 +34,8 @@ from .hub import PoweredUpHub, BoostHub, Hub
 from .const import USE_BLEAK
 from .sockets import bricknil_socket_server
 
-if USE_BLEAK:
-    from .bleak import Bleak
+#if USE_BLEAK:
+    #from .bleak_interface import Bleak
 
 import threading
 
@@ -188,9 +188,9 @@ def _curio_event_run(ble, system):
             system :  Coroutine that the user provided to instantate their system
 
     """
-    run(_run_all(ble, system), with_monitor=True)
+    run(_run_all(ble, system), with_monitor=False)
 
-def start(user_system_setup_func):
+def start(user_system_setup_func): #pragma: no cover
     """
         Main entry point into running everything.
 
@@ -204,6 +204,7 @@ def start(user_system_setup_func):
     """
 
     if USE_BLEAK:
+        from .bleak_interface import Bleak
         ble = Bleak()
         # Run curio in a thread
         curry_curio_event_run = partial(_curio_event_run, ble=ble, system=user_system_setup_func)

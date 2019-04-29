@@ -30,7 +30,7 @@ from curio import run, spawn,  sleep, Queue, tcp_server
             #wc = WebClient(client, addr, web_out_queue)
             #await spawn(wc.run, daemon=True)
 
-async def bricknil_socket_server(web_out_queue, address):
+async def bricknil_socket_server(web_out_queue, address): #pragma: no cover
     """Listen for client connections on port 25000 and spawn
        `WebClient` instance.
        This fuction is spawned as a task during system instantiation
@@ -44,7 +44,7 @@ async def bricknil_socket_server(web_out_queue, address):
     task = await spawn(tcp_server, '', 25000, web_client_connected, daemon=True)
 
 
-class WebClient:
+class WebClient: #pragma: no cover
     """ Represents a client that has connected to BrickNil's server
 
         Each client has a connection to the global BrickNil `curio.Queue`

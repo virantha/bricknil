@@ -1,8 +1,10 @@
 import pytest
-import os, struct, copy
-import logging
+import os, struct, copy, sys
+from functools import partial
+import logging, threading
 from asyncio import coroutine
 from curio import kernel, sleep, spawn, Event
+import time
 
 from mock import Mock
 from mock import patch, call, create_autospec
@@ -17,7 +19,7 @@ from bricknil.messages import UnknownMessageError, HubPropertiesMessage
 from bricknil.sensor import *
 from bricknil.const import DEVICES
 from bricknil import attach, start
-from bricknil.hub import PoweredUpHub, Hub, BoostHub, DuploTrainHub
+from bricknil.hub import PoweredUpHub, Hub, BoostHub, DuploTrainHub, PoweredUpRemote
 import bricknil
 import bricknil.const
 
@@ -39,7 +41,7 @@ class TestSensors:
                              DuploVisionSensor,
                              VoltageSensor,
         ]
-        self.hub_list = [ PoweredUpHub, BoostHub, DuploTrainHub]
+        self.hub_list = [ PoweredUpHub, BoostHub, DuploTrainHub, PoweredUpRemote]
     
     def _with_header(self, msg:bytearray):
         l = len(msg)+2
@@ -52,6 +54,7 @@ class TestSensors:
             # or some combination of those in the allowed_combo list
             capabilities = data.draw(
                     st.one_of(
+                        st.lists(st.sampled_from([cap.name for cap in list(sensor.capability)]), min_size=1, max_size=1),
                         st.lists(st.sampled_from(sensor.capability), min_size=1, max_size=1),
                         st.lists(st.sampled_from(sensor.allowed_combo), min_size=1, unique=True)
                     )
@@ -161,6 +164,93 @@ class TestSensors:
         
         await hub_stop_evt.set()
         await system.join()
+
+    @given(data = st.data())
+    def test_run_hub_with_bleak(self, data):
+
+        Hub.hubs = []
+        sensor_name = 'sensor'
+        sensor = data.draw(st.sampled_from(self.sensor_list))
+        capabilities = self._draw_capabilities(data, sensor)
+
+        hub_type = data.draw(st.sampled_from(self.hub_list))
+        TestHub, stop_evt = self._get_hub_class(hub_type, sensor, sensor_name, capabilities)
+        hub = TestHub('test_hub')
+
+        async def dummy():
+            pass
+        # Start the hub
+        #MockBleak = MagicMock()
+        sys.modules['bleak'] = MockBleak(hub)
+        with patch('bricknil.bricknil.USE_BLEAK', True), \
+             patch('bricknil.ble_queue.USE_BLEAK', True) as use_bleak:
+            sensor_obj = getattr(hub, sensor_name)
+            sensor_obj.send_message = Mock(side_effect=coroutine(lambda x,y: "the awaitable should return this"))
+            from bricknil.bleak_interface import Bleak
+            ble = Bleak()
+            # Run curio in a thread
+            async def dummy(): pass
+
+            async def start_curio():
+                system = await spawn(bricknil.bricknil._run_all(ble, dummy))
+                while len(ble.devices) < 1 or not ble.devices[0].notify:
+                    await sleep(0.01)
+                await stop_evt.set()
+                print("sending quit")
+                await ble.in_queue.put( ('quit', ''))
+                #await system.join()
+                print('system joined')
+
+            def start_thread():
+                kernel.run(start_curio)
+
+            t = threading.Thread(target=start_thread)
+            t.start()
+            print('started thread for curio')
+            ble.run()
+            t.join()
+
+
+
+
+class MockBleak(MagicMock):
+    def __init__(self, hub):
+        MockBleak.hub = hub
+        pass
+    @classmethod
+    async def discover(cls, timeout, loop):
+        # Need to return devices here, which is a list of device tuples
+        hub = MockBleak.hub
+        devices = [MockBleakDevice(hub.uart_uuid, hub.manufacturer_id)]
+        return devices
+
+    @classmethod
+    def BleakClient(cls, address, loop):
+        print("starting BleakClient")
+        hub = MockBleak.hub
+        device = MockBleakDevice(hub.uart_uuid, hub.manufacturer_id)
+        return device
+
+class MockBleakDevice:
+    def __init__(self, uuid, manufacturer_id):
+        self.uuids = [str(uuid)]
+        self.manufacturer_data = {'values': [0, manufacturer_id]  }
+        self.name = ""
+        self.address = "XX:XX:XX:XX:XX" 
+        self.notify = False
+
+    async def connect(self):
+        self.characteristics = MockBleak.hub.char_uuid
+        pass
+    async def write_gatt_char(self, char_uuid, msg_bytes):
+        print(f'Got msg on {char_uuid}: {msg_bytes}')
+
+    async def start_notify(self, char_uuid, handler):
+        print("started notify")
+        self.notify = True
+
+    async def disconnect(self):
+        print("device disconnected")
 
 class MockBLE:
     def __init__(self, hub):
