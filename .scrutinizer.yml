@@ -8,3 +8,5 @@ build:
     tests:
         override:
             - 'pyenv local $PYTHON_VERSIONS'
+            - command: 'tox'
+            - py-scrutinzer-run
