@@ -18,6 +18,7 @@ import logging
 import json
 from curio import run, spawn,  sleep, Queue, tcp_server
 
+logger = logging.getLogger(str(__name__))
 #async def socket_server(web_out_queue, address):
     #sock = socket(AF_INET, SOCK_STREAM)
     #sock.setsockopt(SOL_SOCKET, SO_REUSEADDR,1)
@@ -37,7 +38,7 @@ async def bricknil_socket_server(web_out_queue, address): #pragma: no cover
        in :func:`bricknil.bricknil._run_all``
     """
     async def web_client_connected(client, addr):
-        print('connection from', addr)
+        logger.info('connection from', addr)
         wc = WebClient(client, addr, web_out_queue)
         await wc.run()
 
@@ -57,7 +58,7 @@ class WebClient: #pragma: no cover
         self.in_queue = in_queue
         self.client = client
         self.addr = addr
-        print(f'Web client {client} connected from {addr}')
+        logger.info(f'Web client {client} connected from {addr}')
         
 
     async def run(self):
@@ -68,7 +69,7 @@ class WebClient: #pragma: no cover
                 #print(f'Webclient queue got: {msg}')
                 await self.in_queue.task_done()
                 await self.client.sendall(msg)
-        print('connection closed')
+        logger.info('connection closed')
 
 class WebMessage:
     """Handles message conversion into JSON and transmission
@@ -85,5 +86,5 @@ class WebMessage:
                 'message': msg ,
         }
         obj_string = json.dumps(obj)
-        print(obj_string)
+        logger.debug(obj_string)
         await self.hub.web_queue_out.put(f'{obj_string}\n'.encode('utf-8'))
