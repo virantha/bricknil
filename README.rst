@@ -90,8 +90,7 @@ Features
    * Allows expressive concurrent programming using async/await syntax
    * The current implementation uses the async library Curio_ by David Beazley 
 * Cross-platform
-   * Uses the Adafruit Bluefruit BluetoothLE library for Mac OS X
-   * Uses the Bleak Bluetooth library for Linux and Win10; also tested on Raspberry Pi.
+   * Uses the Bleak Bluetooth Low Energy library
 
 
 .. _Curio: http://curio.readthedocs.io
@@ -503,8 +502,7 @@ Bluetooth event processing.
 .. figure:: images/run_loops.svg
     :align: center
 
-    BrickNil running inside Curio's event loop, which in turn is run by the
-    Adafruit_BluefruitLE library run loop
+    BrickNil running inside Curio's event loop
 
 I'd much have preferred to have the Bluetooth library be implemented via an
 async library like Curio, asyncio, or Trio, but I wasn't able to find any such
@@ -614,11 +612,9 @@ Credits
 This project is also greatly indebted to the following persons, as well as their open-sourced libraries, portions of which have been incorporated into
 BrickNil under the terms of their respective licenses:
 
-* **Tony DiCola** for his Adafruit_Python_BluefruitLE_ library that provides the BluetoothLE communication stack on Mac OS X
-* :gh_user:`Henrik Blidh <hbldh>` for his Bleak_ library that provided a pure python way to communicate with BluetoothLE over DBus on Linux.
+* :gh_user:`Henrik Blidh <hbldh>` for his Bleak_ library that provided a cross-platform, pure python way to communicate with BluetoothLE.
 
 .. _Bleak: https://github.com/hbldh/bleak
-.. _Adafruit_Python_BluefruitLE: https://github.com/adafruit/Adafruit_Python_BluefruitLE
 
 
 Disclaimer
