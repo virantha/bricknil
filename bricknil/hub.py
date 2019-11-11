@@ -19,7 +19,6 @@ import uuid
 from curio import sleep, UniversalQueue, CancelledError
 from .process import Process
 from .sensor.peripheral import Peripheral  # for type check
-from .const import USE_BLEAK
 from .sockets import WebMessage
 
 class UnknownPeripheralMessage(Exception): pass
