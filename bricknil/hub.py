@@ -249,3 +249,12 @@ class DuploTrainHub(Hub):
         super().__init__(name, query_port_info, ble_id)
         self.ble_name = 'Train Base'
         self.manufacturer_id = 32
+
+
+class CPlusHub(Hub):
+    """Technic Control+ Hub
+    """
+    def __init__(self, name, query_port_info=False, ble_id=None):
+        super().__init__(name, query_port_info, ble_id)
+        self.ble_name = "Control+ Hub"
+        self.manufacturer_id = 128
