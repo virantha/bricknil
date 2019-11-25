@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bricknil.sensor.motor &#8212; BrickNil 0.9.2 documentation</title>
+    <title>bricknil.sensor.motor &#8212; BrickNil 0.9.3 documentation</title>
     <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">BrickNil 0.9.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">BrickNil 0.9.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../sensor.html" accesskey="U">bricknil.sensor</a> &#187;</li> 
       </ul>
@@ -338,6 +338,76 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x26</span></div>
+
+
+<div class="viewcode-block" id="CPlusLargeMotor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.motor.html#bricknil.sensor.motor.CPlusLargeMotor">[docs]</a><span class="k">class</span> <span class="nc">CPlusLargeMotor</span><span class="p">(</span><span class="n">TachoMotor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Access the Technic Control Plus Large motors</span>
+
+<span class="sd">        These are similar to the :class:`InternalMotor` with build-in tachometer and</span>
+<span class="sd">        sensor for sending back the motor&#39;s current speed and position.  You</span>
+<span class="sd">        don&#39;t need to use the sensors, and can treat this as strictly an</span>
+<span class="sd">        output.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Basic connection to the motor on Port A</span>
+<span class="sd">            @attach(CPlusLargeMotor, name=&#39;motor&#39;)</span>
+
+<span class="sd">            # Report back when motor speed changes. You must have a motor_change method defined </span>
+<span class="sd">            @attach(CPlusLargeMotor, name=&#39;motor&#39;, capabilities=[&#39;sense_speed&#39;])</span>
+
+<span class="sd">            # Only report back when speed change exceeds 5 units, and position changes (degrees)</span>
+<span class="sd">            @attach(CPlusLargeMotor, name=&#39;motor&#39;, capabilities=[(&#39;sense_speed&#39;, 5), &#39;sense_pos&#39;])</span>
+
+<span class="sd">        And then within the run body::</span>
+
+<span class="sd">            await self.motor.set_speed(50)   # Setting the speed</span>
+<span class="sd">            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds</span>
+<span class="sd">            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o&#39;clock position</span>
+<span class="sd">            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            * :class:`TrainMotor` for connecting to a train motor</span>
+<span class="sd">            * :class:`InternalMotor` for connecting to the Boost hub built-in motors</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x2E</span></div>
+
+
+<div class="viewcode-block" id="CPlusXLMotor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.motor.html#bricknil.sensor.motor.CPlusXLMotor">[docs]</a><span class="k">class</span> <span class="nc">CPlusXLMotor</span><span class="p">(</span><span class="n">TachoMotor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Access the Technic Control Plus XL motors</span>
+
+<span class="sd">        These are similar to the :class:`InternalMotor` with build-in tachometer and</span>
+<span class="sd">        sensor for sending back the motor&#39;s current speed and position.  You</span>
+<span class="sd">        don&#39;t need to use the sensors, and can treat this as strictly an</span>
+<span class="sd">        output.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Basic connection to the motor on Port A</span>
+<span class="sd">            @attach(CPlusXLMotor, name=&#39;motor&#39;)</span>
+
+<span class="sd">            # Report back when motor speed changes. You must have a motor_change method defined </span>
+<span class="sd">            @attach(CPlusXLMotor, name=&#39;motor&#39;, capabilities=[&#39;sense_speed&#39;])</span>
+
+<span class="sd">            # Only report back when speed change exceeds 5 units, and position changes (degrees)</span>
+<span class="sd">            @attach(CPlusXLMotor, name=&#39;motor&#39;, capabilities=[(&#39;sense_speed&#39;, 5), &#39;sense_pos&#39;])</span>
+
+<span class="sd">        And then within the run body::</span>
+
+<span class="sd">            await self.motor.set_speed(50)   # Setting the speed</span>
+<span class="sd">            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds</span>
+<span class="sd">            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o&#39;clock position</span>
+<span class="sd">            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            * :class:`TrainMotor` for connecting to a train motor</span>
+<span class="sd">            * :class:`InternalMotor` for connecting to the Boost hub built-in motors</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_sensor_id</span> <span class="o">=</span> <span class="mh">0x2F</span></div>
 
 
 <div class="viewcode-block" id="TrainMotor"><a class="viewcode-back" href="../../../_autosummary/bricknil.sensor.motor.html#bricknil.sensor.motor.TrainMotor">[docs]</a><span class="k">class</span> <span class="nc">TrainMotor</span><span class="p">(</span><span class="n">Motor</span><span class="p">):</span>

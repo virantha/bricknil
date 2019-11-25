@@ -15,6 +15,10 @@ bricknil.sensor.motor
       .. autosummary::
 
 	  
+	  CPlusLargeMotor
+	  
+	  CPlusXLMotor
+	  
 	  DuploTrainMotor
 	  
 	  ExternalMotor
