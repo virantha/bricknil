@@ -1,5 +1,15 @@
+0.9.3 - 11/25/19
+---------------
+- Support for Control+ devices by :gh_user:`dlech`
+   - :class:`~bricknil.sensor.motor.CPlusXLMotor`
+   - :class:`~bricknil.sensor.motor.CPlusLargeMotor`
+
+0.9.2 - 5/7/19
+---------------
+- Fixed extraneous print statements
+
 0.9.1 - 4/24/19
---------------
+---------------
 - Fixed regression in tachomotor position/rotation setting
 
 0.9 - 4/5/19
