@@ -1,11 +1,11 @@
-# Copyright 2019 Virantha N. Ekanayake 
-# 
+# Copyright 2019 Virantha N. Ekanayake
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
 
 """
 import uuid
-from curio import sleep, UniversalQueue, CancelledError
+from asyncio import sleep, Queue, CancelledError
 from .process import Process
 from .sensor.peripheral import Peripheral  # for type check
 from .sockets import WebMessage
@@ -34,10 +34,10 @@ class Hub(Process):
             ble_id (str) : BluetoothLE network(MAC) adddress to connect to (None if you want to connect to the first matching hub)
 
        Attributes:
-      
+
             hubs (list [`Hub`]) : Class attr to keep track of all Hub (and subclasses) instances
-            message_queue (`curio.Queue`) : Outgoing message queue to :class:`bricknil.ble_queue.BLEventQ`
-            peripheral_queue (`curio.UniversalQueue`) : Incoming messages from :class:`bricknil.ble_queue.BLEventQ`
+            message_queue (`asyncio.Queue`) : Outgoing message queue to :class:`bricknil.ble_queue.BLEventQ`
+            peripheral_queue (`asyncio.Queue`) : Incoming messages from :class:`bricknil.ble_queue.BLEventQ`
             uart_uuid (`uuid.UUID`) : UUID broadcast by LEGO UARTs
             char_uuid (`uuid.UUID`) : Lego uses only one service characteristic for communicating with the UART services
             tx : Service characteristic for tx/rx messages that's set by :func:`bricknil.ble_queue.BLEventQ.connect`
@@ -60,7 +60,7 @@ class Hub(Process):
         self.peripherals = {}  # attach_sensor method will add sensors to this
         self.port_to_peripheral = {}   # Quick mapping from a port number to a peripheral object
                                         # Only gets populated once the peripheral attaches itself physically
-        self.peripheral_queue = UniversalQueue()  # Incoming messages from peripherals
+        self.peripheral_queue = Queue()  # Incoming messages from peripherals
 
         # Keep track of port info as we get messages from the hub ('update_port' messages)
         self.port_info = {}
@@ -92,7 +92,7 @@ class Hub(Process):
     async def peripheral_message_loop(self):
         """The main loop that receives messages from the :class:`bricknil.messages.Message` parser.
 
-           Waits for messages on a UniversalQueue and dispatches to the appropriate peripheral handler.
+           Waits for messages on a Queue and dispatches to the appropriate peripheral handler.
         """
         try:
             self.message_debug(f'starting peripheral message loop')
@@ -103,7 +103,6 @@ class Hub(Process):
             while True:
                 msg = await self.peripheral_queue.get()
                 msg, data = msg
-                await self.peripheral_queue.task_done()
                 if msg == 'value_change':
                     port, msg_bytes = data
                     peripheral = self.port_to_peripheral[port]
@@ -134,14 +133,14 @@ class Hub(Process):
                         await self._get_port_info(port, msg)
                 else:
                     raise UnknownPeripheralMessage
-                    
+
 
         except CancelledError:
             self.message(f'Terminating peripheral')
 
     async def connect_peripheral_to_port(self, device_name, port):
         """Set the port number of the newly attached peripheral
-        
+
         When the hub gets an Attached I/O message on a new port with the device_name,
         this method is called to find the peripheral it should set this port to.  If
         the user has manually specified a port, then this function just validates that
@@ -159,7 +158,7 @@ class Hub(Process):
                 else:
                     raise DifferentPeripheralOnPortError
 
-        # This port has not been reserved for a specific peripheral, so let's just 
+        # This port has not been reserved for a specific peripheral, so let's just
         # search for the first peripheral with a matching name and attach this port to it
         for peripheral_name, peripheral in self.peripherals.items():
             if peripheral.sensor_name == device_name and peripheral.port == None:
@@ -185,7 +184,7 @@ class Hub(Process):
 
     async def _get_port_info(self, port, msg):
         """Utility function to query information on available ports and modes from a hub.
-           
+
         """
         if msg == 'port_detected':
             # Request mode info
@@ -208,14 +207,14 @@ class Hub(Process):
                         'PCT Range': 0x02, 'SI Range':0x03, 'Symbol':0x04,
                         'MAPPING': 0x05,
                         }
-                # Send a message to requeust each type of info 
+                # Send a message to requeust each type of info
                 for k,v in info_types.items():
                     b = [0x00, 0x22, port, mode, v]
                     await self.send_message(f'req info({k}) on mode {mode} {port}', b)
 
 
 class PoweredUpHub(Hub):
-    """PoweredUp Hub class 
+    """PoweredUp Hub class
     """
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)
@@ -223,7 +222,7 @@ class PoweredUpHub(Hub):
         self.manufacturer_id = 65
 
 class PoweredUpRemote(Hub):
-    """PoweredUp Remote class 
+    """PoweredUp Remote class
     """
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name, query_port_info, ble_id)

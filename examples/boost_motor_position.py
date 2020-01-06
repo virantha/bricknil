@@ -1,6 +1,6 @@
 import logging
 
-from curio import sleep, Queue
+from asyncio import sleep, Queue
 from bricknil import attach, start
 from bricknil.hub import PoweredUpRemote, BoostHub
 from bricknil.sensor import InternalMotor, RemoteButtons, LED, Button, ExternalMotor

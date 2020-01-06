@@ -1,7 +1,7 @@
 """Parse incoming BLE Lego messages from hubs
 
 Each hub has one of these objects to control access to the underlying BLE library notification thread.
-Communication back into the hub (running in python async-land) is through a :class:`curio.UniversalQueue` 
+Communication back into the hub is through a :class:`asyncio.Queue`
 object.
 
 Todo:
@@ -17,7 +17,7 @@ class MessageDispatch:
     """Parse messages (bytearray)
 
        Once the :meth:`parse` method is called, the message header will be parsed, and based on the msg_type
-       byte, the processing of the message body will be dispatched to the `parse` method of the matching Message body parser.  
+       byte, the processing of the message body will be dispatched to the `parse` method of the matching Message body parser.
        Message body parsers are subclasses of :class:`bricknil.messages.Message`, and will call back
        to the `message*` methods below.  This object will then send a message to the connected :class:`bricknil.hub.Hub`
        object.
@@ -33,7 +33,7 @@ class MessageDispatch:
         """
         self.hub = hub
         self.port_info = {}
-        
+
     def parse(self, msg:bytearray):
         """Parse the header of the message and dispatch message body processing
 
@@ -64,25 +64,25 @@ class MessageDispatch:
     def message_update_value_to_peripheral(self, port,  value):
         """Called whenever a peripheral on the hub reports a change in its sensed value
         """
-        self.hub.peripheral_queue.put( ('value_change', (port, value)) )
+        self.hub.peripheral_queue.put_nowait( ('value_change', (port, value)) )
 
     def message_port_info_to_peripheral(self, port, message):
         """Called whenever a peripheral needs to update its meta-data
         """
-        self.hub.peripheral_queue.put( ('update_port', (port, self.port_info[port])) )
-        self.hub.peripheral_queue.put( (message, port) )
+        self.hub.peripheral_queue.put_nowait( ('update_port', (port, self.port_info[port])) )
+        self.hub.peripheral_queue.put_nowait( (message, port) )
 
     def message_attach_to_hub(self, device_name, port):
         """Called whenever a peripheral is attached to the hub
         """
         # Now, we should activate updates from this sensor
-        self.hub.peripheral_queue.put( ('attach', (port, device_name)) )
+        self.hub.peripheral_queue.put_nowait( ('attach', (port, device_name)) )
 
         # Send a message to update the information on this port
-        self.hub.peripheral_queue.put( ('update_port',  (port, self.port_info[port])) )
+        self.hub.peripheral_queue.put_nowait( ('update_port',  (port, self.port_info[port])) )
 
         # Send a message saying this port is detected, in case the hub
         # wants to query for more properties.  (Since an attach message
         # doesn't do anything if the user hasn't @attach'ed a peripheral to it)
-        self.hub.peripheral_queue.put( ('port_detected', port))
+        self.hub.peripheral_queue.put_nowait( ('port_detected', port))
 

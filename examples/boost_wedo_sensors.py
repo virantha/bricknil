@@ -1,6 +1,6 @@
 import logging, struct
 
-from curio import sleep, Queue
+from asyncio import sleep, Queue
 from bricknil import attach, start
 from bricknil.hub import BoostHub
 from bricknil.sensor import LED, ExternalMotionSensor, ExternalTiltSensor, WedoMotor

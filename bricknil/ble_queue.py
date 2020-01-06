@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from curio import Queue, sleep, CancelledError
+from asyncio import Queue, sleep, CancelledError
 import sys, functools, uuid
 
 from .sensor import Button # Hack! only to get the button sensor_id for the fake attach message
@@ -45,7 +45,7 @@ class BLEventQ(Process):
             while True:
                 msg = await self.q.get()
                 msg_type, hub, msg_val = msg
-                await self.q.task_done()
+                #await self.q.task_done()
                 self.message_debug(f'Got msg: {msg_type} = {msg_val}')
                 await self.send_message(hub.tx, msg_val)
         except CancelledError:
@@ -128,11 +128,11 @@ class BLEventQ(Process):
             self.message_info(f'Looking for first matching hub')
 
         # Start discovery
+
         found = False
         while not found and timeout > 0:
             await self.ble.in_queue.put('discover')  # Tell bleak to start discovery
-            devices = await self.ble.out_queue.get() # Wait for discovered devices
-            await self.ble.out_queue.task_done()
+            devices = await self.ble.out_queue.get() # Wai# await self.ble.out_queue.task_done()
             # Filter out no-matching uuid
             devices = [d for d in devices if str(uart_uuid) in d.metadata['uuids']]
             # Now, extract the manufacturer_id
@@ -164,7 +164,7 @@ class BLEventQ(Process):
                   different OS and libraries
 
         """
-        # Connect the messaging queue for communication between self and the hub
+        # Connect the messaging queue for communication between self and the h
         hub.message_queue = self.q
         self.message(f'Starting scan for UART {hub.uart_uuid}')
 
@@ -182,7 +182,7 @@ class BLEventQ(Process):
 
         await self.ble.in_queue.put( ('connect', self.device.address) )
         device = await self.ble.out_queue.get()
-        await self.ble.out_queue.task_done()
+            
         hub.ble_id = self.device.address
         self.message_info(f'Device advertised: {device.services.characteristics}')
         hub.tx = (device, hub.char_uuid)

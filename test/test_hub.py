@@ -3,7 +3,7 @@ import os, struct, copy, sys
 from functools import partial
 import logging, threading
 from asyncio import coroutine
-from curio import kernel, sleep, spawn, Event
+from asyncio import kernel, sleep, spawn, Event
 import time
 
 from mock import Mock

@@ -1,11 +1,11 @@
-# Copyright 2019 Virantha N. Ekanayake 
-# 
+# Copyright 2019 Virantha N. Ekanayake
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,7 +13,7 @@
 # limitations under the License.
 """All motor related peripherals including base motor classes"""
 
-from curio import sleep, current_task, spawn  # Needed for motor speed ramp
+from asyncio import sleep, current_task, create_task as spawn  # Needed for motor speed ramp
 
 from enum import Enum
 from struct import pack
@@ -32,7 +32,7 @@ class Motor(Peripheral):
     async def set_speed(self, speed):
         """ Validate and set the train speed
 
-            If there is an in-progress ramp, and this command is not part of that ramp, 
+            If there is an in-progress ramp, and this command is not part of that ramp,
             then cancel that in-progress ramp first, before issuing this set_speed command.
 
             Args:
@@ -44,11 +44,11 @@ class Motor(Peripheral):
         self.speed = speed
         self.message_info(f'Setting speed to {speed}')
         await self.set_output(0, self._convert_speed_to_val(speed))
-        
+
     async def _cancel_existing_differet_ramp(self):
         """Cancel the existing speed ramp if it was from a different task
 
-            Remember that speed ramps must be a task with daemon=True, so there is no 
+            Remember that speed ramps must be a task with daemon=True, so there is no
             one awaiting its future.
         """
         # Check if there's a ramp task in progress
@@ -56,7 +56,7 @@ class Motor(Peripheral):
             # Check if it's this current task or not
             current = await current_task()
             if current != self.ramp_in_progress_task:
-                # We're trying to set the speed 
+                # We're trying to set the speed
                 # outside a previously in-progress ramp, so cancel the previous ramp
                 await self.ramp_in_progress_task.cancel()
                 self.ramp_in_progress_task = None
@@ -67,7 +67,7 @@ class Motor(Peripheral):
         """Ramp the speed by 10 units in the time given in milliseconds
 
         """
-        TIME_STEP_MS = 100 
+        TIME_STEP_MS = 100
         await self._cancel_existing_differet_ramp()
         assert ramp_time_ms > 100, f'Ramp speed time must be greater than 100ms ({ramp_time_ms}ms used)'
 
@@ -85,8 +85,8 @@ class Motor(Peripheral):
             while current_step < number_of_steps:
                 next_speed = int(start_speed + current_step*speed_step)
                 self.message_debug(f'Setting next_speed: {next_speed}')
-                current_step +=1 
-                if current_step == number_of_steps: 
+                current_step +=1
+                if current_step == number_of_steps:
                     next_speed = target_speed
                 await self.set_speed(next_speed)
                 await sleep(TIME_STEP_MS/1000)
@@ -100,7 +100,7 @@ class TachoMotor(Motor):
 
     capability = Enum("capability", {"sense_speed":1, "sense_pos":2})
 
-    datasets = { 
+    datasets = {
                  capability.sense_speed: (1, 1),
                  capability.sense_pos: (1, 4),
                 }
@@ -115,7 +115,7 @@ class TachoMotor(Motor):
         """Set the absolute position of the motor
 
            Everytime the hub is powered up, the zero-angle reference will be reset to the
-           motor's current position. When you issue this command, the motor will rotate to 
+           motor's current position. When you issue this command, the motor will rotate to
            the position given in degrees.  The sign of the pos tells you which direction to rotate:
            (1) a positive number will rotate clockwise as looking from end of shaft towards the motor,
            (2) a negative number will rotate counter-clockwise
@@ -132,7 +132,7 @@ class TachoMotor(Motor):
               speed (int) : Absolute value from 0-100
               max_power (int):  Max percentage power that will be applied (0-100%)
 
-           Notes: 
+           Notes:
 
                Use command GotoAbsolutePosition
                 * 0x00 = hub id
@@ -168,7 +168,7 @@ class TachoMotor(Motor):
               speed (int) : -100 to 100
               max_power (int):  Max percentage power that will be applied (0-100%)
 
-           Notes: 
+           Notes:
 
                Use command StartSpeedForDegrees
                 * 0x00 = hub id
@@ -195,7 +195,7 @@ class TachoMotor(Motor):
         """
         # Set acceleration profile
         delta_speed = target_speed - self.speed
-        zero_100_ramp_time_ms = int(ramp_time_ms/delta_speed * 100.0) 
+        zero_100_ramp_time_ms = int(ramp_time_ms/delta_speed * 100.0)
         zero_100_ramp_time_ms = zero_100_ramp_time_ms % 10000 # limit time to 10s
 
         hi = (zero_100_ramp_time_ms >> 8) & 255
@@ -225,7 +225,7 @@ class InternalMotor(TachoMotor):
             # Any speed command will cause both motors to rotate at the same speed
             @attach(InternalMotor, name='motors', port=InternalMotor.Port.AB)
 
-            # Report back when motor speed changes. You must have a motor_change method defined 
+            # Report back when motor speed changes. You must have a motor_change method defined
             @attach(InternalMotor, name='motor', port=InternalMotor.Port.A, capabilities=['sense_speed'])
 
             # Only report back when speed change exceeds 5 units
@@ -256,8 +256,8 @@ class InternalMotor(TachoMotor):
             port = port_map[port.value]
         self.speed = 0
         super().__init__(name, port, capabilities)
-    
-        
+
+
 class ExternalMotor(TachoMotor):
     """ Access the stand-alone Boost motors
 
@@ -271,7 +271,7 @@ class ExternalMotor(TachoMotor):
             # Basic connection to the motor on Port A
             @attach(ExternalMotor, name='motor')
 
-            # Report back when motor speed changes. You must have a motor_change method defined 
+            # Report back when motor speed changes. You must have a motor_change method defined
             @attach(ExternalMotor, name='motor', capabilities=['sense_speed'])
 
             # Only report back when speed change exceeds 5 units, and position changes (degrees)
@@ -306,7 +306,7 @@ class CPlusLargeMotor(TachoMotor):
             # Basic connection to the motor on Port A
             @attach(CPlusLargeMotor, name='motor')
 
-            # Report back when motor speed changes. You must have a motor_change method defined 
+            # Report back when motor speed changes. You must have a motor_change method defined
             @attach(CPlusLargeMotor, name='motor', capabilities=['sense_speed'])
 
             # Only report back when speed change exceeds 5 units, and position changes (degrees)
@@ -341,7 +341,7 @@ class CPlusXLMotor(TachoMotor):
             # Basic connection to the motor on Port A
             @attach(CPlusXLMotor, name='motor')
 
-            # Report back when motor speed changes. You must have a motor_change method defined 
+            # Report back when motor speed changes. You must have a motor_change method defined
             @attach(CPlusXLMotor, name='motor', capabilities=['sense_speed'])
 
             # Only report back when speed change exceeds 5 units, and position changes (degrees)
@@ -413,7 +413,7 @@ class WedoMotor(Motor):
 class DuploTrainMotor(Motor):
     """Train Motor on Duplo Trains
 
-       Make sure that the train is sitting on the ground (the front wheels need to keep rotating) in 
+       Make sure that the train is sitting on the ground (the front wheels need to keep rotating) in
        order to keep the train motor powered.  If you pick up the train, the motor will stop operating
        withina few seconds.
 

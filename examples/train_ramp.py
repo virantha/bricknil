@@ -1,6 +1,6 @@
 import logging
 
-from curio import sleep
+from asyncio import sleep
 from bricknil import attach, start
 from bricknil.hub import PoweredUpHub
 from bricknil.sensor import TrainMotor

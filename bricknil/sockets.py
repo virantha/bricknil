@@ -1,12 +1,12 @@
 
-# Copyright 2019 Virantha N. Ekanayake 
-# 
+# Copyright 2019 Virantha N. Ekanayake
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
 
 import logging
 import json
-from curio import run, spawn,  sleep, Queue, tcp_server
+from asyncio import run, create_task as spawn,  sleep, Queue
 
 logger = logging.getLogger(str(__name__))
 #async def socket_server(web_out_queue, address):
@@ -42,15 +42,13 @@ async def bricknil_socket_server(web_out_queue, address): #pragma: no cover
         wc = WebClient(client, addr, web_out_queue)
         await wc.run()
 
-    task = await spawn(tcp_server, '', 25000, web_client_connected, daemon=True)
-
 
 class WebClient: #pragma: no cover
     """ Represents a client that has connected to BrickNil's server
 
-        Each client has a connection to the global BrickNil `curio.Queue`
+        Each client has a connection to the global BrickNil `asyncio.Queue`
         that handles broadcast messages about peripherals.  Peripherals
-        insert the messages into the queue, and clients can read from 
+        insert the messages into the queue, and clients can read from
         it (hence why it's called in_queue in this class).
     """
     def __init__(self, client, addr, in_queue):
@@ -59,7 +57,7 @@ class WebClient: #pragma: no cover
         self.client = client
         self.addr = addr
         logger.info(f'Web client {client} connected from {addr}')
-        
+
 
     async def run(self):
 
@@ -77,7 +75,7 @@ class WebMessage:
 
     def __init__(self, hub):
         self.hub = hub
-    
+
     async def send(self, peripheral, msg):
         obj = { 'hub': self.hub.name,
                 'peripheral_type': peripheral.__class__.__name__,

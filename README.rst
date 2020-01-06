@@ -32,7 +32,7 @@ An example BrickNil program for controlling the Train motor speed is shown below
 
 .. code-block:: python
 
-   from curio import sleep
+   from asyncio import sleep
    from bricknil import attach, start
    from bricknil.hub import PoweredUpHub
    from bricknil.sensor import TrainMotor
@@ -93,7 +93,6 @@ Features
    * Uses the Bleak Bluetooth Low Energy library
 
 
-.. _Curio: http://curio.readthedocs.io
 .. _EuroBricks: https://www.eurobricks.com/forum/index.php?/forums/topic/162288-powered-up-a-tear-down/
 .. _Powered-Up: https://github.com/nathankellenicki/node-poweredup
 .. _Bleak: https://github.com/hbldh/bleak
@@ -134,7 +133,7 @@ numbers are reverse speeds):
 
 .. code-block:: python
 
-   from curio import sleep
+   from asyncio import sleep
    from bricknil.hub import PoweredUpHub
    from bricknil.sensor import TrainMotor
 
@@ -488,28 +487,8 @@ BrickNil Architecture
 This section documents the internal architecture of BrickNil and how all the components communicate with
 each other.
 
-Run loops
----------
-There are actually two threads of execution in the current system architecture.
-The main Bluetooth radio communication loop is provided by the BluetoothLE
-library, which manages everything in the background and can callback directly
-into user code.  In parallel with this, inside this library, a separate
-execution loop is running the Curio event library, which provides the async
-event loop that executes our user code. Thus, we need to be careful about
-maintaining thread safety between the Curio async event loop and the background
-Bluetooth event processing.  
-
-.. figure:: images/run_loops.svg
-    :align: center
-
-    BrickNil running inside Curio's event loop
-
-I'd much have preferred to have the Bluetooth library be implemented via an
-async library like Curio, asyncio, or Trio, but I wasn't able to find any such
-library. This admitted kludge of nested run loops was the only way I could get everything
-working.  
-
-
+Both, the Bluetooth handling and the user-defined code runs in a signle asyncio
+loop.
 
 Installation
 ############
