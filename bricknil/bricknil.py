@@ -32,7 +32,6 @@ from .process import Process
 from .ble_queue import BLEventQ
 from .hub import PoweredUpHub, BoostHub, Hub
 from .sockets import bricknil_socket_server
-from .bleak_interface import Bleak
 
 import threading
 
@@ -102,16 +101,16 @@ class attach:
             return o
         return wrapper_f
 
-
-
-
-
-async def _run_all(ble, system):
-    """Curio run loop
+async def main(system):
     """
-    print('inside curio run loop')
+    Entry-point coroutine that handles everything. This is to be run run
+    in bricknil's main loop.
+
+    You normally don't need to use this directly, instead use start()
+    """
+
     # Instantiate the Bluetooth LE handler/queue
-    ble_q = BLEventQ(ble)
+    ble_q = BLEventQ()
     # The web client out_going queue
     web_out_queue = Queue()
     # Instantiate socket listener
@@ -154,7 +153,6 @@ async def _run_all(ble, system):
         # Start each hub
         task_run = spawn(hub.run())
         hub_tasks.append(task_run)
-        await task_run
 
     # Now wait for the tasks to finish
     ble_q.message_info(f'Waiting for hubs to end')
@@ -162,7 +160,7 @@ async def _run_all(ble, system):
     for task in hub_tasks:
         await task
     ble_q.message_info(f'Hubs end')
-
+    await ble_q.disconnect()
     for task in hub_peripheral_listen_tasks:
         task.cancel()
     task_ble_q.cancel()
@@ -172,20 +170,6 @@ async def _run_all(ble, system):
         if hub.query_port_info:
             hub.message_info(pprint.pformat(hub.port_info))
 
-
-
-async def _curio_event_run(ble, system):
-    """ One line function to start the Curio Event loop,
-        starting all the hubs with the message queue to the bluetooth
-        communcation thread loop.
-
-        Args:
-            ble : The interface object
-            system :  Coroutine that the user provided to instantate their system
-
-    """
-    await _run_all(ble, system)
-
 def start(user_system_setup_func): #pragma: no cover
     """
         Main entry point into running everything.
@@ -194,24 +178,9 @@ def start(user_system_setup_func): #pragma: no cover
         function will take care of the rest.  This includes:
 
         - Initializing the bluetooth interface object
-        - Starting a run loop inside this bluetooth interface for executing the
-          asyncio event loop
         - Starting up the user async co-routines inside the asyncio event loop
     """
-    async def main():
-        ble = Bleak()
-
-        async def user():
-            print('Started bricknil main task')
-            await _curio_event_run(ble, user_system_setup_func)
-        async def btle():
-            print('Started BLE command task')
-            await ble.asyncio_loop()
-        user_t = spawn(user())
-        btle_t = spawn(btle())
-        await user_t
-        await btle_t
     loop = get_event_loop()
-    loop.run_until_complete(main())
+    loop.run_until_complete(main(user_system_setup_func))
 
 

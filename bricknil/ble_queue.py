@@ -1,11 +1,11 @@
-# Copyright 2019 Virantha N. Ekanayake 
-# 
+# Copyright 2019 Virantha N. Ekanayake
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from asyncio import Queue, sleep, CancelledError
-import sys, functools, uuid
+import sys, functools, uuid, bleak
 
 from .sensor import Button # Hack! only to get the button sensor_id for the fake attach message
 from .process import Process
@@ -31,14 +31,14 @@ class BLEventQ(Process):
 
     """
 
-    def __init__(self, ble):
+    def __init__(self):
         super().__init__('BLE Event Q')
-        self.ble = ble
         self.q = Queue()
         self.adapter = None
         # User needs to make sure adapter is powered up and on
         #    sudo hciconfig hci0 up
         self.hubs = {}
+        self.devices = []
 
     async def run(self):
         try:
@@ -49,8 +49,14 @@ class BLEventQ(Process):
                 self.message_debug(f'Got msg: {msg_type} = {msg_val}')
                 await self.send_message(hub.tx, msg_val)
         except CancelledError:
+            await self.disconnect()
+
+    async def disconnect(self):
+        if len(self.devices) > 0:
             self.message(f'Terminating and disconnecting')
-            await self.ble.in_queue.put( 'quit' )
+            for device in self.devices:
+                await device.disconnect()
+            self.devices = []
 
     async def send_message(self, characteristic, msg):
         """Prepends a byte with the length of the msg and writes it to
@@ -64,7 +70,7 @@ class BLEventQ(Process):
         length = len(msg)+1
         values = bytearray([length]+msg)
         device, char_uuid = characteristic
-        await self.ble.in_queue.put( ('tx', (device, char_uuid, values)) )
+        await device.write_gatt_char(char_uuid, values)
 
     async def get_messages(self, hub):
         """Instance a Message object to parse incoming messages and setup
@@ -83,14 +89,14 @@ class BLEventQ(Process):
             self.message_debug('{0} Received: {1}'.format(hub.name, msg))
 
         device, char_uuid = hub.tx
-        await self.ble.in_queue.put( ('notify', (device, char_uuid, bleak_received) ))
+        await device.start_notify(char_uuid, bleak_received)
 
 
     def _check_devices_for(self, devices, name, manufacturer_id, address):
         """Check if any of the devices match what we're looking for
-           
+
            First, check to make sure the manufacturer_id matches.  If the
-           manufacturer_id is not present in the BLE advertised data from the 
+           manufacturer_id is not present in the BLE advertised data from the
            device, then fall back to the name (although this is unreliable because
            the name on the device can be changed by the user through the LEGO apps).
 
@@ -131,8 +137,9 @@ class BLEventQ(Process):
 
         found = False
         while not found and timeout > 0:
-            await self.ble.in_queue.put('discover')  # Tell bleak to start discovery
-            devices = await self.ble.out_queue.get() # Wai# await self.ble.out_queue.task_done()
+            print('Awaiting on bleak discover')
+            devices = await bleak.discover(timeout=1)
+            print('Done Awaiting on bleak discover')
             # Filter out no-matching uuid
             devices = [d for d in devices if str(uart_uuid) in d.metadata['uuids']]
             # Now, extract the manufacturer_id
@@ -155,16 +162,7 @@ class BLEventQ(Process):
 
 
     async def connect(self, hub):
-        """
-            We probably need a different ble_queue type per operating system,
-            and try to abstract away some of these hacks.
-
-            Todo:
-                * This needs to be cleaned up to get rid of all the hacks for
-                  different OS and libraries
-
-        """
-        # Connect the messaging queue for communication between self and the h
+        # Connect the messaging queue for communication between self and the hub
         hub.message_queue = self.q
         self.message(f'Starting scan for UART {hub.uart_uuid}')
 
@@ -172,7 +170,7 @@ class BLEventQ(Process):
         try:
             ble_id = uuid.UUID(hub.ble_id) if hub.ble_id else None
         except ValueError:
-            # In case the user passed in a 
+            # In case the user passed in a
             self.message_info(f"ble_id {hub.ble_id} is not a parseable UUID, so assuming it's a BLE network addresss")
             ble_id = hub.ble_id
 
@@ -180,9 +178,11 @@ class BLEventQ(Process):
 
         self.message(f"found device {self.device.name}")
 
-        await self.ble.in_queue.put( ('connect', self.device.address) )
-        device = await self.ble.out_queue.get()
-            
+
+        device = bleak.BleakClient(address=self.device.address)
+        self.devices.append(device)
+        await device.connect()
+
         hub.ble_id = self.device.address
         self.message_info(f'Device advertised: {device.services.characteristics}')
         hub.tx = (device, hub.char_uuid)
