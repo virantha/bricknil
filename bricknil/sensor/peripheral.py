@@ -130,12 +130,12 @@ class Peripheral(Process):
                 If multiple values, then a list of those values
                 Value can be either uint8, uint16, or uint32 depending on value of `byte_count`
         """
-        if byte_count == 1:   # just a uint8
-            val = msg_bytes[0]
-        elif byte_count == 2: # uint16 little-endian
-            val = struct.unpack('<H', msg_bytes)[0]
-        elif byte_count == 4: # uint32 little-endian
-            val = struct.unpack('<I', msg_bytes)[0]
+        if byte_count == 1:   # just an int8
+            val = struct.unpack('<b', msg_bytes)[0]
+        elif byte_count == 2: # int16 little-endian
+            val = struct.unpack('<h', msg_bytes)[0]
+        elif byte_count == 4: # int32 little-endian
+            val = struct.unpack('<i', msg_bytes)[0]
         else:
             self.message_error(f'Cannot convert array of {msg_bytes} length {len(msg_bytes)} to python datatype')
             val = None
