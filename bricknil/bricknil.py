@@ -124,9 +124,6 @@ async def main(system):
     hub_tasks = []
     hub_peripheral_listen_tasks = [] # Need to cancel these at the end
 
-    # Run the bluetooth listen queue
-    task_ble_q = spawn(ble_q.run())
-
     # Connect all the hubs first before enabling any of them
     for hub in Hub.hubs:
         hub.web_queue_out = web_out_queue
@@ -163,7 +160,6 @@ async def main(system):
     await ble_q.disconnect()
     for task in hub_peripheral_listen_tasks:
         task.cancel()
-    task_ble_q.cancel()
 
     # Print out the port information in debug mode
     for hub in Hub.hubs:

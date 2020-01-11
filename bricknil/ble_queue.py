@@ -33,23 +33,11 @@ class BLEventQ(Process):
 
     def __init__(self):
         super().__init__('BLE Event Q')
-        self.q = Queue()
         self.adapter = None
         # User needs to make sure adapter is powered up and on
         #    sudo hciconfig hci0 up
         self.hubs = {}
         self.devices = []
-
-    async def run(self):
-        try:
-            while True:
-                msg = await self.q.get()
-                msg_type, hub, msg_val = msg
-                #await self.q.task_done()
-                self.message_debug(f'Got msg: {msg_type} = {msg_val}')
-                await self.send_message(hub.tx, msg_val)
-        except CancelledError:
-            await self.disconnect()
 
     async def disconnect(self):
         if len(self.devices) > 0:
@@ -163,7 +151,7 @@ class BLEventQ(Process):
 
     async def connect(self, hub):
         # Connect the messaging queue for communication between self and the hub
-        hub.message_queue = self.q
+        hub.ble_handler = self
         self.message(f'Starting scan for UART {hub.uart_uuid}')
 
         # HACK

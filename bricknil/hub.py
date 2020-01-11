@@ -36,7 +36,7 @@ class Hub(Process):
        Attributes:
 
             hubs (list [`Hub`]) : Class attr to keep track of all Hub (and subclasses) instances
-            message_queue (`asyncio.Queue`) : Outgoing message queue to :class:`bricknil.ble_queue.BLEventQ`
+            ble_handler (`BLEventQ`) : Hub's Bluetooth LE handling object
             peripheral_queue (`asyncio.Queue`) : Incoming messages from :class:`bricknil.ble_queue.BLEventQ`
             uart_uuid (`uuid.UUID`) : UUID broadcast by LEGO UARTs
             char_uuid (`uuid.UUID`) : Lego uses only one service characteristic for communicating with the UART services
@@ -52,8 +52,8 @@ class Hub(Process):
     def __init__(self, name, query_port_info=False, ble_id=None):
         super().__init__(name)
         self.ble_id = ble_id
+        self.ble_handler = None
         self.query_port_info = query_port_info
-        self.message_queue = None
         self.uart_uuid = uuid.UUID('00001623-1212-efde-1623-785feabcd123')
         self.char_uuid = uuid.UUID('00001624-1212-efde-1623-785feabcd123')
         self.tx = None
@@ -76,18 +76,51 @@ class Hub(Process):
 
 
     async def send_message(self, msg_name, msg_bytes, peripheral=None):
-        """Insert a message to the hub into the queue(:func:`bricknil.hub.Hub.message_queue`) connected to our BLE
-           interface
+        """Send a message (command) to the hub.
 
         """
-
         while not self.tx:  # Need to make sure we have a handle to the uart
             await sleep(1)
-        await self.message_queue.put((msg_name, self, msg_bytes))
+        await self.ble_handler.send_message(self.tx, msg_bytes)
         if self.web_queue_out and peripheral:
             cls_name = peripheral.__class__.__name__
             await self.web_message.send(peripheral, msg_name)
             #await self.web_queue_out.put( f'{self.name}|{cls_name}|{peripheral.name}|{peripheral.port}|{msg_name}\r\n'.encode('utf-8') )
+
+    async def recv_message(self, msg, data):
+        """Receive and process message (notification) from the hub.
+
+        """
+        if msg == 'value_change':
+            port, msg_bytes = data
+            peripheral = self.port_to_peripheral[port]
+            await peripheral.update_value(msg_bytes)
+            self.message_debug(f'peripheral msg: {peripheral} {msg}')
+            if self.web_queue_out:
+                cls_name = peripheral.__class__.__name__
+                if len(peripheral.capabilities) > 0:
+                    for cap in peripheral.value:
+                        await self.web_message.send(peripheral, f'value change mode: {cap.value} = {peripheral.value[cap]}')
+                        #await self.web_queue_out.put( f'{self.name}|{cls_name}|{peripheral.name}|{peripheral.port}|value change mode: {cap.value} = {peripheral.value[cap]}\r\n'.encode('utf-8') )
+            handler_name = f'{peripheral.name}_change'
+            handler = getattr(self, handler_name)
+            await handler()
+        elif msg == 'attach':
+            port, device_name = data
+            peripheral = await self.connect_peripheral_to_port(device_name, port)
+            if peripheral:
+                self.message_debug(f'peripheral msg: {peripheral} {msg}')
+                peripheral.message_handler = self.send_message
+                await peripheral.activate_updates()
+        elif msg == 'update_port':
+            port, info = data
+            self.port_info[port] = info
+        elif msg.startswith('port'):
+            port = data
+            if self.query_port_info:
+                await self._get_port_info(port, msg)
+        else:
+            raise UnknownPeripheralMessage
 
     async def peripheral_message_loop(self):
         """The main loop that receives messages from the :class:`bricknil.messages.Message` parser.
@@ -103,38 +136,7 @@ class Hub(Process):
             while True:
                 msg = await self.peripheral_queue.get()
                 msg, data = msg
-                if msg == 'value_change':
-                    port, msg_bytes = data
-                    peripheral = self.port_to_peripheral[port]
-                    await peripheral.update_value(msg_bytes)
-                    self.message_debug(f'peripheral msg: {peripheral} {msg}')
-                    if self.web_queue_out:
-                        cls_name = peripheral.__class__.__name__
-                        if len(peripheral.capabilities) > 0:
-                            for cap in peripheral.value:
-                                await self.web_message.send(peripheral, f'value change mode: {cap.value} = {peripheral.value[cap]}')
-                                #await self.web_queue_out.put( f'{self.name}|{cls_name}|{peripheral.name}|{peripheral.port}|value change mode: {cap.value} = {peripheral.value[cap]}\r\n'.encode('utf-8') )
-                    handler_name = f'{peripheral.name}_change'
-                    handler = getattr(self, handler_name)
-                    await handler()
-                elif msg == 'attach':
-                    port, device_name = data
-                    peripheral = await self.connect_peripheral_to_port(device_name, port)
-                    if peripheral:
-                        self.message_debug(f'peripheral msg: {peripheral} {msg}')
-                        peripheral.message_handler = self.send_message
-                        await peripheral.activate_updates()
-                elif msg == 'update_port':
-                    port, info = data
-                    self.port_info[port] = info
-                elif msg.startswith('port'):
-                    port = data
-                    if self.query_port_info:
-                        await self._get_port_info(port, msg)
-                else:
-                    raise UnknownPeripheralMessage
-
-
+                await self.recv_message(msg, data)
         except CancelledError:
             self.message(f'Terminating peripheral')
 
