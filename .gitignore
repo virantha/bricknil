@@ -8,8 +8,6 @@ htmlcov/
 # pycharm
 .idea/*
 .cache/*
-# adafruit checkout
-Adafruit_Python_BluefruitLE/*
 # C extensions
 *.so
 

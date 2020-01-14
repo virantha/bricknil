@@ -1,3 +1,2 @@
 pyyaml
-curio
-bluebrick-Adafruit_BluefruitLE >= 0.9.12
+bleak

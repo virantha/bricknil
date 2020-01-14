@@ -1,11 +1,11 @@
-# Copyright 2019 Virantha N. Ekanayake 
-# 
+# Copyright 2019 Virantha N. Ekanayake
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ from enum import Enum
 from collections import namedtuple
 
 from ..process import Process
-from curio import sleep, spawn, current_task
+from asyncio import sleep, current_task, create_task as spawn
 from ..const import DEVICES
 
 
@@ -42,15 +42,15 @@ class Peripheral(Process):
                 * For each mode/capability, send a byte like the following:
                     * Upper 4-bits is mode number
                     * Lower 4-bits is the dataset number
-                    * For example, for getting RGB values, it's mode 6, and we want all three datasets 
-                        (for each color), so we'd add three bytes [0x60, 0x61, 0x62].  
+                    * For example, for getting RGB values, it's mode 6, and we want all three datasets
+                        (for each color), so we'd add three bytes [0x60, 0x61, 0x62].
                         If you just wanted the Red value, you just append [0x60]
             * Send a [0x42, port, 0x03] message to unlock the port
             * Now, when the sensor sends back values, it uses 0x46 messages with the following byte sequence:
                 * Port id
                 * 16-bit entry where the true bits mark which mode has values included in this message
                     (So 0x00 0x05 means values from Modes 2 and 0)
-                * Then the set of values from the sensor, which are ordered by Mode number 
+                * Then the set of values from the sensor, which are ordered by Mode number
                     (so the sensor reading from mode 0 would come before the reading from mode 2)
                 * Each set of values includes however many bytes are needed to represent each dataset
                     (for example, up to 3 for RGB colors), and the byte-width of each value (4 bytes for a 32-bit int)
@@ -63,20 +63,20 @@ class Peripheral(Process):
           capabilities : can be input in the following formats (where the
             number in the tuple can be a threshold to trigger updates)
 
-               * ['sense_color', 'sense_distannce'] 
+               * ['sense_color', 'sense_distannce']
                * [capability.sense_color, capability.sense_distance]
                * [('sense_color', 1), ('sense_distance', 2)]
 
           name (str) : Human readable name
           port (int) : Port to connect to (otherwise will connect to first matching peripheral with defined sensor_id)
-           
+
 
        Attributes:
             port (int) : Physical port on the hub this Peripheral attaches to
             sensor_name (str) : Name coming out of `const.DEVICES`
             value (dict) : Sensor readings get dumped into this dict
             message_handler (func) : Outgoing message queue to `BLEventQ` that's set by the Hub when an attach message is seen
-            capabilites (list [ `capability` ]) : Support capabilities 
+            capabilites (list [ `capability` ]) : Support capabilities
             thresholds (list [ int ]) : Integer list of thresholds for updates for each of the sensing capabilities
 
     """
@@ -96,7 +96,7 @@ class Peripheral(Process):
         """Convert capabilities in different formats (string, tuple, etc)
 
            Returns:
-                
+
                 validated_caps, thresholds  (list[`capability`], list[int]): list of capabilities and list of associated thresholds
         """
         validated_caps = []
@@ -144,7 +144,7 @@ class Peripheral(Process):
     async def _parse_combined_sensor_values(self, msg: bytearray):
         """
             Byte sequence is as follows:
-                # uint16 where each set bit indicates data value from that mode is present 
+                # uint16 where each set bit indicates data value from that mode is present
                   (e.g. 0x00 0x05 means Mode 2 and Mode 0 data is present
                 # The data from the lowest Mode number comes first in the subsequent bytes
                 # Each Mode has a number of datasets associated with it (RGB for example is 3 datasets), and
@@ -158,7 +158,7 @@ class Peripheral(Process):
 
             Side-effects:
                 self.value
-          
+
         """
         msg.pop(0)  # Remove the leading 0 (since we never have more than 7 datasets even with all the combo modes activated
         # The next byte is a bit mask of the mode/dataset entries present in this value
@@ -200,7 +200,7 @@ class Peripheral(Process):
         """
         if speed == 127: return 127
         if speed > 100: speed = 100
-        if speed < 0: 
+        if speed < 0:
             # Now, truncate to 8-bits
             speed = speed & 255 # Or I guess I could do 256-abs(s)
         return speed
@@ -208,7 +208,7 @@ class Peripheral(Process):
 
     async def set_output(self, mode, value):
         """Don't change this unless you're changing the way you do a Port Output command
-        
+
            Outputs the following sequence to the sensor
             * 0x00 = hub id from common header
             * 0x81 = Port Output Command
@@ -261,15 +261,15 @@ class Peripheral(Process):
             this call from :func:`bricknil.hub.Hub.peripheral_message_loop`
 
             See class description for explanation on how Combined Mode updates are done.
-            
+
             Returns:
                 None
 
         """
-        
+
         assert self.port is not None, f"Cannot activate updates on sensor before it's been attached to {self.name}!"
-        
-        if len(self.capabilities) == 0: 
+
+        if len(self.capabilities) == 0:
             # Nothing to do since no capabilities defined
             return
 
@@ -280,7 +280,7 @@ class Peripheral(Process):
         if len(self.capabilities)==1:  # Just a normal single sensor
             mode = self.capabilities[0].value
             b = [0x00, 0x41, self.port, mode, self.thresholds[0], 0, 0, 0, 1]
-            await self.send_message(f'Activate SENSOR: port {self.port}', b) 
+            await self.send_message(f'Activate SENSOR: port {self.port}', b)
         else:
             # Combo mode.  Need to make sure only allowed combinations are preset
             # Lock sensor

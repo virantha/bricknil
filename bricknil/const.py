@@ -17,11 +17,6 @@
 from enum import Enum
 import platform
 
-if platform.system() == "Darwin":
-    USE_BLEAK = False
-else:
-    USE_BLEAK = True
-
 class Color(Enum):
     """11 colors"""
     black = 0 

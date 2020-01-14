@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
-from curio import sleep
+from asyncio import sleep
 from bricknil import attach, start
 from bricknil.hub import CPlusHub
 from bricknil.sensor.motor import CPlusXLMotor

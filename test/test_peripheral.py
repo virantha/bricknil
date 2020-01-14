@@ -2,7 +2,7 @@ import pytest
 import os, struct, copy
 import logging
 from asyncio import coroutine
-from curio import kernel, sleep
+from asyncio import kernel, sleep
 
 from mock import Mock
 from mock import patch, call

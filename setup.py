@@ -79,8 +79,7 @@ setup (
     zip_safe = True,
     include_package_data = True,
     packages = packages,
-    install_requires = required + ['pyobjc ; sys.platform == "darwin"',
-                                   'bricknil-bleak ; sys.platform != "darwin"'],
+    install_requires = required,
     dependency_links = dependency_links,
     entry_points = {
             'console_scripts': [

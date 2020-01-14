@@ -3,7 +3,7 @@ import os, struct, copy, sys
 from functools import partial
 import logging, threading
 from asyncio import coroutine
-from curio import kernel, sleep, spawn, Event
+from asyncio import kernel, sleep, spawn, Event
 import time
 
 from mock import Mock
@@ -106,14 +106,32 @@ class TestSensors:
         hub = TestHub('test_hub')
 
         # Start the hub
-        #kernel.run(self._emit_control(TestHub))
-        with patch('Adafruit_BluefruitLE.get_provider') as ble,\
-             patch('bricknil.ble_queue.USE_BLEAK', False) as use_bleak:
-            ble.return_value = MockBLE(hub)
-            sensor_obj = getattr(hub, sensor_name)
-            sensor_obj.send_message = Mock(side_effect=coroutine(lambda x,y: "the awaitable should return this"))
-            kernel.run(self._emit_control, data, hub, stop_evt, ble(), sensor_obj)
-            #start(system)
+        sys.modules['bleak'] = MockBleak(hub)
+        sensor_obj = getattr(hub, sensor_name)
+        sensor_obj.send_message = Mock(side_effect=coroutine(lambda x,y: "the awaitable should return this"))
+        from bricknil.bleak_interface import Bleak
+        ble = Bleak()
+        # Run curio in a thread
+        async def dummy(): pass
+
+        async def start_curio():
+            system = await spawn(bricknil.bricknil._run_all(ble, dummy))
+            while len(ble.devices) < 1 or not ble.devices[0].notify:
+                await sleep(0.01)
+            await stop_evt.set()
+            print("sending quit")
+            await ble.in_queue.put( ('quit', ''))
+            #await system.join()
+            print('system joined')
+
+        def start_thread():
+            kernel.run(start_curio)
+
+        t = threading.Thread(target=start_thread)
+        t.start()
+        print('started thread for curio')
+        ble.run()
+        t.join()
 
     async def _wait_send_message(self, mock_call, msg):
         print("in mock")
@@ -164,53 +182,6 @@ class TestSensors:
         
         await hub_stop_evt.set()
         await system.join()
-
-    @given(data = st.data())
-    def test_run_hub_with_bleak(self, data):
-
-        Hub.hubs = []
-        sensor_name = 'sensor'
-        sensor = data.draw(st.sampled_from(self.sensor_list))
-        capabilities = self._draw_capabilities(data, sensor)
-
-        hub_type = data.draw(st.sampled_from(self.hub_list))
-        TestHub, stop_evt = self._get_hub_class(hub_type, sensor, sensor_name, capabilities)
-        hub = TestHub('test_hub')
-
-        async def dummy():
-            pass
-        # Start the hub
-        #MockBleak = MagicMock()
-        sys.modules['bleak'] = MockBleak(hub)
-        with patch('bricknil.bricknil.USE_BLEAK', True), \
-             patch('bricknil.ble_queue.USE_BLEAK', True) as use_bleak:
-            sensor_obj = getattr(hub, sensor_name)
-            sensor_obj.send_message = Mock(side_effect=coroutine(lambda x,y: "the awaitable should return this"))
-            from bricknil.bleak_interface import Bleak
-            ble = Bleak()
-            # Run curio in a thread
-            async def dummy(): pass
-
-            async def start_curio():
-                system = await spawn(bricknil.bricknil._run_all(ble, dummy))
-                while len(ble.devices) < 1 or not ble.devices[0].notify:
-                    await sleep(0.01)
-                await stop_evt.set()
-                print("sending quit")
-                await ble.in_queue.put( ('quit', ''))
-                #await system.join()
-                print('system joined')
-
-            def start_thread():
-                kernel.run(start_curio)
-
-            t = threading.Thread(target=start_thread)
-            t.start()
-            print('started thread for curio')
-            ble.run()
-            t.join()
-
-
 
 
 class MockBleak(MagicMock):

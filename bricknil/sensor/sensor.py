@@ -1,11 +1,11 @@
-# Copyright 2019 Virantha N. Ekanayake 
-# 
+# Copyright 2019 Virantha N. Ekanayake
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +14,7 @@
 
 """Actual sensor and motor peripheral definitions from Boost and PoweredUp
 """
-from curio import sleep, current_task, spawn  # Needed for motor speed ramp
+from asyncio import sleep, current_task, create_task as spawn  # Needed for motor speed ramp
 
 from enum import Enum, IntEnum
 from struct import pack
@@ -34,7 +34,7 @@ class VisionSensor(Peripheral):
         - *sense_ambient*: Distance under one inch (so inverse of the preceeding)
         - *sense_rgb*: R, G, B values (3 sets of uint16)
 
-        Any combination of sense_color, sense_distance, sense_count, sense_reflectivity, 
+        Any combination of sense_color, sense_distance, sense_count, sense_reflectivity,
         and sense_rgb is supported.
 
         Examples::
@@ -51,11 +51,11 @@ class VisionSensor(Peripheral):
             @attach(VisionSensor, name='vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
 
         The values returned by the sensor will always be available in the instance variable
-        `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are 
+        `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are
         enabled, the following values will be stored and updated::
 
             self.value = { VisionSensor.capability.sense_color:  uint8,
-                           VisionSensor.capability.sense_rgb: 
+                           VisionSensor.capability.sense_rgb:
                                             [ uint16, uint16, uint16 ]
                          }
 
@@ -75,7 +75,7 @@ class VisionSensor(Peripheral):
     """
 
     _sensor_id = 0x0025
-    capability = Enum("capability", 
+    capability = Enum("capability",
                       [('sense_color', 0),
                        ('sense_distance', 1),
                        ('sense_count', 2),
@@ -102,7 +102,7 @@ class VisionSensor(Peripheral):
 class InternalTiltSensor(Peripheral):
     """
         Access the internal tilt sensor in the Boost Move Hub.
-        
+
         The various modes are:
 
         - **sense_angle** - X, Y angles.  Both are 0 if hub is lying flat with button up
@@ -137,12 +137,12 @@ class InternalTiltSensor(Peripheral):
         will be stored and updated::
 
             self.value = { InternalTiltSensor.capability.sense_angle:  [uint8, uint8],
-                           InternalTiltSensor.capability.sense_orientation: 
+                           InternalTiltSensor.capability.sense_orientation:
                                             Enum(InternalTiltSensor.orientation)
                          }
     """
     _sensor_id = 0x0028
-    capability = Enum("capability", 
+    capability = Enum("capability",
                       [('sense_angle', 0),
                        ('sense_tilt', 1),
                        ('sense_orientation', 2),
@@ -152,7 +152,7 @@ class InternalTiltSensor(Peripheral):
 
     datasets = { capability.sense_angle: (2, 1),
                  capability.sense_tilt: (1, 1),
-                 capability.sense_orientation: (1, 1),  
+                 capability.sense_orientation: (1, 1),
                  capability.sense_impact: (1, 4),
                  capability.sense_acceleration_3_axis: (3, 1),
                 }
@@ -164,10 +164,10 @@ class InternalTiltSensor(Peripheral):
                       capability.sense_acceleration_3_axis,
                     ]
 
-    orientation = Enum('orientation', 
+    orientation = Enum('orientation',
                         {   'up': 0,
-                            'right': 1, 
-                            'left': 2, 
+                            'right': 1,
+                            'left': 2,
                             'far_side':3,
                             'near_side':4,
                             'down':5,
@@ -189,7 +189,7 @@ class InternalTiltSensor(Peripheral):
 class ExternalMotionSensor(Peripheral):
     """Access the external motion sensor (IR) provided in the Wedo sets
 
-       Measures distance to object, or if an object is moving (distance varying). 
+       Measures distance to object, or if an object is moving (distance varying).
 
        - **sense_distance** - distance in inches from 0-10
        - **sense_count**  - Increments every time it detects motion (32-bit value)
@@ -206,12 +206,12 @@ class ExternalMotionSensor(Peripheral):
             @attach(ExternalMotionSensor, name='motion_sensor', capabilities=['sense_count'])
     """
     _sensor_id = 0x0023
-    capability = Enum("capability", 
+    capability = Enum("capability",
                       [('sense_distance', 0),
                        ('sense_count', 1),
                        ])
 
-    datasets = { capability.sense_distance: (1, 1),  
+    datasets = { capability.sense_distance: (1, 1),
                  capability.sense_count: (1, 4),
                 }
     allowed_combo = [ ]
@@ -234,22 +234,22 @@ class ExternalTiltSensor(Peripheral):
 
     """
     _sensor_id = 0x0022
-    capability = Enum("capability", 
+    capability = Enum("capability",
                       [('sense_angle', 0),
                        ('sense_orientation', 1),
                        ('sense_impact', 2),
                        ])
 
-    datasets = { capability.sense_angle: (2, 1),  
+    datasets = { capability.sense_angle: (2, 1),
                  capability.sense_orientation: (1, 1),
                  capability.sense_impact: (3, 1),
                 }
     allowed_combo = [ ]
 
-    orientation = Enum('orientation', 
+    orientation = Enum('orientation',
                         {   'up': 0,
-                            'right': 7, 
-                            'left': 5, 
+                            'right': 7,
+                            'left': 5,
                             'far_side':3,
                             'near_side':9,
                         })
@@ -286,7 +286,7 @@ class RemoteButtons(Peripheral):
        There are actually a few different modes that the hardware supports, but we are
        only going to use one of them called 'KEYSD' (see the notes in the documentation on the
        raw values reported by the hub).  This mode makes the remote send three values back
-       in a list.  To access each button state, there are three helper methods provided 
+       in a list.  To access each button state, there are three helper methods provided
        (see below)
 
        Examples::
@@ -335,7 +335,7 @@ class RemoteButtons(Peripheral):
 class Button(Peripheral):
     """ Register to be notified of button presses on the Hub (Boost or PoweredUp)
 
-        This is actually a slight hack, since the Hub button is not a peripheral that is 
+        This is actually a slight hack, since the Hub button is not a peripheral that is
         attached like other sensors in the Lego protocol.  Instead, the buttons are accessed
         through Hub property messages.  We abstract away these special messages to make the
         button appear to be like any other peripheral sensor.
@@ -373,7 +373,7 @@ class Button(Peripheral):
             self.value[cap] = [None]*self.datasets[cap][0]
 
         b = [0x00, 0x01, 0x02, 0x02]  # Button reports from "Hub Properties Message Type"
-        await self.send_message(f'Activate button reports: port {self.port}', b) 
+        await self.send_message(f'Activate button reports: port {self.port}', b)
 
 
 class DuploVisionSensor(Peripheral):
@@ -384,7 +384,7 @@ class DuploVisionSensor(Peripheral):
         - *sense_reflectivity*: Under distances of one inch, the inverse of the distance
         - *sense_rgb*: R, G, B values (3 sets of uint16)
 
-        Any combination of sense_color, sense_ctag, sense_reflectivity, 
+        Any combination of sense_color, sense_ctag, sense_reflectivity,
         and sense_rgb is supported.
 
         Examples::
@@ -401,11 +401,11 @@ class DuploVisionSensor(Peripheral):
             @attach(DuploVisionSensor, name='vision', capabilities=[('sense_color', 1), ('sense_rgb', 5)])
 
         The values returned by the sensor will always be available in the instance variable
-        `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are 
+        `self.value`.  For example, when the `sense_color` and `sense_rgb` capabilities are
         enabled, the following values will be stored and updated::
 
             self.value = { DuploVisionSensor.capability.sense_color:  uint8,
-                           DuploVisionSensor.capability.sense_rgb: 
+                           DuploVisionSensor.capability.sense_rgb:
                                             [ uint16, uint16, uint16 ]
                          }
 
@@ -418,7 +418,7 @@ class DuploVisionSensor(Peripheral):
             -  3 = RGB I
     """
     _sensor_id = 0x002B
-    capability = Enum("capability", 
+    capability = Enum("capability",
                       [('sense_color', 0),
                        ('sense_ctag', 1),
                        ('sense_reflectivity', 2),
@@ -455,7 +455,7 @@ class VoltageSensor(Peripheral):
 
     capability = Enum("capability", {'sense_s': 0, 'sense_l': 1})
     datasets = {capability.sense_s: (1, 2),   # 2-bytes (16-bit)
-                capability.sense_l: (1, 2), 
+                capability.sense_l: (1, 2),
                }
     allowed_combo = [ ]
 
@@ -477,7 +477,7 @@ class CurrentSensor(Peripheral):
 
     capability = Enum("capability", {'sense_s': 0, 'sense_l': 1})
     datasets = {capability.sense_s: (1, 2),   # 2-bytes (16-bit)
-                capability.sense_l: (1, 2), 
+                capability.sense_l: (1, 2),
                }
     allowed_combo = [ ]
 
@@ -489,7 +489,7 @@ class DuploSpeedSensor(Peripheral):
        - *sense_speed*: Returns the speed of the front wheels
        - *sense_count*: Keeps count of the number of revolutions the front wheels have spun
 
-       Either or both can be enabled for measurement. 
+       Either or both can be enabled for measurement.
 
        Examples::
 
@@ -503,7 +503,7 @@ class DuploSpeedSensor(Peripheral):
        current speed by::
 
             speed = self.speed_sensor.value
-        
+
        For the second example, the two values will be in a dict::
 
             speed = self.speed_sensor.value[DuploSpeedSensor.sense_speed]
@@ -511,7 +511,7 @@ class DuploSpeedSensor(Peripheral):
 
     """
     _sensor_id = 0x002C
-    capability = Enum("capability", 
+    capability = Enum("capability",
                       [('sense_speed', 0),
                        ('sense_count', 1),
                        ])
