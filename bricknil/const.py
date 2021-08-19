@@ -14,8 +14,8 @@
 
 """Useful constants for BrickNil
 """
-from enum import Enum
 import platform
+from enum import Enum
 
 if platform.system() == "Darwin":
     USE_BLEAK = False
@@ -64,5 +64,6 @@ DEVICES = {     0x0001:   'Motor',
                 0x003A:   'Powered Up Hub IMU Gyro',
                 0x003B:   'Powered Up Hub IMU Position',
                 0x003C:   'Powered Up Hub IMU Temperature',
+                0x0042:   'Debug', # There is a port with id 70 but is not currently known what this does (suspected to be debug port)
             }
 
