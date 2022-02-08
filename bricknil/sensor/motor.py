@@ -395,7 +395,7 @@ class CPlusMediumAngularMotor(TachoMotor):
 
     """
 
-    _sensor_id = 0x4C
+    _sensor_id = 0x4B
 
 class CPlusLargeAngularMotor(TachoMotor):
     """ Access the Technic Control Plus Large Angular motors
