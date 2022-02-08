@@ -291,7 +291,7 @@ class ExternalMotor(TachoMotor):
     """
 
     _sensor_id = 0x26
-                0x004C:   'Technic Control+ Angular Motor',
+
 
 class CPlusLargeMotor(TachoMotor):
     """ Access the Technic Control Plus Large motors
