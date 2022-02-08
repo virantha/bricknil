@@ -363,6 +363,74 @@ class CPlusXLMotor(TachoMotor):
     _sensor_id = 0x2F
 
 
+class CPlusMediumAngularMotor(TachoMotor):
+    """ Access the Technic Control Plus Medium Angular motors
+
+        These are similar to the :class:`InternalMotor` with build-in tachometer and
+        sensor for sending back the motor's current speed and position.  You
+        don't need to use the sensors, and can treat this as strictly an
+        output.
+
+        Examples::
+
+            # Basic connection to the motor on Port A
+            @attach(CPlusMediumAngularMotor, name='motor')
+
+            # Report back when motor speed changes. You must have a motor_change method defined 
+            @attach(CPlusMediumAngularMotor, name='motor', capabilities=['sense_speed'])
+
+            # Only report back when speed change exceeds 5 units, and position changes (degrees)
+            @attach(CPlusMediumAngularMotor, name='motor', capabilities=[('sense_speed', 5), 'sense_pos'])
+
+        And then within the run body::
+
+            await self.motor.set_speed(50)   # Setting the speed
+            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
+            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o'clock position
+            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position
+
+        See Also:
+            * :class:`TrainMotor` for connecting to a train motor
+            * :class:`InternalMotor` for connecting to the Boost hub built-in motors
+
+    """
+
+    _sensor_id = 0x4B
+
+class CPlusLargeAngularMotor(TachoMotor):
+    """ Access the Technic Control Plus Large Angular motors
+
+        These are similar to the :class:`InternalMotor` with build-in tachometer and
+        sensor for sending back the motor's current speed and position.  You
+        don't need to use the sensors, and can treat this as strictly an
+        output.
+
+        Examples::
+
+            # Basic connection to the motor on Port A
+            @attach(CPlusLargeAngularMotor, name='motor')
+
+            # Report back when motor speed changes. You must have a motor_change method defined 
+            @attach(CPlusLargeAngularMotor, name='motor', capabilities=['sense_speed'])
+
+            # Only report back when speed change exceeds 5 units, and position changes (degrees)
+            @attach(CPlusLargeAngularMotor, name='motor', capabilities=[('sense_speed', 5), 'sense_pos'])
+
+        And then within the run body::
+
+            await self.motor.set_speed(50)   # Setting the speed
+            await self.motor.ramp_speed(80, 2000)  # Ramp speed to 80 over 2 seconds
+            await self.motor.set_pos(90, speed=20) # Turn clockwise to 3 o'clock position
+            await self.motor.rotate(60, speed=-50) # Turn 60 degrees counter-clockwise from current position
+
+        See Also:
+            * :class:`TrainMotor` for connecting to a train motor
+            * :class:`InternalMotor` for connecting to the Boost hub built-in motors
+
+    """
+
+    _sensor_id = 0x4C
+
 class TrainMotor(Motor):
     """
         Connects to the train motors.
