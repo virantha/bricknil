@@ -64,5 +64,7 @@ DEVICES = {     0x0001:   'Motor',
                 0x003A:   'Powered Up Hub IMU Gyro',
                 0x003B:   'Powered Up Hub IMU Position',
                 0x003C:   'Powered Up Hub IMU Temperature',
+                0x004B:   'Technic Control+ Medium Angular Motor',
+                0x004C:   'Technic Control+ Large Angular Motor',
             }
 
